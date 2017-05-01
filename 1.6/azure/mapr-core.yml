@@ -9,14 +9,7 @@ config:
   hosts: []
 
   provider:
-    id: aws
-    config:
-       aws_region: AWS_REGION
-       stack_name: CF_STACK_NAME
-       count: NO_OF_MACHINES_IN_CLUSTER
-       disk_type: DISK_TYPE
-       disk_size: SIZE_IN_GB
-       disk_count: NO_IN_EACH_NODE
+    id: azure
 
   #DOC user id, must be present for every host defined above (required)
   ssh_id: SSH_USER
