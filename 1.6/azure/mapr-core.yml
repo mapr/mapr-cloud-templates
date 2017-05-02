@@ -6,7 +6,7 @@ environment:
 config:
   #DOC list of hosts we want to install packages on (required)
   #DOC installer host must be one of the hosts in this list
-  hosts: []
+  hosts: [HOSTS]
 
   provider:
     id: azure

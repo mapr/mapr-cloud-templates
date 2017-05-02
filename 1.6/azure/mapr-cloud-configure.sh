@@ -4,7 +4,7 @@ MEP=$1
 CLUSTER_NAME=$2
 CLUSTER_ADMIN_PASSWORD=$3
 
-STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/common/mapr_core.yml"
+STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 SERVICE_TEMPLATE="template-20-drill"
 STATUS="SUCCESS"
 
@@ -22,14 +22,18 @@ curl -k -I https://localhost:9443
 echo "Installer state: $?" > /tmp/mapr_installer_state
 
 input=$M_HOME/stanza_input.yml
+rm -f $input
 touch $input
 chown $M_USER:$M_USER $input
 
 echo "config.ssh_id=centos " >> $input
 # TODO: SWF: Need to handle using a keyfile if possible
-echo "ssh_key_file= " >> $input
-echo "config.mep_version=${MEP} " > $input
+echo "config.ssh_key_file= " >> $input
+echo "config.ssh_password=${CLUSTER_ADMIN_PASSWORD} " >> $input
+echo "config.mep_version=${MEP} " >> $input
 echo "config.cluster_name=${CLUSTER_NAME} " >> $input
+# TODO: SWF need to find the IPs based on subnet and installer's private IP
+echo "config.hosts=[28.1.8.4, 28.1.8.5] " >> $input
 
 CMD="cd $M_HOME; bin/mapr-installer-cli install -v -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
