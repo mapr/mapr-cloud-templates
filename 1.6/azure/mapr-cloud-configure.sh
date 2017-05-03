@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
 CLUSTER_ADMIN_PASSWORD=$3
@@ -26,14 +27,17 @@ rm -f $input
 touch $input
 chown $M_USER:$M_USER $input
 
+# TODO: get SSH user name
 echo "config.ssh_id=centos " >> $input
 # TODO: SWF: Need to handle using a keyfile if possible
 echo "config.ssh_key_file= " >> $input
-echo "config.ssh_password=${CLUSTER_ADMIN_PASSWORD} " >> $input
+# TODO: SWF: Pass in an admin user name and create a public/private key to access
+echo "config.ssh_id=centos " >> $input
+echo "config.ssh_password=UsingCloud4MapR " >> $input
 echo "config.mep_version=${MEP} " >> $input
 echo "config.cluster_name=${CLUSTER_NAME} " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
-echo "config.hosts=[28.1.8.4, 28.1.8.5] " >> $input
+echo "config.hosts=[\"28.1.8.4\", \"28.1.8.5\"] " >> $input
 
 CMD="cd $M_HOME; bin/mapr-installer-cli install -v -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
