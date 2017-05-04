@@ -77,7 +77,7 @@ echo "config.mep_version=${MEP} " >> $input
 echo "config.cluster_name=${CLUSTER_NAME} " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
 echo "config.hosts=$NODE_LIST " >> $input
-echo "config.services=
+echo "config.services=$SERVICE_TEMPLATE " >> $input
 
 CMD="cd $M_HOME; bin/mapr-installer-cli install -v -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
