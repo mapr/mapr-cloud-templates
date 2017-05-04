@@ -27,6 +27,7 @@ STATUS="SUCCESS"
 
 M_HOME=/opt/mapr/installer
 M_USER=mapr
+M_PASSWORD=mapr
 # TODO: Need to get the core version in here
 MAPR_CORE=5.2.1
 H=$(hostname -f)
@@ -82,7 +83,7 @@ echo "config.cluster_name=$CLUSTER_NAME " >> $input
 echo "config.hosts=$NODE_LIST " >> $input
 echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 
-CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
+CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $M_USER:$M_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
 sudo -u $M_USER bash -c "$CMD" || STATUS="FAILURE"
