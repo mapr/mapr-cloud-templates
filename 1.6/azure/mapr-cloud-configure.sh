@@ -7,14 +7,18 @@ CLUSTER_ADMIN_PASSWORD=$3
 THREE_DOT_SUBNET_PRIVATE=$4
 START_OCTET=$5
 NODE_COUNT=$6
+SERVICE_TEMPLATE=$7
+
+
 RESULT=""
 
 echo "MEP: ${MEP}"
-echo "CLUSTER_NAME: ${CLUSTER_NAME}"
+echo "CLUSTER_NAME: $CLUSTER_NAME"
 echo "CLUSTER_ADMIN_PASSWORD: <hidden>"
-echo "THREE_DOT_SUBNET_PRIVATE: ${THREE_DOT_SUBNET_PRIVATE}"
-echo "START_OCTET: ${START_OCTET}"
-echo "NODE_COUNT: ${NODE_COUNT}"
+echo "THREE_DOT_SUBNET_PRIVATE: $THREE_DOT_SUBNET_PRIVATE"
+echo "START_OCTET: $START_OCTET"
+echo "NODE_COUNT: $NODE_COUNT"
+echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 SERVICE_TEMPLATE="template-20-drill"
@@ -32,9 +36,7 @@ function create_node_list() {
     let last_node=current_node+$2-1
     local mapr_nodes="["
 
-    while true; do
-        [ $current_node -gt $last_node ] && break
-
+    while [ $current_node -le $last_node ]; do
         if [ $current_node -eq $last_node ]; then
             mapr_nodes="$mapr_nodes\"$3$current_node\"]"
         else
@@ -49,6 +51,7 @@ function create_node_list() {
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
+echo "NODE_LIST: $NODE_LIST"
 
 # TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
 #sed -i -e "s/REPLACE_THIS/$H/" $M_HOME/data/properties.json
@@ -74,6 +77,7 @@ echo "config.mep_version=${MEP} " >> $input
 echo "config.cluster_name=${CLUSTER_NAME} " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
 echo "config.hosts=$NODE_LIST " >> $input
+echo "config.services=
 
 CMD="cd $M_HOME; bin/mapr-installer-cli install -v -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
