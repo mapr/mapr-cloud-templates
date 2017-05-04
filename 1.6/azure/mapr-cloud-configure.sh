@@ -3,11 +3,12 @@
 # TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
-CLUSTER_ADMIN_PASSWORD=$3
-THREE_DOT_SUBNET_PRIVATE=$4
-START_OCTET=$5
-NODE_COUNT=$6
-SERVICE_TEMPLATE=$7
+CLUSTER_ADMIN_USER=$3
+CLUSTER_ADMIN_PASSWORD=$4
+THREE_DOT_SUBNET_PRIVATE=$5
+START_OCTET=$6
+NODE_COUNT=$7
+SERVICE_TEMPLATE=$8
 
 
 RESULT=""
@@ -53,6 +54,8 @@ create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
 echo "NODE_LIST: $NODE_LIST"
 
+. $M_HOME/build/installer/bin/activate
+
 # TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
 #sed -i -e "s/REPLACE_THIS/$H/" $M_HOME/data/properties.json
 service mapr-installer start
@@ -72,14 +75,14 @@ echo "config.ssh_id=centos " >> $input
 echo "config.ssh_key_file= " >> $input
 # TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=centos " >> $input
-echo "config.ssh_password=UsingCloud4MapR " >> $input
-echo "config.mep_version=${MEP} " >> $input
-echo "config.cluster_name=${CLUSTER_NAME} " >> $input
+echo "config.ssh_password=$CLUSTER_ADMIN_PASSWORD " >> $input
+echo "config.mep_version=$MEP " >> $input
+echo "config.cluster_name=$CLUSTER_NAME " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
 echo "config.hosts=$NODE_LIST " >> $input
 echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 
-CMD="cd $M_HOME; bin/mapr-installer-cli install -v -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
+CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
 sudo -u $M_USER bash -c "$CMD" || STATUS="FAILURE"
