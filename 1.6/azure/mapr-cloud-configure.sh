@@ -1,5 +1,29 @@
 #!/usr/bin/env bash
 
+msg_err() {
+    echo "\nERROR: $1"
+    exit 1
+}
+
+create_node_list() {
+    local current_node=$1
+    local last_node
+    let last_node=current_node+$2-1
+    local mapr_nodes="["
+
+    while [ $current_node -le $last_node ]; do
+        if [ $current_node -eq $last_node ]; then
+            mapr_nodes="$mapr_nodes\"$3$current_node\"]"
+        else
+            mapr_nodes="$mapr_nodes\"$3$current_node\", "
+        fi
+
+        let current_node=$current_node+1
+    done
+
+    RESULT=$mapr_nodes
+}
+
 # TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
@@ -28,26 +52,8 @@ MAPR_USER=mapr
 
 # TODO: Need to get the core version in here
 MAPR_CORE=5.2.1
-H=$(hostname -f)
+H=$(hostname -f) || msg_err "Could not run hostname"
 
-function create_node_list() {
-    local current_node=$1
-    local last_node
-    let last_node=current_node+$2-1
-    local mapr_nodes="["
-
-    while [ $current_node -le $last_node ]; do
-        if [ $current_node -eq $last_node ]; then
-            mapr_nodes="$mapr_nodes\"$3$current_node\"]"
-        else
-            mapr_nodes="$mapr_nodes\"$3$current_node\", "
-        fi
-
-        let current_node=$current_node+1
-    done
-
-    RESULT=$mapr_nodes
-}
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
@@ -57,16 +63,16 @@ echo "NODE_LIST: $NODE_LIST"
 
 # TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
 #sed -i -e "s/REPLACE_THIS/$H/" MAPR_HOME/data/properties.json
-service mapr-installer start
-sleep 10
-curl -k -I https://localhost:9443
+service mapr-installer start || msg_err "Could not start mapr-installer service"
+sleep 2
+curl -k -I https://localhost:9443 || msg_err "Could not run curl"
 
 echo "Installer state: $?" > /tmp/mapr_installer_state
 
 input=$MAPR_HOME/stanza_input.yml
 rm -f $input
 touch $input
-chown $MAPR_USER:$MAPR_USER $input
+chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
 
 # TODO: get SSH user name
 echo "config.ssh_id=centos " >> $input
@@ -84,4 +90,4 @@ echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
-sudo -u $MAPR_USER bash -c "$CMD" || STATUS="FAILURE"
+sudo -u $MAPR_USER bash -c "$CMD" || msg_err "Could not run installation"
