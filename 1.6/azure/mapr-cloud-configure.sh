@@ -24,6 +24,17 @@ create_node_list() {
     RESULT=$mapr_nodes
 }
 
+wait_for_connection() {
+    local retries=0
+    while [ $retries -le 30 ]; do
+        curl --silent -k -I $1 && return
+        let retries=$retries+1
+        sleep 2
+        echo "Retry: $retries"
+    done
+    msg_err "Connection to $1 was not able to be established"
+}
+
 # TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
@@ -64,8 +75,7 @@ echo "NODE_LIST: $NODE_LIST"
 # TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
 #sed -i -e "s/REPLACE_THIS/$H/" MAPR_HOME/data/properties.json
 service mapr-installer start || msg_err "Could not start mapr-installer service"
-sleep 2
-curl -k -I https://localhost:9443 || msg_err "Could not run curl"
+wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
 echo "Installer state: $?" > /tmp/mapr_installer_state
 
