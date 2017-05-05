@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 msg_err() {
-    echo "\nERROR: $1"
+    echo "ERROR: $1"
     exit 1
 }
 
@@ -26,10 +26,10 @@ create_node_list() {
 
 wait_for_connection() {
     local retries=0
-    while [ $retries -le 30 ]; do
+    while [ $retries -le 20 ]; do
+        sleep 2
         curl --silent -k -I $1 && return
         let retries=$retries+1
-        sleep 2
         echo "Retry: $retries"
     done
     msg_err "Connection to $1 was not able to be established"
