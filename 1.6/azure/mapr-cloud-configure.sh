@@ -3,18 +3,17 @@
 # TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
-CLUSTER_ADMIN_USER=$3
-CLUSTER_ADMIN_PASSWORD=$4
-THREE_DOT_SUBNET_PRIVATE=$5
-START_OCTET=$6
-NODE_COUNT=$7
-SERVICE_TEMPLATE=$8
+MAPR_PASSWORD=$3
+THREE_DOT_SUBNET_PRIVATE=$4
+START_OCTET=$5
+NODE_COUNT=$65
+SERVICE_TEMPLATE=$7
 
 RESULT=""
 
-echo "MEP: ${MEP}"
+echo "MEP: $MEP"
 echo "CLUSTER_NAME: $CLUSTER_NAME"
-echo "CLUSTER_ADMIN_PASSWORD: <hidden>"
+echo "MAPR_PASSWORD: <hidden>"
 echo "THREE_DOT_SUBNET_PRIVATE: $THREE_DOT_SUBNET_PRIVATE"
 echo "START_OCTET: $START_OCTET"
 echo "NODE_COUNT: $NODE_COUNT"
@@ -25,8 +24,8 @@ SERVICE_TEMPLATE="template-20-drill"
 STATUS="SUCCESS"
 
 M_HOME=/opt/mapr/installer
-M_USER=mapr
-M_PASSWORD=mapr
+MAPR_USER=mapr
+
 # TODO: Need to get the core version in here
 MAPR_CORE=5.2.1
 H=$(hostname -f)
@@ -74,15 +73,15 @@ echo "config.ssh_id=centos " >> $input
 # TODO: SWF: Need to handle using a keyfile if possible
 echo "config.ssh_key_file= " >> $input
 # TODO: SWF: Pass in an admin user name and create a public/private key to access
-echo "config.ssh_id=$CLUSTER_ADMIN_USER " >> $input
-echo "config.ssh_password=$CLUSTER_ADMIN_PASSWORD " >> $input
+echo "config.ssh_id=$MAPR_USER " >> $input
+echo "config.ssh_password=$MAPR_PASSWORD " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
 echo "config.hosts=$NODE_LIST " >> $input
 echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 
-CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $M_USER:$M_PASSWORD@localhost:9443 -o @$input"
+CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
 sudo -u $M_USER bash -c "$CMD" || STATUS="FAILURE"
