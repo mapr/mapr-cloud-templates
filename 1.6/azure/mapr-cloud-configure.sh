@@ -10,7 +10,6 @@ START_OCTET=$6
 NODE_COUNT=$7
 SERVICE_TEMPLATE=$8
 
-
 RESULT=""
 
 echo "MEP: ${MEP}"
@@ -75,7 +74,7 @@ echo "config.ssh_id=centos " >> $input
 # TODO: SWF: Need to handle using a keyfile if possible
 echo "config.ssh_key_file= " >> $input
 # TODO: SWF: Pass in an admin user name and create a public/private key to access
-echo "config.ssh_id=centos " >> $input
+echo "config.ssh_id=$CLUSTER_ADMIN_USER " >> $input
 echo "config.ssh_password=$CLUSTER_ADMIN_PASSWORD " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
@@ -87,8 +86,3 @@ CMD="cd $M_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $M_USER:
 echo $CMD > /tmp/cmd
 
 sudo -u $M_USER bash -c "$CMD" || STATUS="FAILURE"
-
-SERVICES=$(curl -s -k  "https://$M_USER:${CLUSTER_ADMIN_PASSWORD}@localhost:9443/api/services?name=mapr-webserver&version=$MAPR_CORE")
-
-
-
