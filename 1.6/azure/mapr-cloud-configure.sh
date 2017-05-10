@@ -100,4 +100,4 @@ echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
-sudo -u $MAPR_USER bash -c "$CMD" || msg_err "Could not run installation"
+#sudo -u $MAPR_USER bash -c "$CMD" || msg_err "Could not run installation"
