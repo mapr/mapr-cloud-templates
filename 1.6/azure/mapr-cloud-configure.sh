@@ -87,7 +87,6 @@ chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_U
 # TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input
-echo "config.ssh_key_file= " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
