@@ -61,7 +61,7 @@ STATUS="SUCCESS"
 MAPR_HOME=/opt/mapr/installer
 MAPR_USER=mapr
 # TODO: Need to get the core version in here. Might need to inspect this machine to see what packages are installed
-MAPR_CORE=5.2.0
+MAPR_CORE=5.2.1
 H=$(hostname -f) || msg_err "Could not run hostname"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
