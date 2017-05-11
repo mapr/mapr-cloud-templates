@@ -62,7 +62,7 @@ MAPR_HOME=/opt/mapr/installer
 MAPR_USER=mapr
 
 # TODO: Need to get the core version in here
-MAPR_CORE=5.2.0
+MAPR_CORE=5.2.1
 H=$(hostname -f) || msg_err "Could not run hostname"
 
 
@@ -84,8 +84,10 @@ rm -f $input
 touch $input
 chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
 
+# TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input
+echo "config.ssh_key_file= " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
 # TODO: SWF need to find the IPs based on subnet and installer's private IP
