@@ -62,7 +62,7 @@ MAPR_HOME=/opt/mapr/installer
 MAPR_USER=mapr
 
 # TODO: Need to get the core version in here
-MAPR_CORE=5.2.1
+MAPR_CORE=5.2.0
 H=$(hostname -f) || msg_err "Could not run hostname"
 
 
