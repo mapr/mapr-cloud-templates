@@ -60,11 +60,9 @@ STATUS="SUCCESS"
 
 MAPR_HOME=/opt/mapr/installer
 MAPR_USER=mapr
-
-# TODO: Need to get the core version in here
-MAPR_CORE=5.2.1
+# TODO: Need to get the core version in here. Might need to inspect this machine to see what packages are installed
+MAPR_CORE=5.2.0
 H=$(hostname -f) || msg_err "Could not run hostname"
-
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
@@ -84,6 +82,7 @@ rm -f $input
 touch $input
 chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
 
+echo "environment.mapr_core_version=$MAPR_CORE " >> $input
 # TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input

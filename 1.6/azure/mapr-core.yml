@@ -1,6 +1,6 @@
 environment:
  #DOC mapr core version (required, must be 5.1.0 and above)
- mapr_core_version: 5.2.1
+ mapr_core_version: CORE_VERSION
 
 #DOC attributes for /config api
 config:
