@@ -84,11 +84,6 @@ rm -f $input
 touch $input
 chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
 
-# TODO: get SSH user name
-echo "config.ssh_id=centos " >> $input
-# TODO: SWF: Need to handle using a keyfile if possible
-echo "config.ssh_key_file= " >> $input
-# TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input
 echo "config.mep_version=$MEP " >> $input
