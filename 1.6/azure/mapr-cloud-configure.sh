@@ -83,16 +83,18 @@ touch $input
 chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
 
 echo "environment.mapr_core_version=$MAPR_CORE " >> $input
-# TODO: SWF: Pass in an admin user name and create a public/private key to access
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
-# TODO: SWF need to find the IPs based on subnet and installer's private IP
 echo "config.hosts=$NODE_LIST " >> $input
 echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 
 CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
-sudo -u $MAPR_USER bash -c "$CMD" || msg_err "Could not run installation"
+RUN_RSLT=sudo -u $MAPR_USER bash -c "$CMD"
+rm -f $input
+if [ $RUN_RSLT -ne 0 ]; then
+    msg_err "Could not run installation"
+fi
