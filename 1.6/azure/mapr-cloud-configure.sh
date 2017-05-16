@@ -93,8 +93,9 @@ echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
 CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
-RUN_RSLT=sudo -u $MAPR_USER bash -c "$CMD"
+sudo -u $MAPR_USER bash -c "$CMD"
+RUN_RSLT=$?
 rm -f $input
 if [ $RUN_RSLT -ne 0 ]; then
-    msg_err "Could not run installation"
+    msg_err "Could not run installation: $RUN_RSLT"
 fi
