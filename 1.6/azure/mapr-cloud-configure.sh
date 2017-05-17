@@ -96,7 +96,7 @@ echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
 echo "config.hosts=$NODE_LIST " >> $input
 echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
-echo "config.provider.resource_group=$RESOURCE_GROUP " >> $input
+echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $input
 
 CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
