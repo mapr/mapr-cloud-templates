@@ -35,6 +35,11 @@ wait_for_connection() {
     msg_err "Connection to $1 was not able to be established"
 }
 
+if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
+    echo "MapR is already installed; Not running Stanza again."
+    exit 0
+fi
+
 # TODO: File should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
