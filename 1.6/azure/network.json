@@ -58,7 +58,7 @@
         ]
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('maprsgName'))]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
       ]
     }
   ]
