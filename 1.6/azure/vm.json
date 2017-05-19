@@ -27,7 +27,10 @@
       "type": "string"
     },
     "diskCount": {
-      "type": "string"
+      "type": "int"
+    },
+    "diskSize": {
+      "type": "int"
     },
     "mepVersion": {
       "type": "string"
@@ -42,7 +45,7 @@
       "type": "string"
     },
     "nodeCount": {
-      "type": "string"
+      "type": "int"
     },
     "serviceTemplate": {
       "type": "string"
