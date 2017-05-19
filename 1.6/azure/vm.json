@@ -245,5 +245,11 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "ateststring": {
+      "type": "string",
+      "value": "here is some tempalte text!!!!"
+    }
+  }
 }
