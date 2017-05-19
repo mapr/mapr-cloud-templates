@@ -61,6 +61,11 @@ echo "NODE_COUNT: $NODE_COUNT"
 echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 
+if [ $RESOURCE_GROUP == "" ]; then
+    echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
+    exit 0
+fi
+
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 SERVICE_TEMPLATE="template-20-drill"
 STATUS="SUCCESS"
@@ -69,7 +74,6 @@ MAPR_HOME=/opt/mapr/installer
 MAPR_USER=mapr
 # TODO: Need to get the core version in here. Might need to inspect this machine to see what packages are installed
 MAPR_CORE=5.2.1
-H=$(hostname -f) || msg_err "Could not run hostname"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
@@ -78,6 +82,7 @@ echo "NODE_LIST: $NODE_LIST"
 . $MAPR_HOME/build/installer/bin/activate
 
 # TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
+#H=$(hostname -f) || msg_err "Could not run hostname"
 #sed -i -e "s/REPLACE_THIS/$H/" MAPR_HOME/data/properties.json
 service mapr-installer start || msg_err "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
