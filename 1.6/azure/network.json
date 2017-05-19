@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "addressPrefixPublic": {
+      "type": "string"
+    },
+    "subnetNamePublic": {
+      "type": "string"
+    },
+    "subnetPrefixPublic": {
+      "type": "string"
+    },,
+    "subnetNamePrivate": {
+      "type": "string"
+    },
+    "subnetPrefixPrivate": {
+      "type": "string"
+    },
+    "maprsgName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "networkApiVersion": "2017-04-01"
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('addressPrefixPublic')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetNamePublic')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefixPublic')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('maprsgName'))]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('subnetNamePrivate')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefixPrivate')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('maprsgName'))]"
+      ]
+    }
+  ]
+}
