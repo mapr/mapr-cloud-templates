@@ -56,10 +56,7 @@
             }
           }
         ]
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
-      ]
+      }
     }
   ]
 }
