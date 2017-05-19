@@ -61,7 +61,7 @@ echo "NODE_COUNT: $NODE_COUNT"
 echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 
-if [ $RESOURCE_GROUP == "" ]; then
+if [ $RESOURCE_GROUP == "custom-configuration" ]; then
     echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
     exit 0
 fi
