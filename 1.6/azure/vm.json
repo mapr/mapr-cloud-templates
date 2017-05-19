@@ -49,11 +49,15 @@
     },
     "serviceTemplate": {
       "type": "string"
+    },
+    "subnetRefPrivate": {
+      "type": "string"
     }
   },
   "variables": {
     "computeApiVersion": "2017-03-30",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
+    "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -94,6 +98,34 @@
     }]
   },
   "resources": [
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('maprnicName'), copyIndex())]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "cluster": "[variables('nonDotClusterName')]"
+      },
+      "copy": {
+        "name": "nicopy",
+        "count": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[concat('ipconfig', add(copyIndex(), 1))]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), add(4, copyIndex()))]",
+              "subnet": {
+                "id": "[parameters('subnetRefPrivate')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
     {
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
