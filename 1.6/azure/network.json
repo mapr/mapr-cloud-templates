@@ -13,7 +13,7 @@
     },
     "subnetPrefixPublic": {
       "type": "string"
-    },,
+    },
     "subnetNamePrivate": {
       "type": "string"
     },
