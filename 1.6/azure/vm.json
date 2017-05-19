@@ -53,6 +53,7 @@
   },
   "variables": {
     "computeApiVersion": "2017-03-30",
+    "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -170,7 +171,7 @@
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "vmcopy",
-        "count": "[parameters('nodeCountSansInstaller')]"
+        "count": "[variables('nodeCountSansInstaller')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
