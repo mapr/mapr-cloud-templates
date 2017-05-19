@@ -234,7 +234,7 @@
               "storageAccountType": "[parameters('diskType')]"
             }
           },
-          "dataDisks": "[take(parameters('diskArray'), parameters('diskCount'))]"
+          "dataDisks": "[take(variables('diskArray'), parameters('diskCount'))]"
         },
         "networkProfile": {
           "networkInterfaces": [
