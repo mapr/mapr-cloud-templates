@@ -52,6 +52,9 @@
     },
     "subnetRefPrivate": {
       "type": "string"
+    },
+    "maprPassword": {
+      "type": "string"
     }
   },
   "variables": {
