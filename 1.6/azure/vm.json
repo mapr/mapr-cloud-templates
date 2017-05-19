@@ -132,7 +132,7 @@
       "name": "[concat(parameters('maprvmName'), '0')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), 'a0'))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
       ],
       "tags": {
         "Role": "MapR Cluster",
@@ -164,7 +164,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), 'b0'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
             }
           ]
         }
