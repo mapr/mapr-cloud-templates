@@ -9,7 +9,7 @@ config:
   hosts: [HOSTS]
 
   provider:
-    id: azure
+    id: AZURE
 
   #DOC user id, must be present for every host defined above (required)
   ssh_id: SSH_USER
