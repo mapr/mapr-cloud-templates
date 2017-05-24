@@ -9,7 +9,7 @@ config:
   hosts: []
 
   provider:
-    id: aws
+    id: AWS
     config:
        aws_region: AWS_REGION
        stack_name: CF_STACK_NAME
