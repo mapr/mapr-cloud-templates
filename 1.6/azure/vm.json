@@ -15,7 +15,7 @@
       "type": "string"
     },
     "adminPassword": {
-      "type": "string"
+      "type": "securestring"
     },
     "maprimageName": {
       "type": "string"
@@ -54,7 +54,7 @@
       "type": "string"
     },
     "maprPassword": {
-      "type": "string"
+      "type": "securestring"
     }
   },
   "variables": {
