@@ -9,10 +9,11 @@ config:
   hosts: []
 
   provider:
-    id: aws
+    id: AWS
     config:
        aws_region: AWS_REGION
-       stack_name: CF_STACK_NAME
+       auto_scaling_group: ASG_GROUP_NAME
+       key_name: AWS_KEY_NAME
        count: NO_OF_MACHINES_IN_CLUSTER
        disk_type: DISK_TYPE
        disk_size: SIZE_IN_GB
