@@ -62,7 +62,6 @@ echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
-SERVICE_TEMPLATE="template-20-drill"
 STATUS="SUCCESS"
 
 MAPR_HOME=/opt/mapr/installer
