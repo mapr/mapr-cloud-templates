@@ -61,11 +61,6 @@ echo "NODE_COUNT: $NODE_COUNT"
 echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 
-if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
-    echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
-    exit 0
-fi
-
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 SERVICE_TEMPLATE="template-20-drill"
 STATUS="SUCCESS"
@@ -89,6 +84,11 @@ wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
 echo "Installer state: $?" > /tmp/mapr_installer_state
 
+if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
+    echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
+    exit 0
+fi
+
 input=$MAPR_HOME/stanza_input.yml
 rm -f $input
 touch $input
@@ -97,6 +97,7 @@ chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_U
 echo "environment.mapr_core_version=$MAPR_CORE " >> $input
 echo "config.ssh_id=$MAPR_USER " >> $input
 echo "config.ssh_password=$MAPR_PASSWORD " >> $input
+#echo "config.ssh_key_file=/opt/mapr/installer/data/installer_key " >> $input
 echo "config.mep_version=$MEP " >> $input
 echo "config.cluster_name=$CLUSTER_NAME " >> $input
 echo "config.hosts=$NODE_LIST " >> $input
