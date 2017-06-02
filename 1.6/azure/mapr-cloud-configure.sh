@@ -17,11 +17,24 @@ create_node_list() {
         else
             mapr_nodes="$mapr_nodes\"$3$current_node\", "
         fi
-
         let current_node=$current_node+1
     done
 
-    RESULT=$mapr_nodes
+    RESULT=${mapr_nodes}
+}
+
+add_nodes_yaml() {
+    local current_node=$1
+    local last_node
+    let last_node=current_node+$2-1
+    local mapr_nodes=""
+
+    while [ $current_node -le $last_node ]; do
+        echo "    - $3$current_node" >> $4
+        let current_node=$current_node+1
+    done
+
+    RESULT="${mapr_nodes}"
 }
 
 wait_for_connection() {
@@ -65,9 +78,11 @@ STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1
 STATUS="SUCCESS"
 
 MAPR_HOME=/opt/mapr/installer
+# TODO: Need to pass this in too
 MAPR_USER=mapr
 # TODO: Need to get the core version in here. Might need to inspect this machine to see what packages are installed
 MAPR_CORE=5.2.1
+CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
@@ -83,32 +98,48 @@ wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
 echo "Installer state: $?" > /tmp/mapr_installer_state
 
+INPUT=$MAPR_HOME/stanza_input.yml
+rm -f $INPUT
+touch $INPUT
+chown $MAPR_USER:$MAPR_USER $INPUT || msg_err "Could not change owner to $MAPR_USER"
+
 if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
+    create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
+    NODE_LIST=$RESULT
+    cat >> $INPUT << EOM
+config:
+  ssh_id: $MAPR_USER
+  cluster_name: $CLUSTER_NAME
+  mep_version: $MEP
+  provider:
+    id: AZURE
+    config:
+      resource_group: $RESOURCE_GROUP
+  hosts:
+EOM
+    add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
+
+    CMD="$CLI import --no_check_certificate --config -t $INPUT"
     echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
-    exit 0
+else
+    echo "environment.mapr_core_version=$MAPR_CORE " >> $INPUT
+    echo "config.ssh_id=$MAPR_USER " >> $INPUT
+    echo "config.ssh_password=$MAPR_PASSWORD " >> $INPUT
+    #echo "config.ssh_key_file=/opt/mapr/installer/data/installer_key " >> $INPUT
+    echo "config.mep_version=$MEP " >> $INPUT
+    echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
+    echo "config.hosts=$NODE_LIST " >> $INPUT
+    echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
+    echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
+    CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
+    echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
 
-input=$MAPR_HOME/stanza_input.yml
-rm -f $input
-touch $input
-chown $MAPR_USER:$MAPR_USER $input || msg_err "Could not change owner to $MAPR_USER"
-
-echo "environment.mapr_core_version=$MAPR_CORE " >> $input
-echo "config.ssh_id=$MAPR_USER " >> $input
-echo "config.ssh_password=$MAPR_PASSWORD " >> $input
-#echo "config.ssh_key_file=/opt/mapr/installer/data/installer_key " >> $input
-echo "config.mep_version=$MEP " >> $input
-echo "config.cluster_name=$CLUSTER_NAME " >> $input
-echo "config.hosts=$NODE_LIST " >> $input
-echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $input
-echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $input
-
-CMD="cd $MAPR_HOME; bin/mapr-installer-cli install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$input"
 echo $CMD > /tmp/cmd
 
 sudo -u $MAPR_USER bash -c "$CMD"
 RUN_RSLT=$?
-rm -f $input
+rm -f $INPUT
 if [ $RUN_RSLT -ne 0 ]; then
     msg_err "Could not run installation: $RUN_RSLT"
 fi
