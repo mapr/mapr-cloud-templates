@@ -107,6 +107,8 @@ if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
     create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
     NODE_LIST=$RESULT
     cat >> $INPUT << EOM
+environment:
+  mapr_core_version: $MAPR_CORE
 config:
   ssh_id: $MAPR_USER
   cluster_name: $CLUSTER_NAME
