@@ -108,6 +108,7 @@
       "name": "[concat(parameters('maprnicName'), copyIndex())]",
       "location": "[resourceGroup().location]",
       "tags": {
+        "role": "MapR Cluster",
         "cluster": "[variables('nonDotClusterName')]"
       },
       "copy": {

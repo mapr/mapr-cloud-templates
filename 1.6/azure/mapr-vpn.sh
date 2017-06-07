@@ -10,8 +10,6 @@ echo "OPENVPN PASSWORD: <hidden>"
 echo "OPENVPN SUBNET: $subnet"
 echo "OPENVPN LISTEN FQDN: $listen_fqdn"
 
-service --status-all
-
 # if OpenVPN is already installed don't do it again
 service --status-all 2>&1 | grep openvpnas > /dev/null
 if [ $? -eq 0 ]; then
@@ -35,7 +33,4 @@ if [ $last_exit -ne 0 ]; then
     exit $last_exit
 fi
 echo "OpenVPN successfully configured"
-
-service --status-all
-
 echo "OpenVPN setup complete"
