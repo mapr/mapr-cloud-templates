@@ -18,21 +18,24 @@ if ( $? -eq 0 ]; then
     echo "OpenVPN is already installed so it will not be reinstalled"
     exit 0
 fi
+echo "OpenVPN is not installed; installing ..."
 
 ./install_openvpn_access_server.sh $admin_pw
 last_exit=$?
 if [ $last_exit -ne 0 ]; then
-    >&2 echo "Error from install_openvpn_access_server: $last_exit"
+    >&2 echo "OpenVPN Error from install_openvpn_access_server: $last_exit"
     exit $last_exit
 fi
+echo "OpenVPN successfully installed"
 
 ./mapr-vpn-configure.sh $admin_user $admin_pw $subnet $listen_fqdn
 last_exit=$?
 if [ $last_exit -ne 0 ]; then
-    >&2 echo "Error from mapr-vpn-configure: $last_exit"
+    >&2 echo "OpenVPN Error from mapr-vpn-configure: $last_exit"
     exit $last_exit
 fi
+echo "OpenVPN successfully configured"
 
 service --status-all
 
-echo "VPN setup sucessfully"
+echo "OpenVPN setup complete"
