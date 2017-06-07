@@ -6,6 +6,7 @@ subnet=$3
 listen_ip=$4
 
 echo "OPENVPN USER: $1"
+echo "OPENVPN PASSWORD: <hidden>"
 echo "OPENVPN SUBNET: $3"
 echo "OPENVPN LISTENIP: $4"
 
