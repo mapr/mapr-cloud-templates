@@ -14,7 +14,7 @@ service --status-all
 
 # if OpenVPN is already installed don't do it again
 service --status-all 2>&1 | grep openvpnas > /dev/null
-if ( $? -eq 0 ]; then
+if [ $? -eq 0 ]; then
     echo "OpenVPN is already installed so it will not be reinstalled"
     exit 0
 fi
