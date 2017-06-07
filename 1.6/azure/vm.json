@@ -139,8 +139,9 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
       ],
       "tags": {
-        "Role": "MapR Cluster",
-        "SubRole": "Installer and Server Node"
+        "role": "MapR Cluster",
+        "subRole": "Installer and Server Node",
+        "cluster": "[variables('nonDotClusterName')]"
       },
       "properties": {
         "hardwareProfile": {
@@ -182,7 +183,8 @@
           "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), '0')]"
         ],
         "tags": {
-          "displayName": "mapr-installer"
+          "displayName": "mapr-installer",
+          "cluster": "[variables('nonDotClusterName')]"
         },
         "properties": {
           "publisher": "Microsoft.Azure.Extensions",
@@ -213,8 +215,9 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
       ],
       "tags": {
-        "Role": "MapR Cluster",
-        "SubRole": "Server Node"
+        "role": "MapR Cluster",
+        "subRole": "Server Node",
+        "cluster": "[variables('nonDotClusterName')]"
       },
       "properties": {
         "hardwareProfile": {
