@@ -77,6 +77,8 @@ echo "NODE_COUNT: $NODE_COUNT"
 echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
+echo "MAPR_CORE: $MAPR_CORE"
+echo "MAPR_USER: $MAPR_USER"
 
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
