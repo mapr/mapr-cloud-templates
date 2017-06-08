@@ -62,6 +62,7 @@
     "networkApiVersion": "2017-04-01",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
+    "adminAuthType": "password",
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -198,7 +199,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('maprPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name)]"
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('maprPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', variables('adminAuthType'))]"
           }
         }
       }]
