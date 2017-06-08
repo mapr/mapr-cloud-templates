@@ -53,7 +53,7 @@ if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
     exit 0
 fi
 
-# TODO: File should go away and logic should be put in mapr-setup
+# TODO: This file should go away and logic should be put in mapr-setup
 MEP=$1
 CLUSTER_NAME=$2
 MAPR_PASSWORD=$3
@@ -63,6 +63,8 @@ NODE_COUNT=$6
 SERVICE_TEMPLATE=$7
 RESOURCE_GROUP=$8
 ADMIN_AUTH_TYPE=$9
+MAPR_CORE=$10
+MAPR_USER=$11
 
 RESULT=""
 
@@ -80,10 +82,6 @@ STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1
 STATUS="SUCCESS"
 
 MAPR_HOME=/opt/mapr/installer
-# TODO: Need to pass this in too
-MAPR_USER=mapr
-# TODO: Need to get the core version in here. Might need to inspect this machine to see what packages are installed
-MAPR_CORE=5.2.1
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
