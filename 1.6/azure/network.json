@@ -23,6 +23,9 @@
     "publicAccessCIDR": {
       "type": "string"
     },
+    "clusterName": {
+      "type": "string"
+    },
     "maprsgName": {
       "type": "string"
     }
@@ -37,7 +40,8 @@
       "name": "[parameters('maprsgName')]",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "MapR Security Group"
+        "displayName": "MapR Security Group",
+        "cluster": "[parameters('clusterName')]"
       },
       "properties": {
         "securityRules": [
@@ -106,6 +110,10 @@
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "MapR Virtual Network",
+        "cluster": "[parameters('clusterName')]"
+      },
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
       ],

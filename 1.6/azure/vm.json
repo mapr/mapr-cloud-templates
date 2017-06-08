@@ -110,7 +110,7 @@
       "location": "[resourceGroup().location]",
       "tags": {
         "role": "MapR Cluster",
-        "cluster": "[variables('nonDotClusterName')]"
+        "cluster": "[parameters('clusterName')]"
       },
       "copy": {
         "name": "nicopy",
@@ -143,7 +143,7 @@
       "tags": {
         "role": "MapR Cluster",
         "subRole": "Installer and Server Node",
-        "cluster": "[variables('nonDotClusterName')]"
+        "cluster": "[parameters('clusterName')]"
       },
       "properties": {
         "hardwareProfile": {
@@ -186,7 +186,7 @@
         ],
         "tags": {
           "displayName": "mapr-installer",
-          "cluster": "[variables('nonDotClusterName')]"
+          "cluster": "[parameters('clusterName')]"
         },
         "properties": {
           "publisher": "Microsoft.Azure.Extensions",
@@ -219,7 +219,7 @@
       "tags": {
         "role": "MapR Cluster",
         "subRole": "Server Node",
-        "cluster": "[variables('nonDotClusterName')]"
+        "cluster": "[parameters('clusterName')]"
       },
       "properties": {
         "hardwareProfile": {
