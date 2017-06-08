@@ -136,7 +136,7 @@ else
     echo "config.hosts=$NODE_LIST " >> $INPUT
     echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
-    echo "config.provider.config.admin_auth_type=$$ADMIN_AUTH_TYPE " >> $INPUT
+    echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
