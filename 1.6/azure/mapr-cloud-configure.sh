@@ -62,6 +62,7 @@ START_OCTET=$5
 NODE_COUNT=$6
 SERVICE_TEMPLATE=$7
 RESOURCE_GROUP=$8
+ADMIN_AUTH_TYPE=$9
 
 RESULT=""
 
@@ -73,6 +74,7 @@ echo "START_OCTET: $START_OCTET"
 echo "NODE_COUNT: $NODE_COUNT"
 echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
+echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
 
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
@@ -117,6 +119,7 @@ config:
     id: AZURE
     config:
       resource_group: $RESOURCE_GROUP
+      admin_auth_type: $ADMIN_AUTH_TYPE
   hosts:
 EOM
     add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
@@ -133,6 +136,7 @@ else
     echo "config.hosts=$NODE_LIST " >> $INPUT
     echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
+    echo "config.provider.config.admin_auth_type=$$ADMIN_AUTH_TYPE " >> $INPUT
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
