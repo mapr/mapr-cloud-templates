@@ -120,6 +120,11 @@ config:
     config:
       resource_group: $RESOURCE_GROUP
       admin_auth_type: $ADMIN_AUTH_TYPE
+      subscription_id: <subscription_id>
+      tenant_id: <tenant_id>
+      client_id: <client_id>
+    encryptedConfig:
+      secret: <secret>
   hosts:
 EOM
     add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
@@ -137,6 +142,10 @@ else
     echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
     echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
+    echo "config.provider.config.subscription_id=<subscription_id> " >> $INPUT
+    echo "config.provider.config.tenant_id=<tenant_id> " >> $INPUT
+    echo "config.provider.config.client_id=<client_id> " >> $INPUT
+    echo "config.provider.encryptedConfig.secret=<secret> " >> $INPUT
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
