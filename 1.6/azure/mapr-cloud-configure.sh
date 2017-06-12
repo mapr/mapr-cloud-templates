@@ -65,6 +65,8 @@ RESOURCE_GROUP=$8
 ADMIN_AUTH_TYPE=$9
 MAPR_CORE=${10}
 MAPR_USER=${11}
+SUBSCRIPTION_ID=${12}
+TENANT_ID=${13}
 
 RESULT=""
 
@@ -79,6 +81,8 @@ echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
 echo "MAPR_CORE: $MAPR_CORE"
 echo "MAPR_USER: $MAPR_USER"
+echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
+echo "TENANT_ID: $TENANT_ID"
 
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
@@ -120,8 +124,8 @@ config:
     config:
       resource_group: $RESOURCE_GROUP
       admin_auth_type: $ADMIN_AUTH_TYPE
-      subscription_id: <subscription_id>
-      tenant_id: <tenant_id>
+      subscription_id: $SUBSCRIPTION_ID
+      tenant_id: $TENANT_ID
       client_id: <client_id>
     encryptedConfig:
       secret: <secret>
@@ -142,8 +146,8 @@ else
     echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
     echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
-    echo "config.provider.config.subscription_id=<subscription_id> " >> $INPUT
-    echo "config.provider.config.tenant_id=<tenant_id> " >> $INPUT
+    echo "config.provider.config.subscription_id=$SUBSCRIPTION_ID " >> $INPUT
+    echo "config.provider.config.tenant_id=$TENANT_ID " >> $INPUT
     echo "config.provider.config.client_id=<client_id> " >> $INPUT
     echo "config.provider.encryptedConfig.secret=<secret> " >> $INPUT
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
