@@ -32,6 +32,7 @@
   },
   "variables": {
     "computeApiVersion": "2017-03-30",
+    "networkApiVersion": "2017-04-01",
 
     "publicIPAddressType": "Dynamic",
     "dnsLabelPrefix": "[concat(variables('nonDotClusterName'), '-', uniqueString(resourceGroup().id, deployment().name))]",
