@@ -41,7 +41,7 @@
     "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
     "openvpnvmName": "[concat(variables('nonDotClusterName'), '-openvpn-vm')]",
     "openvpnvmSize": "Standard_DS1_v2",
-    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]",
+    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]"
   },
   "resources": [
     {
