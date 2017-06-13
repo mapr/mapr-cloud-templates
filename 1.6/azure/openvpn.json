@@ -17,9 +17,6 @@
     "fourDotSubnetPublic": {
       "type": "string"
     },
-    "maprNetworkTemplate": {
-      "type": "string"
-    },
     "threeDotSubnetPublic": {
       "type": "string"
     },
@@ -67,8 +64,7 @@
         "cluster": "[parameters('clusterName')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]",
-        "[concat('Microsoft.Resources/deployments/', parameters('maprNetworkTemplate'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]"
       ],
       "properties": {
         "ipConfigurations": [
