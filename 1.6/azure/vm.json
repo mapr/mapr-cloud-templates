@@ -11,6 +11,9 @@
     "instanceType": {
       "type": "string"
     },
+    "adminAuthType": {
+      "type": "string"
+    },
     "adminUsername": {
       "type": "string"
     },
@@ -53,7 +56,7 @@
     "subnetRefPrivate": {
       "type": "string"
     },
-    "maprPassword": {
+    "clusterAdminPassword": {
       "type": "securestring"
     }
   },
@@ -65,7 +68,12 @@
     "networkApiVersion": "2017-04-01",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
-    "adminAuthType": "password",
+
+    "osProfile_password": {
+      "computerName": "[concat(parameters('maprvmName'), '0')]",
+      "adminUsername": "[parameters('adminUsername')]",
+      "adminPassword": "[parameters('adminPassword')]"
+    },
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -152,11 +160,8 @@
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
-        "osProfile": {
-          "computerName": "[concat(parameters('maprvmName'), '0')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
+        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
+
         "storageProfile": {
           "imageReference": {
             "id": "[parameters('maprimageName')]"
@@ -202,7 +207,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('maprPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', variables('adminAuthType'), ' ', variables('maprCore'), ' ', variables('maprUser'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', variables('adminAuthType'), ' ', variables('maprCore'), ' ', variables('maprUser'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
           }
         }
       }]

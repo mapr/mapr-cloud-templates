@@ -109,6 +109,8 @@ rm -f $INPUT
 touch $INPUT
 chown $MAPR_USER:$MAPR_USER $INPUT || msg_err "Could not change owner to $MAPR_USER"
 
+echo "$MAPR_USER:$MAPR_PASSWORD" | chpasswd
+
 if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
     create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
     NODE_LIST=$RESULT
