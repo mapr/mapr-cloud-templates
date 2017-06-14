@@ -138,15 +138,17 @@ else
     echo "environment.mapr_core_version=$MAPR_CORE " >> $INPUT
     echo "config.ssh_id=$MAPR_USER " >> $INPUT
     echo "config.ssh_password=$MAPR_PASSWORD " >> $INPUT
-    #echo "config.ssh_key_file=/opt/mapr/installer/data/installer_key " >> $INPUT
     echo "config.mep_version=$MEP " >> $INPUT
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
     echo "config.hosts=$NODE_LIST " >> $INPUT
-    echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
     echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
     echo "config.provider.config.subscription_id=$SUBSCRIPTION_ID " >> $INPUT
     echo "config.provider.config.tenant_id=$TENANT_ID " >> $INPUT
+    if [ "$SERVICE_TEMPLATE" != "none" ]; then
+        echo "config.services={\"${SERVICE_TEMPLATE}\":{}} " >> $INPUT
+    fi
+
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
