@@ -263,8 +263,8 @@
     }
   ],
   "outputs": {
-    "MaprInstallerIp": {
-      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion')).value.ipConfigurations[0].properties.privateIPAddress",
+    "MaprInstallerNic": {
+      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion'))]",
       "type": "object"
     }
   }
