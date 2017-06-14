@@ -268,7 +268,7 @@
       "type": "object"
     },
     "MaprInstallerUrl": {
-      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion))]",
+      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion'))]",
       "type": "object"
     }
   }
