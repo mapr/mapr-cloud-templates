@@ -58,7 +58,7 @@
     },
     "clusterAdminPassword": {
       "type": "securestring"
-    }
+    },
   },
   "variables": {
     "maprCore": "5.2.1",
@@ -263,9 +263,13 @@
     }
   ],
   "outputs": {
-    "ateststring": {
-      "type": "string",
-      "value": "here is some tempalte text!!!!"
+    "MaprInstallerIp": {
+      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', [concat(parameters('maprnicName'), '0')], variables('networkApiVersion'))]",
+      "type": "object"
+    },
+    "MaprInstallerUrl": {
+      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', [concat(parameters('maprnicName'), '0')], variables('networkApiVersion))]",
+      "type": "object"
     }
   }
 }
