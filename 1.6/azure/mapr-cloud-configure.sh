@@ -27,13 +27,13 @@ find_installed_core_version() {
 compare_versions() {
     if [ "$1" = "$2" ] ; then
         echo "Versions match: $1 = $2"
-        RESULT=$1
+        RESULT="$1"
     elif [ "$1" \> "$2" ] ; then
-        echo "ERROR version $1 is greater than version $2"
-        RESULT=$1
+        echo "ERROR version '$1' is greater than version '$2'"
+        RESULT="$1"
     else
-        echo "ERROR version $1 is less than version $2"
-        RESULT=$2
+        echo "ERROR version '$1' is less than version '$2'"
+        RESULT="$2"
     fi
 }
 
@@ -52,7 +52,62 @@ create_node_list() {
         let current_node=$current_node+1
     done
 
-    RESULT=${mapr_nodes}
+    RESULT="$mapr_nodes"
+}
+
+mapr_user_properties_json() {
+    local KEY=cluster_admin_id
+
+    if [ ! -f "$1" ]; then
+        echo "ERROR: $1 file not found"
+        RESULT=""
+        return
+    fi
+
+    grep -Po '"cluster_admin_id":.*?[^\\]",' $1 > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Could not find cluster_admin_id in $1"
+        RESULT=""
+        return
+    fi
+
+    RESULT="$(sed -n 's/.*"cluster_admin_id": "\(.*\)",/\1/p' $1)"
+}
+
+mapr_owner_properties_json() {
+    local output=$(ls -l $1)
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Could not ls $1: $output"
+        RESULT=""
+        return
+    fi
+
+    output=$(echo $output | awk 'NR==1 {print $3}')
+    RESULT="$output"
+}
+
+compare_users() {
+    if [ "$1" = "$2" ] ; then
+        echo "Users match: '$1' = '$2'"
+    else
+        echo "ERROR: user '$1' does not match user '$2'"
+    fi
+
+    id -u $1 > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "User '$1' exists"
+        RESULT="$1"
+        return
+    fi
+    id -u $2 > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "User '$2' exists"
+        RESULT="$2"
+        return
+    fi
+
+    echo "FATAL: Could not find User '$1' or '$2' is in the list of OS users"
+    exit 1
 }
 
 add_nodes_yaml() {
@@ -66,7 +121,7 @@ add_nodes_yaml() {
         let current_node=$current_node+1
     done
 
-    RESULT="${mapr_nodes}"
+    RESULT="$mapr_nodes"
 }
 
 wait_for_connection() {
@@ -89,6 +144,8 @@ fi
 RESULT=""
 INTERNAL="mapr-core-internal-"
 MAPR="/opt/mapr"
+MAPR_HOME="$MAPR/installer"
+PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
 
 MEP=$1
 CLUSTER_NAME=$2
@@ -99,10 +156,23 @@ NODE_COUNT=$6
 SERVICE_TEMPLATE=$7
 RESOURCE_GROUP=$8
 ADMIN_AUTH_TYPE=$9
-MAPR_USER=${10}
-SUBSCRIPTION_ID=${11}
-TENANT_ID=${12}
+SUBSCRIPTION_ID=${10}
+TENANT_ID=${11}
 
+
+
+
+mapr_user_properties_json $PROPERTIES_JSON
+echo "MapR user from properties file is: '$RESULT'"
+MAPR_USER_PROPERTIES=$RESULT
+
+mapr_owner_properties_json $PROPERTIES_JSON
+echo "MapR user from file owner is: '$RESULT'"
+MAPR_PROPERTIES_OWNER=$RESULT
+
+compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
+echo "MapR user is: $RESULT"
+MAPR_USER=$RESULT
 
 
 
@@ -122,17 +192,16 @@ else
 fi
 
 find_installed_core_version $BUILD_FILE_VERSION
-echo "$RESULT"
+echo "Build file version: '$RESULT'"
 BUILD_FILE_VERSION=$RESULT
 
 find_installed_core_version $RPM_VERSION
-echo "$RESULT"
+echo "RPM version: '$RESULT'"
 RPM_VERSION=$RESULT
 
 compare_versions $BUILD_FILE_VERSION $RPM_VERSION
-echo "Final MapR Core version: $RESULT"
+echo "Final MapR Core version: '$RESULT'"
 MAPR_CORE=$RESULT
-
 
 
 
@@ -153,7 +222,6 @@ echo "TENANT_ID: $TENANT_ID"
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
 
-MAPR_HOME="$MAPR/installer"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
