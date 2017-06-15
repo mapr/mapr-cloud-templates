@@ -146,6 +146,11 @@ INTERNAL="mapr-core-internal-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
+# TODO: SWF, should this url be passed in?
+STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
+STATUS="SUCCESS"
+CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
+
 
 MEP=$1
 CLUSTER_NAME=$2
@@ -159,9 +164,6 @@ ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
 
-
-
-
 mapr_user_properties_json $PROPERTIES_JSON
 echo "MapR user from properties file is: '$RESULT'"
 MAPR_USER_PROPERTIES=$RESULT
@@ -173,9 +175,6 @@ MAPR_PROPERTIES_OWNER=$RESULT
 compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
 echo "MapR user is: $RESULT"
 MAPR_USER=$RESULT
-
-
-
 
 BUILD_FILE_VERSION=$(cat $MAPR/MapRBuildVersion)
 if [ $? -ne 0 ]; then
@@ -203,8 +202,6 @@ compare_versions $BUILD_FILE_VERSION $RPM_VERSION
 echo "Final MapR Core version: '$RESULT'"
 MAPR_CORE=$RESULT
 
-
-
 echo "MEP: $MEP"
 echo "CLUSTER_NAME: $CLUSTER_NAME"
 echo "MAPR_PASSWORD: <hidden>"
@@ -218,11 +215,6 @@ echo "MAPR_CORE: $MAPR_CORE"
 echo "MAPR_USER: $MAPR_USER"
 echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 echo "TENANT_ID: $TENANT_ID"
-
-STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
-STATUS="SUCCESS"
-
-CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
