@@ -61,7 +61,6 @@
     },
   },
   "variables": {
-    "maprCore": "5.2.1",
     "maprUser": "mapr",
 
     "computeApiVersion": "2017-03-30",
@@ -207,7 +206,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', variables('maprCore'), ' ', variables('maprUser'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', variables('maprUser'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
           }
         }
       }]

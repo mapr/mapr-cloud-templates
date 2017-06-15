@@ -5,6 +5,38 @@ msg_err() {
     exit 1
 }
 
+find_installed_core_version() {
+    if [ -z $1 ]; then
+        RESULT=""
+        return
+    fi
+
+    local ver=$1
+    local mapr_major_version=${ver%%.*}
+    ver=${ver#*.}
+
+    local mapr_minor_version=${ver%%.*}
+    ver=${ver#*.}
+
+    local mapr_triple_version=${ver%%.*}
+    local mapr_version="${mapr_major_version}.${mapr_minor_version}.${mapr_triple_version}"
+
+    RESULT="$mapr_version"
+}
+
+compare_versions() {
+    if [ "$1" = "$2" ] ; then
+        echo "Versions match: $1 = $2"
+        RESULT=$1
+    elif [ "$1" \> "$2" ] ; then
+        echo "ERROR version $1 is greater than version $2"
+        RESULT=$1
+    else
+        echo "ERROR version $1 is less than version $2"
+        RESULT=$2
+    fi
+}
+
 create_node_list() {
     local current_node=$1
     local last_node
@@ -54,6 +86,10 @@ if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
 fi
 
 # TODO: This file should go away and logic should be put in mapr-setup
+RESULT=""
+INTERNAL="mapr-core-internal-"
+MAPR="/opt/mapr"
+
 MEP=$1
 CLUSTER_NAME=$2
 MAPR_PASSWORD=$3
@@ -63,12 +99,42 @@ NODE_COUNT=$6
 SERVICE_TEMPLATE=$7
 RESOURCE_GROUP=$8
 ADMIN_AUTH_TYPE=$9
-MAPR_CORE=${10}
-MAPR_USER=${11}
-SUBSCRIPTION_ID=${12}
-TENANT_ID=${13}
+MAPR_USER=${10}
+SUBSCRIPTION_ID=${11}
+TENANT_ID=${12}
 
-RESULT=""
+
+
+
+
+BUILD_FILE_VERSION=$(cat $MAPR/MapRBuildVersion)
+if [ $? -ne 0 ]; then
+    echo "ERROR: Could not find $MAPR/MapRBuildVersion"
+    BUILD_FILE_VERSION=""
+fi
+
+RPM_VERSION=$(rpm -qa | grep $INTERNAL)
+if [ $? -ne 0 ]; then
+    echo "ERROR: Could not find rpm starting with $INTERNAL"
+    RPM_VERSION=""
+else
+    RPM_VERSION="${RPM_VERSION/$INTERNAL/}"
+fi
+
+find_installed_core_version $BUILD_FILE_VERSION
+echo "$RESULT"
+BUILD_FILE_VERSION=$RESULT
+
+find_installed_core_version $RPM_VERSION
+echo "$RESULT"
+RPM_VERSION=$RESULT
+
+compare_versions $BUILD_FILE_VERSION $RPM_VERSION
+echo "Final MapR Core version: $RESULT"
+MAPR_CORE=$RESULT
+
+
+
 
 echo "MEP: $MEP"
 echo "CLUSTER_NAME: $CLUSTER_NAME"
@@ -87,7 +153,7 @@ echo "TENANT_ID: $TENANT_ID"
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
 
-MAPR_HOME=/opt/mapr/installer
+MAPR_HOME="$MAPR/installer"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
