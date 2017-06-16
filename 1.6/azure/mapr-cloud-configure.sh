@@ -109,17 +109,8 @@ ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
 
-
-
-MAPR_USER="foo"
-echo "before $MAPR_USER"
-echo "before $MAPR_PASSWORD"
-
+# Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
-echo "after $MAPR_USER"
-echo "after $MAPR_PASSWORD"
-
-
 
 BUILD_FILE_VERSION=$(cat $MAPR/MapRBuildVersion)
 if [ $? -ne 0 ]; then
@@ -167,9 +158,6 @@ echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
-# TODO: SWF: I don't see REPLACE_THIS in properties.json anymore. Not needed?
-#H=$(hostname -f) || msg_err "Could not run hostname"
-#sed -i -e "s/REPLACE_THIS/$H/" MAPR_HOME/data/properties.json
 service mapr-installer start || msg_err "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
