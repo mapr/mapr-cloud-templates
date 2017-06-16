@@ -111,16 +111,13 @@ TENANT_ID=${11}
 
 
 
-
-
 MAPR_USER="foo"
 echo "before $MAPR_USER"
+echo "before $MAPR_PASSWORD"
 
-. ./mapr-init.sh apassword
+. ./mapr-init.sh $MAPR_PASSWORD
 echo "after $MAPR_USER"
 echo "after $MAPR_PASSWORD"
-
-
 
 
 
