@@ -131,14 +131,14 @@
       },
       "resources": [{
         "apiVersion": "[variables('computeApiVersion')]",
-        "name": "run-configure",
+        "name": "openvpn-configure",
         "type": "extensions",
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Compute/virtualMachines/', variables('openvpnvmName'))]"
         ],
         "tags": {
-          "displayName": "openvpn-installer",
+          "displayName": "openvpn-configure",
           "cluster": "[parameters('clusterName')]"
         },
         "properties": {

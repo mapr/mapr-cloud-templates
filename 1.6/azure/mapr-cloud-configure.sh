@@ -55,61 +55,6 @@ create_node_list() {
     RESULT="$mapr_nodes"
 }
 
-mapr_user_properties_json() {
-    local KEY=cluster_admin_id
-
-    if [ ! -f "$1" ]; then
-        echo "ERROR: $1 file not found"
-        RESULT=""
-        return
-    fi
-
-    grep -Po '"cluster_admin_id":.*?[^\\]",' $1 > /dev/null
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Could not find cluster_admin_id in $1"
-        RESULT=""
-        return
-    fi
-
-    RESULT="$(sed -n 's/.*"cluster_admin_id": "\(.*\)",/\1/p' $1)"
-}
-
-mapr_owner_properties_json() {
-    local output=$(ls -l $1)
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Could not ls $1: $output"
-        RESULT=""
-        return
-    fi
-
-    output=$(echo $output | awk 'NR==1 {print $3}')
-    RESULT="$output"
-}
-
-compare_users() {
-    if [ "$1" = "$2" ] ; then
-        echo "Users match: '$1' = '$2'"
-    else
-        echo "ERROR: user '$1' does not match user '$2'"
-    fi
-
-    id -u $1 > /dev/null
-    if [ $? -eq 0 ]; then
-        echo "User '$1' exists"
-        RESULT="$1"
-        return
-    fi
-    id -u $2 > /dev/null
-    if [ $? -eq 0 ]; then
-        echo "User '$2' exists"
-        RESULT="$2"
-        return
-    fi
-
-    echo "FATAL: Could not find User '$1' or '$2' is in the list of OS users"
-    exit 1
-}
-
 add_nodes_yaml() {
     local current_node=$1
     local last_node
@@ -130,7 +75,7 @@ wait_for_connection() {
         sleep 2
         curl --silent -k -I $1 && return
         let retries=$retries+1
-        echo "Retry: $retries"
+        echo "Waiting for successful connection: $retries"
     done
     msg_err "Connection to $1 was not able to be established"
 }
@@ -164,17 +109,19 @@ ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
 
-mapr_user_properties_json $PROPERTIES_JSON
-echo "MapR user from properties file is: '$RESULT'"
-MAPR_USER_PROPERTIES=$RESULT
 
-mapr_owner_properties_json $PROPERTIES_JSON
-echo "MapR user from file owner is: '$RESULT'"
-MAPR_PROPERTIES_OWNER=$RESULT
 
-compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
-echo "MapR user is: $RESULT"
-MAPR_USER=$RESULT
+
+
+MAPR_USER="foo"
+echo "before $MAPR_USER"
+
+. ./mapr-init.sh apassword
+echo "after $MAPR_PASSWORD"
+
+
+
+
 
 BUILD_FILE_VERSION=$(cat $MAPR/MapRBuildVersion)
 if [ $? -ne 0 ]; then

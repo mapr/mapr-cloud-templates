@@ -183,7 +183,7 @@
       },
       "resources": [{
         "apiVersion": "[variables('computeApiVersion')]",
-        "name": "run-installer",
+        "name": "mapr-installer",
         "type": "extensions",
         "location": "[resourceGroup().location]",
         "dependsOn": [
@@ -200,6 +200,7 @@
           "autoUpgradeMinorVersion": true,
           "settings": {
             "fileUris": [
+              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-init.sh",
               "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-cloud-configure.sh"
             ]
           },
@@ -209,6 +210,7 @@
         }
       }]
     },
+
     {
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
@@ -256,7 +258,34 @@
             }
           ]
         }
-      }
+      },
+      "resources": [{
+        "apiVersion": "[variables('computeApiVersion')]",
+        "name": "mapr-init",
+        "type": "extensions",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), add(copyIndex(), 1))]"
+        ],
+        "tags": {
+          "displayName": "mapr-init",
+          "cluster": "[parameters('clusterName')]"
+        },
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-init.sh"
+            ]
+          },
+          "protectedSettings": {
+            "commandToExecute": "[concat('bash mapr-init.sh ', parameters('clusterAdminPassword'))]"
+          }
+        }
+      }]
     }
   ],
   "outputs": {
