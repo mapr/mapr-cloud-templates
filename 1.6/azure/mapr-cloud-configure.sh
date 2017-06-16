@@ -117,6 +117,7 @@ MAPR_USER="foo"
 echo "before $MAPR_USER"
 
 . ./mapr-init.sh apassword
+echo "after $MAPR_USER"
 echo "after $MAPR_PASSWORD"
 
 
@@ -203,7 +204,7 @@ config:
 EOM
     add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
 
-    CMD="$CLI import --no_check_certificate --config -t $INPUT"
+    CMD="$CLI import --no_check_certificate --config -t $INPUT -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443"
     echo "MapR custom configuration selected; Log in to MapR web UI to complete installation."
 else
     echo "environment.mapr_core_version=$MAPR_CORE " >> $INPUT
