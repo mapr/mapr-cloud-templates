@@ -210,6 +210,7 @@ else
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
 
+# TODO: This needs to be removed!!!
 echo $CMD > /tmp/cmd
 
 sudo -u $MAPR_USER bash -c "$CMD"
