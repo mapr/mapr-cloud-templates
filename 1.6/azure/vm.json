@@ -140,7 +140,7 @@
       "condition": "[greater(parameters('nodeCount'), 1)]",
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('maprnicName'), copyIndex())]",
+      "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
       "location": "[resourceGroup().location]",
       "tags": {
         "role": "MapR Cluster",
@@ -153,10 +153,10 @@
       "properties": {
         "ipConfigurations": [
           {
-            "name": "[concat('ipconfig', add(copyIndex(), 1))]",
+            "name": "[concat('ipconfig', add(copyIndex(), 2))]",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), add(4, copyIndex()))]",
+              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), add(5, copyIndex()))]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
               }
