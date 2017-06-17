@@ -212,6 +212,7 @@
     },
 
     {
+      "condition": "[greater(parameters('nodeCount'), 1)]",
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
