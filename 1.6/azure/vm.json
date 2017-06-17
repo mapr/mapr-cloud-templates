@@ -114,6 +114,32 @@
     {
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('maprnicName'), '0')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "role": "MapR Cluster",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), '4')]",
+              "subnet": {
+                "id": "[parameters('subnetRefPrivate')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "condition": "[greater(parameters('nodeCount'), 1)]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('maprnicName'), copyIndex())]",
       "location": "[resourceGroup().location]",
       "tags": {
