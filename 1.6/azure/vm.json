@@ -219,7 +219,7 @@
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "vmcopy",
-        "count": "[variables('nodeCountSansInstaller')]"
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
