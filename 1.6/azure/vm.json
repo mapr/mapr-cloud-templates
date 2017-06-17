@@ -287,6 +287,7 @@
         }
       },
       "resources": [{
+        "condition": "[greater(parameters('nodeCount'), 1)]",
         "apiVersion": "[variables('computeApiVersion')]",
         "name": "mapr-init",
         "type": "extensions",
