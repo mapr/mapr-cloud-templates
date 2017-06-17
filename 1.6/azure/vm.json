@@ -148,7 +148,7 @@
       },
       "copy": {
         "name": "nicopy",
-        "count": "[parameters('nodeCount')]"
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]",
       },
       "properties": {
         "ipConfigurations": [
