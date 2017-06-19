@@ -197,6 +197,7 @@ else
     echo "config.ssh_password=$MAPR_PASSWORD " >> $INPUT
     echo "config.mep_version=$MEP " >> $INPUT
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
+    echo "config.cluster_admin_passwd=$MAPR_PASSWORD " >> $INPUT
     echo "config.hosts=$NODE_LIST " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
     echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
