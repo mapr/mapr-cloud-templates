@@ -5,11 +5,17 @@
     "clusterName": {
       "type": "string"
     },
+    "adminAuthType": {
+      "type": "string"
+    },
     "adminUsername": {
       "type": "string"
     },
     "adminPassword": {
       "type": "securestring"
+    },
+    "adminPublicKey": {
+      "type": "string"
     },
     "diskType": {
       "type": "string"
@@ -38,7 +44,25 @@
     "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
     "openvpnvmName": "[concat(variables('nonDotClusterName'), '-openvpn-vm')]",
     "openvpnvmSize": "Standard_DS1_v2",
-    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]"
+    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]",
+
+    "osProfile_password": {
+      "computerName": "[variables('openvpnvmName')]",
+      "adminUsername": "[parameters('adminUsername')]",
+      "adminPassword": "[parameters('adminPassword')]"
+    },
+    "osProfile_sshPublicKey": {
+      "linuxOperatingSystemProfile": {
+        "username": "[parameters('adminUsername')]",
+        "sshProfile": {
+          "publicKeys": [
+            {
+              "certificateData": "[parameters('adminPublicKey')]"
+            }
+          ]
+        }
+      }
+    }
   },
   "resources": [
     {
@@ -100,11 +124,7 @@
         "hardwareProfile": {
           "vmSize": "[variables('openvpnvmSize')]"
         },
-        "osProfile": {
-          "computerName": "[variables('openvpnvmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
+        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
         "storageProfile": {
           "imageReference" : {
             "publisher": "Canonical",

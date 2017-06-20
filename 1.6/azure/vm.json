@@ -20,6 +20,9 @@
     "adminPassword": {
       "type": "securestring"
     },
+    "adminPublicKey": {
+      "type": "string"
+    },
     "maprimageName": {
       "type": "string"
     },
