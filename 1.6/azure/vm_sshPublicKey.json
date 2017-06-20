@@ -69,47 +69,6 @@
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
 
-    "osProfile_password": {
-      "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "adminPassword": "[parameters('adminPassword')]"
-    },
-    "osProfile_sshPublicKey": {
-      "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": "true",
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPublicKey')]"
-            }
-          ]
-        }
-      }
-    },
-    "osProfile0_password": {
-      "computerName": "[concat(parameters('maprvmName'), '0')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "adminPassword": "[parameters('adminPassword')]"
-    },
-    "osProfile0_sshPublicKey": {
-      "computerName": "[concat(parameters('maprvmName'), '0')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": "true",
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPublicKey')]"
-            }
-          ]
-        }
-      }
-    },
-
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
       "diskSizeGB": "[parameters('diskSize')]",
@@ -221,8 +180,21 @@
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
-        "osProfile": "[variables(concat('osProfile0_', parameters('adminAuthType')))]",
-
+        "osProfile": {
+          "computerName": "[concat(parameters('maprvmName'), '0')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
         "storageProfile": {
           "imageReference": {
             "id": "[parameters('maprimageName')]"
@@ -297,7 +269,21 @@
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
-        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
+        "osProfile_sshPublicKey": {
+          "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
         "storageProfile": {
           "imageReference": {
             "id": "[parameters('maprimageName')]"
