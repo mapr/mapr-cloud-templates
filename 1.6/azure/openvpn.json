@@ -52,12 +52,15 @@
       "adminPassword": "[parameters('adminPassword')]"
     },
     "osProfile_sshPublicKey": {
-      "linuxOperatingSystemProfile": {
-        "username": "[parameters('adminUsername')]",
-        "sshProfile": {
+      "computerName": "[variables('openvpnvmName')]",
+      "adminUsername": "[parameters('adminUsername')]",
+      "linuxConfiguration": {
+        "disablePasswordAuthentication": "true",
+        "ssh": {
           "publicKeys": [
             {
-              "certificateData": "[parameters('adminPublicKey')]"
+              "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+              "keyData": "[parameters('adminPublicKey')]"
             }
           ]
         }
@@ -124,21 +127,7 @@
         "hardwareProfile": {
           "vmSize": "[variables('openvpnvmSize')]"
         },
-        "osProfile": {
-          "computerName": "[variables('openvpnvmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-                  "keyData": "[parameters('adminPublicKey')]"
-                }
-              ]
-            }
-          }
-        },
+        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
         "storageProfile": {
           "imageReference" : {
             "publisher": "Canonical",
