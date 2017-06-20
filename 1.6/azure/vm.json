@@ -108,7 +108,7 @@
           ]
         }
       }
-    }
+    },
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -186,7 +186,7 @@
       },
       "copy": {
         "name": "nicopy",
-        "count": "[max(variables('nodeCountSansInstaller'), 1)]",
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]"
       },
       "properties": {
         "ipConfigurations": [
