@@ -125,12 +125,15 @@
           "vmSize": "[variables('openvpnvmSize')]"
         },
         "osProfile": {
-          "linuxOperatingSystemProfile": {
-            "username": "[parameters('adminUsername')]",
-            "sshProfile": {
+          "computerName": "[variables('openvpnvmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
               "publicKeys": [
                 {
-                  "certificateData": "[parameters('adminPublicKey')]"
+                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
                 }
               ]
             }
