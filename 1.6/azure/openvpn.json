@@ -124,7 +124,18 @@
         "hardwareProfile": {
           "vmSize": "[variables('openvpnvmSize')]"
         },
-        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
+        "osProfile": {
+          "linuxOperatingSystemProfile": {
+            "username": "[parameters('adminUsername')]",
+            "sshProfile": {
+              "publicKeys": [
+                {
+                  "certificateData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
         "storageProfile": {
           "imageReference" : {
             "publisher": "Canonical",
