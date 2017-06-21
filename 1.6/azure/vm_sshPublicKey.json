@@ -348,6 +348,14 @@
     "RemoveMe": {
       "value": "[variables('unusedPassword')]",
       "type": "string"
+    },
+    "RemoveMe2": {
+      "value": "[deployment().name]",
+      "type": "string"
+    },
+    "RemoveMe3": {
+      "value": "[deployment()]",
+      "type": "object"
     }
   }
 }
