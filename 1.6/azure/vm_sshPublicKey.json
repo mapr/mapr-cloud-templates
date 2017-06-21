@@ -68,6 +68,8 @@
     "networkApiVersion": "2017-04-01",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
+    "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
+    "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString'))]",
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
@@ -183,7 +185,7 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "Adja83jds@asdiodas",
+          "adminPassword": "[variables('unusedPassword')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": "false",
             "ssh": {
@@ -273,7 +275,7 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "Adja83jds@asdiodas",
+          "adminPassword": "[variables('unusedPassword')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": "false",
             "ssh": {
@@ -342,6 +344,10 @@
     "MaprInstallerNic": {
       "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion'))]",
       "type": "object"
+    },
+    "RemoveMe": {
+      "value": "[variables('unusedPassword')]",
+      "type": "string"
     }
   }
 }

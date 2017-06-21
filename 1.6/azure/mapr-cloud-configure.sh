@@ -158,6 +158,7 @@ echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
+yum update -y mapr-installer-definitions mapr-installer
 service mapr-installer start || msg_err "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
