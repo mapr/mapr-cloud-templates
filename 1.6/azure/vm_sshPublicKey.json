@@ -69,7 +69,7 @@
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
     "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
-    "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString'))]",
+    "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString')))]",
 
     "maprdataDiskCache": "ReadOnly",
     "diskArray": [{
