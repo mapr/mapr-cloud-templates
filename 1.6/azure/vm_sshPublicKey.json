@@ -183,8 +183,9 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "Adja83jds@asdiodas",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
+            "disablePasswordAuthentication": "false",
             "ssh": {
               "publicKeys": [
                 {
@@ -272,8 +273,9 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "Adja83jds@asdiodas",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
+            "disablePasswordAuthentication": "false",
             "ssh": {
               "publicKeys": [
                 {
