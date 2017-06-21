@@ -270,7 +270,7 @@
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
-        "osProfile_sshPublicKey": {
+        "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
