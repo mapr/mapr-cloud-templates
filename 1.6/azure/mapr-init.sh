@@ -7,18 +7,23 @@ PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
 
 MAPR_PASSWORD="$1"
 
+msg_err() {
+    echo "ERROR: $1"
+    exit 1
+}
+
 mapr_user_properties_json() {
     local KEY=cluster_admin_id
 
     if [ ! -f "$1" ]; then
-        echo "ERROR: $1 file not found"
+        echo "WARNING: $1 file not found"
         RESULT=""
         return
     fi
 
     grep -Po '"cluster_admin_id":.*?[^\\]",' $1 > /dev/null
     if [ $? -ne 0 ]; then
-        echo "ERROR: Could not find cluster_admin_id in $1"
+        echo "WARNING: Could not find cluster_admin_id in $1"
         RESULT=""
         return
     fi
@@ -29,7 +34,7 @@ mapr_user_properties_json() {
 mapr_owner_properties_json() {
     local output=$(ls -l $1)
     if [ $? -ne 0 ]; then
-        echo "ERROR: Could not ls $1: $output"
+        echo "WARNING: Could not ls $1: $output"
         RESULT=""
         return
     fi
@@ -42,7 +47,7 @@ compare_users() {
     if [ "$1" = "$2" ] ; then
         echo "Users match: '$1' = '$2'"
     else
-        echo "ERROR: user '$1' does not match user '$2'"
+        echo "WARNING: user '$1' does not match user '$2'"
     fi
 
     id -u $1 > /dev/null
@@ -58,19 +63,19 @@ compare_users() {
         return
     fi
 
-    echo "FATAL: Could not find User '$1' or '$2' is in the list of OS users"
-    exit 1
+    msg_err "Could not find User '$1' or '$2' is in the list of OS users"
 }
 
 change_password() {
     echo "$1:$2" | chpasswd
-    if [ $? -ne 0 ]; then
-        echo "FATAL: Could not change password"
-        exit 1
-    fi
+    [ $? -ne 0 ] && msg_err "Could not change password"
     echo "Password changed"
 }
 
+passwordless_sudo() {
+    sed -i -e 's/ALL$/NOPASSWD: ALL/' /etc/sudoers.d/waagent ||
+        msg_err "Could not set passwordless ssh for OS admin user"
+}
 mapr_user_properties_json $PROPERTIES_JSON
 echo "MapR user from properties file is: '$RESULT'"
 MAPR_USER_PROPERTIES=$RESULT
@@ -84,3 +89,4 @@ echo "MapR user is: $RESULT"
 MAPR_USER=$RESULT
 
 change_password $MAPR_USER $MAPR_PASSWORD
+passwordless_sudo
