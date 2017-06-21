@@ -184,7 +184,7 @@
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "false",
+            "disablePasswordAuthentication": "true",
             "ssh": {
               "publicKeys": [
                 {
