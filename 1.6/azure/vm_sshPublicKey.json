@@ -344,18 +344,6 @@
     "MaprInstallerNic": {
       "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion'))]",
       "type": "object"
-    },
-    "RemoveMe": {
-      "value": "[variables('unusedPassword')]",
-      "type": "string"
-    },
-    "RemoveMe2": {
-      "value": "[deployment().name]",
-      "type": "string"
-    },
-    "RemoveMe3": {
-      "value": "[deployment()]",
-      "type": "object"
     }
   }
 }
