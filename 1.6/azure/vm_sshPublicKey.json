@@ -18,7 +18,7 @@
       "type": "string"
     },
     "adminPassword": {
-      "type": "string"
+      "type": "securestring"
     },
     "adminPublicKey": {
       "type": "string"
@@ -184,7 +184,7 @@
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
+            "disablePasswordAuthentication": "false",
             "ssh": {
               "publicKeys": [
                 {
