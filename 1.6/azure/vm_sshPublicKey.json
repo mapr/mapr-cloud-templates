@@ -18,8 +18,7 @@
       "type": "string"
     },
     "adminPassword": {
-      "type": "securestring",
-      "defaultValue": "Cloud4MapRInstall",
+      "type": "string"
     },
     "adminPublicKey": {
       "type": "string"
