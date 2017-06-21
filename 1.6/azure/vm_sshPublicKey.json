@@ -17,6 +17,9 @@
     "adminUsername": {
       "type": "string"
     },
+    "adminPassword": {
+      "type": "securestring"
+    },
     "adminPublicKey": {
       "type": "string"
     },
