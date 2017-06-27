@@ -37,6 +37,9 @@
     },
     "openVPNpassword": {
       "type": "securestring"
+    },
+    "addressPrefixPublic": {
+      "type": "string"
     }
   },
   "variables": {
@@ -183,7 +186,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-vpn.sh ', parameters('openVPNuser'), ' ', parameters('openVPNpassword'), ' ', parameters('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn)]"
+            "commandToExecute": "[concat('bash mapr-vpn.sh ', parameters('openVPNuser'), ' ', parameters('openVPNpassword'), ' ', parameters('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ' ', parameters('addressPrefixPublic'))]"
           }
         }
       }]
