@@ -32,10 +32,10 @@
     "subnetRefPublic": {
       "type": "string"
     },
-    "openVPNuser": {
+    "openVpnUser": {
       "type": "string"
     },
-    "openVPNpassword": {
+    "openVpnPassword": {
       "type": "securestring"
     },
     "addressPrefixPublic": {
@@ -186,7 +186,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-vpn.sh ', parameters('openVPNuser'), ' ', parameters('openVPNpassword'), ' ', parameters('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ' ', parameters('addressPrefixPublic'))]"
+            "commandToExecute": "[concat('bash mapr-vpn.sh ', parameters('openVpnUser'), ' ', parameters('openVpnPassword'), ' ', parameters('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ' ', parameters('addressPrefixPublic'))]"
           }
         }
       }]
