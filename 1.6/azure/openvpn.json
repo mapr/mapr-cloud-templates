@@ -25,7 +25,7 @@
     },
     "ipAddress": {
       "type": "string"
-    }
+    },
     "subnetRefPublic": {
       "type": "string"
     },
