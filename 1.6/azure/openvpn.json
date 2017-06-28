@@ -23,12 +23,9 @@
     "fourDotSubnetPublic": {
       "type": "string"
     },
-    "threeDotSubnetPublic": {
+    "ipAddress": {
       "type": "string"
-    },
-    "startOctet": {
-      "type": "string"
-    },
+    }
     "subnetRefPublic": {
       "type": "string"
     },
@@ -108,7 +105,7 @@
             "name": "ipconfig1",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(parameters('threeDotSubnetPublic'), parameters('startOctet'))]",
+              "privateIPAddress": "[parameters('ipAddress')]",
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('openvpnpublicIPAddressName'))]"
               },
