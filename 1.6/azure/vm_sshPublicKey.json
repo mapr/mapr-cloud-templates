@@ -44,10 +44,7 @@
     "clusterName": {
       "type": "string"
     },
-    "threeDotSubnetPrivate": {
-      "type": "string"
-    },
-    "startOctet": {
+    "ipAddress": {
       "type": "string"
     },
     "nodeCount": {
@@ -68,6 +65,11 @@
     "networkApiVersion": "2017-04-01",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
+
+    "threeDotSubnetPrivate": "[take(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.')))]",
+    "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
+    "startOctetPlus1": "[add(1, variables('startOctet'))]",
+
     "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
     "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString')))]",
 
@@ -125,7 +127,7 @@
             "name": "ipconfig1",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), '4')]",
+              "privateIPAddress": "[parameters('ipAddress')]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
               }
@@ -152,10 +154,10 @@
       "properties": {
         "ipConfigurations": [
           {
-            "name": "[concat('ipconfig', add(copyIndex(), 2))]",
+            "name": "[concat('ipconfig', add(2, copyIndex()))]",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(parameters('threeDotSubnetPrivate'), add(5, copyIndex()))]",
+              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex()))]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
               }
@@ -244,7 +246,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', parameters('threeDotSubnetPrivate'), ' ', parameters('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', variables('threeDotSubnetPrivate'), ' ', variables('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', subscription().subscriptionId, ' ', subscription().tenantId)]"
           }
         }
       }]
