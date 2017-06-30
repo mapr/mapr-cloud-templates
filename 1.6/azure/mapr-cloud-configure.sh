@@ -188,7 +188,7 @@ echo "NODE_LIST: $NODE_LIST"
 . $MAPR_HOME/build/installer/bin/activate
 
 update_installer
-service mapr-installer start || msg_err "Could not start mapr-installer service"
+service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
 echo "Installer state: $?" > /tmp/mapr_installer_state
