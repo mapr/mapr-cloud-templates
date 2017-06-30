@@ -83,6 +83,7 @@ passwordless_sudo() {
     sed -i -e 's/ALL$/NOPASSWD: ALL/' $file ||
         msg_err "Could not set passwordless ssh for OS admin user"
 }
+
 mapr_user_properties_json $PROPERTIES_JSON
 echo "MapR user from properties file is: '$RESULT'"
 MAPR_USER_PROPERTIES=$RESULT

@@ -6,7 +6,7 @@ INTERNAL="mapr-core-internal-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
-# TODO: SWF, should this url be passed in?
+# TODO: should this url be passed in?
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
@@ -121,6 +121,24 @@ update_installer_suse() {
     zypper --non-interactive update -n "$INSTALL_PACKAGES"
 }
 
+build_version() {
+    RESULT=$(cat $MAPR/MapRBuildVersion)
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Could not find $MAPR/MapRBuildVersion"
+        RESULT=""
+    fi
+}
+
+package_version() {
+    RESULT=$(rpm -qa | grep $INTERNAL)
+    if [ $? -ne 0 ]; then
+        echo "WARNING: Could not find rpm starting with $INTERNAL"
+        RESULT=""
+    else
+        RESULT="${RESULT/$INTERNAL/}"
+    fi
+}
+
 if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
     echo "MapR is already installed; Not running Stanza again."
     exit 0
@@ -141,29 +159,20 @@ TENANT_ID=${11}
 # Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
 
-BUILD_FILE_VERSION=$(cat $MAPR/MapRBuildVersion)
-if [ $? -ne 0 ]; then
-    echo "ERROR: Could not find $MAPR/MapRBuildVersion"
-    BUILD_FILE_VERSION=""
-fi
-
-RPM_VERSION=$(rpm -qa | grep $INTERNAL)
-if [ $? -ne 0 ]; then
-    echo "WARNING: Could not find rpm starting with $INTERNAL"
-    RPM_VERSION=""
-else
-    RPM_VERSION="${RPM_VERSION/$INTERNAL/}"
-fi
+build_version
+BUILD_FILE_VERSION=$RESULT
+package_version
+PACKAGE_VERSION=$RESULT
 
 find_installed_core_version $BUILD_FILE_VERSION
 echo "Build file version: '$RESULT'"
 BUILD_FILE_VERSION=$RESULT
 
-find_installed_core_version $RPM_VERSION
+find_installed_core_version $PACKAGE_VERSION
 echo "RPM version: '$RESULT'"
-RPM_VERSION=$RESULT
+PACKAGE_VERSION=$RESULT
 
-compare_versions $BUILD_FILE_VERSION $RPM_VERSION
+compare_versions $BUILD_FILE_VERSION $PACKAGE_VERSION
 echo "Final MapR Core version: '$RESULT'"
 MAPR_CORE=$RESULT
 
