@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+INSTALL_PACKAGES="mapr-installer-definitions mapr-installer"
+RESULT=""
+INTERNAL="mapr-core-internal-"
+MAPR="/opt/mapr"
+MAPR_HOME="$MAPR/installer"
+PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
+# TODO: SWF, should this url be passed in?
+STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
+STATUS="SUCCESS"
+CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
+
 msg_err() {
     echo "ERROR: $1"
     exit 1
@@ -51,7 +62,6 @@ create_node_list() {
         fi
         let current_node=$current_node+1
     done
-
     RESULT="$mapr_nodes"
 }
 
@@ -65,7 +75,6 @@ add_nodes_yaml() {
         echo "    - $3$current_node" >> $4
         let current_node=$current_node+1
     done
-
     RESULT="$mapr_nodes"
 }
 
@@ -80,22 +89,42 @@ wait_for_connection() {
     msg_err "Connection to $1 was not able to be established"
 }
 
+check_os() {
+    if [ -f /etc/redhat-release ]; then
+        RESULT=redhat
+    elif grep -q -s SUSE /etc/os-release ; then
+        RESULT=suse
+    elif grep -q -s DISTRIB_ID=Ubuntu /etc/lsb-release; then
+        RESULT=ubuntu
+    else
+        msg_err "Unsupported operating system"
+    fi
+}
+
+update_installer() {
+    check_os
+    update_installer_$RESULT
+}
+
+update_installer_redhat() {
+    echo "Updating MapR installer RedHat packages ..."
+    yum update -y "$INSTALL_PACKAGES"
+}
+
+update_installer_ubuntu() {
+    echo "Updating MapR installer Ubuntu packages ..."
+    apt-get --non-interactive --only-upgrade install -y "$INSTALL_PACKAGES"
+}
+
+update_installer_suse() {
+    echo "Updating MapR installer Suse packages ..."
+    zypper --non-interactive update -n "$INSTALL_PACKAGES"
+}
+
 if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
     echo "MapR is already installed; Not running Stanza again."
     exit 0
 fi
-
-# TODO: This file should go away and logic should be put in mapr-setup
-RESULT=""
-INTERNAL="mapr-core-internal-"
-MAPR="/opt/mapr"
-MAPR_HOME="$MAPR/installer"
-PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
-# TODO: SWF, should this url be passed in?
-STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
-STATUS="SUCCESS"
-CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
-
 
 MEP=$1
 CLUSTER_NAME=$2
@@ -158,7 +187,7 @@ echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
-yum update -y mapr-installer-definitions mapr-installer
+update_installer
 service mapr-installer start || msg_err "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
