@@ -101,26 +101,6 @@ check_os() {
     fi
 }
 
-update_installer() {
-    check_os
-    update_installer_$RESULT
-}
-
-update_installer_redhat() {
-    echo "Updating MapR installer RedHat packages ..."
-    yum update -y "$INSTALL_PACKAGES"
-}
-
-update_installer_ubuntu() {
-    echo "Updating MapR installer Ubuntu packages ..."
-    apt-get --only-upgrade install -y "$INSTALL_PACKAGES"
-}
-
-update_installer_suse() {
-    echo "Updating MapR installer Suse packages ..."
-    zypper --non-interactive update -n "$INSTALL_PACKAGES"
-}
-
 build_version() {
     RESULT=$(cat $MAPR/MapRBuildVersion)
     if [ $? -ne 0 ]; then
@@ -196,7 +176,7 @@ echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
-update_installer
+/opt/mapr/installer/bin/mapr-setup.sh -y update
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
@@ -249,9 +229,6 @@ else
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
-
-# TODO: This needs to be removed!!!
-echo $CMD > /tmp/cmd
 
 sudo -u $MAPR_USER bash -c "$CMD"
 RUN_RSLT=$?
