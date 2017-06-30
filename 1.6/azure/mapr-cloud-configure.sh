@@ -113,7 +113,7 @@ update_installer_redhat() {
 
 update_installer_ubuntu() {
     echo "Updating MapR installer Ubuntu packages ..."
-    apt-get --non-interactive --only-upgrade install -y "$INSTALL_PACKAGES"
+    apt-get --only-upgrade install -y "$INSTALL_PACKAGES"
 }
 
 update_installer_suse() {
@@ -149,7 +149,7 @@ fi
 
 RPM_VERSION=$(rpm -qa | grep $INTERNAL)
 if [ $? -ne 0 ]; then
-    echo "ERROR: Could not find rpm starting with $INTERNAL"
+    echo "WARNING: Could not find rpm starting with $INTERNAL"
     RPM_VERSION=""
 else
     RPM_VERSION="${RPM_VERSION/$INTERNAL/}"
