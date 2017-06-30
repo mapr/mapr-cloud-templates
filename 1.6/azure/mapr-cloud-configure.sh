@@ -178,7 +178,7 @@ echo "Build file version: '$RESULT'"
 BUILD_FILE_VERSION=$RESULT
 
 find_installed_core_version $PACKAGE_VERSION
-echo "RPM version: '$RESULT'"
+echo "Package version: '$RESULT'"
 PACKAGE_VERSION=$RESULT
 
 compare_versions $BUILD_FILE_VERSION $PACKAGE_VERSION
