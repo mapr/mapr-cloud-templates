@@ -73,7 +73,14 @@ change_password() {
 }
 
 passwordless_sudo() {
-    sed -i -e 's/ALL$/NOPASSWD: ALL/' /etc/sudoers.d/waagent ||
+    local file=""
+
+    if [ -f /etc/sudoers.d/waagent ]; then
+        file=/etc/sudoers.d/waagent
+    elif [ -f /etc/sudoers.d/90-cloud-init-users ]; then
+        file=/etc/sudoers.d/90-cloud-init-users
+    fi
+    sed -i -e 's/ALL$/NOPASSWD: ALL/' $file ||
         msg_err "Could not set passwordless ssh for OS admin user"
 }
 mapr_user_properties_json $PROPERTIES_JSON
