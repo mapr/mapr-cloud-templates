@@ -2,7 +2,8 @@
 
 INSTALL_PACKAGES="mapr-installer-definitions mapr-installer"
 RESULT=""
-INTERNAL="mapr-core-internal-"
+INTERNAL_ONLY="mapr-core-internal"
+INTERNAL="${INTERNAL_ONLY}-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
@@ -109,7 +110,32 @@ build_version() {
     fi
 }
 
-package_version() {
+package_version_redhat() {
+    echo "Checking MapR packager version RedHat"
+    RESULT=$(rpm -qa | grep $INTERNAL)
+    if [ $? -ne 0 ]; then
+        echo "WARNING: Could not find rpm package starting with $INTERNAL"
+        RESULT=""
+    else
+        RESULT="${RESULT/$INTERNAL/}"
+    fi
+    echo "$RESULT"
+
+}
+
+package_version_ubuntu() {
+    echo "Checking MapR packager version Ubuntu"
+    RESULT=$(dpkg-query --show --showformat='${Version}' $INTERNAL_ONLY)
+    if [ $? -ne 0 ]; then
+        echo "WARNING: Could not find deb package starting with $INTERNAL"
+        RESULT=""
+    else
+        RESULT="${RESULT/$INTERNAL/}"
+    fi
+}
+
+package_version_suse() {
+    echo "Checking MapR packager version Suse"
     RESULT=$(rpm -qa | grep $INTERNAL)
     if [ $? -ne 0 ]; then
         echo "WARNING: Could not find rpm starting with $INTERNAL"
@@ -139,9 +165,12 @@ TENANT_ID=${11}
 # Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
 
+check_os
+OS=$RESULT
+
 build_version
 BUILD_FILE_VERSION=$RESULT
-package_version
+package_version_$OS
 PACKAGE_VERSION=$RESULT
 
 find_installed_core_version $BUILD_FILE_VERSION
