@@ -96,4 +96,5 @@ compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
 echo "MapR user is: $RESULT"
 MAPR_USER=$RESULT
 
+change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
