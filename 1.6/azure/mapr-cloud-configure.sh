@@ -205,7 +205,7 @@ echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
-/opt/mapr/installer/bin/mapr-setup.sh -y update
+/opt/mapr/installer/bin/mapr-setup.sh -y upgrade
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
