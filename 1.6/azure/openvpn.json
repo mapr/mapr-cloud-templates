@@ -44,7 +44,7 @@
     "networkApiVersion": "2017-04-01",
 
     "publicIPAddressType": "Dynamic",
-    "dnsLabelPrefix": "[concat(variables('nonDotClusterName'), '-', uniqueString(resourceGroup().id, deployment().name))]",
+    "dnsLabelPrefix": "[toLower(concat(variables('nonDotClusterName'), '-', substring(uniqueString(resourceGroup().id, deployment().name), 0, 4)))]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
     "openvpnnicName": "[concat(variables('nonDotClusterName'), '-openvpn-nic')]",
     "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
