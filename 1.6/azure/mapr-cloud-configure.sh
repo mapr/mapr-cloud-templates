@@ -161,6 +161,7 @@ RESOURCE_GROUP=$8
 ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
+LICENSE_TYPE=${12}
 
 # Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
@@ -198,6 +199,7 @@ echo "MAPR_CORE: $MAPR_CORE"
 echo "MAPR_USER: $MAPR_USER"
 echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 echo "TENANT_ID: $TENANT_ID"
+echo "LICENSE_TYPE: $LICENSE_TYPE"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT
@@ -247,7 +249,9 @@ else
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
     echo "config.cluster_admin_id=$MAPR_USER " >> $INPUT
     echo "config.cluster_admin_password=$MAPR_PASSWORD " >> $INPUT
+    echo "config.db_admin_password=$MAPR_PASSWORD " >> $INPUT
     echo "config.hosts=$NODE_LIST " >> $INPUT
+    echo "config.license_type=$LICENSE_TYPE " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
     echo "config.provider.config.admin_auth_type=$ADMIN_AUTH_TYPE " >> $INPUT
     echo "config.provider.config.subscription_id=$SUBSCRIPTION_ID " >> $INPUT
