@@ -7,7 +7,6 @@ INTERNAL="${INTERNAL_ONLY}-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
-# TODO: should this url be passed in?
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
@@ -211,9 +210,7 @@ echo "NODE_LIST: $NODE_LIST"
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
-echo "Installer state: $?" > /tmp/mapr_installer_state
-
-INPUT=$MAPR_HOME/stanza_input.yml
+INPUT=$MAPR_HOME/conf/stanza_input.yml
 rm -f $INPUT
 touch $INPUT
 chown $MAPR_USER:$MAPR_USER $INPUT || msg_err "Could not change owner to $MAPR_USER"
@@ -244,12 +241,9 @@ EOM
 else
     echo "environment.mapr_core_version=$MAPR_CORE " >> $INPUT
     echo "config.ssh_id=$MAPR_USER " >> $INPUT
-    echo "config.ssh_password=$MAPR_PASSWORD " >> $INPUT
     echo "config.mep_version=$MEP " >> $INPUT
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
     echo "config.cluster_admin_id=$MAPR_USER " >> $INPUT
-    echo "config.cluster_admin_password=$MAPR_PASSWORD " >> $INPUT
-    echo "config.db_admin_password=$MAPR_PASSWORD " >> $INPUT
     echo "config.hosts=$NODE_LIST " >> $INPUT
     echo "config.license_type=$LICENSE_TYPE " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
@@ -261,12 +255,15 @@ else
     fi
 
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
+    CMD="$CMD -o config.ssh_password=$MAPR_PASSWORD"
+    CMD="$CMD -o config.cluster_admin_password=$MAPR_PASSWORD"
+    CMD="$CMD -o config.db_admin_password=$MAPR_PASSWORD"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
 
 sudo -u $MAPR_USER bash -c "$CMD"
 RUN_RSLT=$?
-rm -f $INPUT
+chmod 0440 $INPUT
 if [ $RUN_RSLT -ne 0 ]; then
     msg_err "Could not run installation: $RUN_RSLT"
 fi
