@@ -261,9 +261,9 @@ else
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
 
+chmod 0440 $INPUT
 sudo -u $MAPR_USER bash -c "$CMD"
 RUN_RSLT=$?
-chmod 0440 $INPUT
 if [ $RUN_RSLT -ne 0 ]; then
     msg_err "Could not run installation: $RUN_RSLT"
 fi
