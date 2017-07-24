@@ -189,9 +189,9 @@
       }]
     } ],
   "outputs": {
-    "ateststring": {
+    "OpenVpnFqdn": {
       "type": "string",
-      "value": "here is some tempalte text!!!!"
+      "value": "[reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn]"
     }
   }
 }
