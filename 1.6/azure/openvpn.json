@@ -37,6 +37,12 @@
     },
     "addressPrefix": {
       "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "artifactsBaseUrl": {
+      "type": "string"
     }
   },
   "variables": {
@@ -78,7 +84,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('openvpnpublicIPAddressName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
@@ -91,7 +97,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('openvpnnicName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "role": "MapR OpenVPN Access",
         "cluster": "[parameters('clusterName')]"
@@ -122,7 +128,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[variables('openvpnvmName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "dependsOn": ["[resourceId('Microsoft.Network/networkInterfaces/', variables('openvpnnicName'))]"],
       "tags": {
         "role": "MapR OpenVPN Access",
@@ -162,7 +168,7 @@
         "apiVersion": "[variables('computeApiVersion')]",
         "name": "openvpn-configure",
         "type": "extensions",
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "dependsOn": [
           "[concat('Microsoft.Compute/virtualMachines/', variables('openvpnvmName'))]"
         ],
@@ -178,8 +184,8 @@
           "settings": {
             "fileUris": [
               "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/openvpn-access-server-ubuntu/install_openvpn_access_server.sh",
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-vpn-configure.sh",
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-vpn.sh"
+              "[concat(parameters('artifactsBaseUrl'), 'mapr-vpn-configure.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), 'mapr-vpn.sh')]"
             ]
           },
           "protectedSettings": {

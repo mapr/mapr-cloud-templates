@@ -28,6 +28,9 @@
     },
     "maprsgName": {
       "type": "string"
+    },
+    "location": {
+      "type": "string"
     }
   },
   "variables": {
@@ -38,7 +41,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[parameters('maprsgName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "MapR Security Group",
         "cluster": "[parameters('clusterName')]"
@@ -109,7 +112,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "MapR Virtual Network",
         "cluster": "[parameters('clusterName')]"

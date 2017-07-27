@@ -61,6 +61,12 @@
     },
     "licenseType": {
       "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "artifactsBaseUrl": {
+      "type": "string"
     }
   },
   "variables": {
@@ -119,7 +125,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('maprnicName'), '0')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "role": "MapR Cluster",
         "cluster": "[parameters('clusterName')]"
@@ -145,7 +151,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "role": "MapR Cluster",
         "cluster": "[parameters('clusterName')]"
@@ -174,7 +180,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('maprvmName'), '0')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
       ],
@@ -229,7 +235,7 @@
         "apiVersion": "[variables('computeApiVersion')]",
         "name": "mapr-installer",
         "type": "extensions",
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "dependsOn": [
           "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), '0')]"
         ],
@@ -244,8 +250,8 @@
           "autoUpgradeMinorVersion": true,
           "settings": {
             "fileUris": [
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-init.sh",
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-cloud-configure.sh"
+              "[concat(parameters('artifactsBaseUrl'), 'mapr-init.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), 'mapr-cloud-configure.sh')]"
             ]
           },
           "protectedSettings": {
@@ -260,7 +266,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "vmcopy",
         "count": "[max(variables('nodeCountSansInstaller'), 1)]"
@@ -320,7 +326,7 @@
         "apiVersion": "[variables('computeApiVersion')]",
         "name": "mapr-init",
         "type": "extensions",
-        "location": "[resourceGroup().location]",
+        "location": "[parameters('location')]",
         "dependsOn": [
           "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), add(copyIndex(), 1))]"
         ],
@@ -335,7 +341,7 @@
           "autoUpgradeMinorVersion": true,
           "settings": {
             "fileUris": [
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-init.sh"
+              "[concat(parameters('artifactsBaseUrl'), 'mapr-init.sh')]"
             ]
           },
           "protectedSettings": {
