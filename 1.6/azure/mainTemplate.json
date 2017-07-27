@@ -9,47 +9,81 @@
         "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
       }
     },
-    "clusterName": {
-      "type": "string",
-      "defaultValue": "my.cluster.com"
-    },
     "adminUsername": {
       "type": "string",
       "metadata": {
-        "description": "User name for the virtual machine."
+        "description": "User name for the virtual machine"
       }
     },
     "adminAuthType": {
       "type": "string",
       "defaultValue": "password",
       "metadata": {
-        "description": "Authentication type (password or sshPublicKey) for the virtual machine."
-      }
-    },
-    "adminPublicKey": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Public key authentication for the virtual machine."
+        "description": "Authentication type (password or sshPublicKey) for the virtual machine"
       }
     },
     "adminPassword": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
-        "description": "Password for the virtual machine."
+        "description": "Password for the virtual machine"
       }
+    },
+    "adminPublicKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Public key authentication for the virtual machine"
+      }
+    },
+    "clusterName": {
+      "type": "string",
+      "defaultValue": "my.cluster.com"
+    },
+    "clusterAdminPassword": {
+      "type": "securestring",
+      "defaultValue": "mapr",
+      "metadata": {
+        "description": "Password for UID mapr"
+      }
+    },
+    "mepVersion": {
+      "type": "string",
+      "defaultValue" : "3.0.0",
+      "metadata": {
+        "description": "Type MEP version to install"
+      }
+    },
+    "serviceTemplate": {
+      "type": "string",
+      "defaultValue": "template-40-maprstreams",
+      "metadata": {
+        "description": "Services for specific use cases"
+      }
+    },
+    "nodeCount": {
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 50,
+      "defaultValue": 2
     },
     "instanceType": {
       "type": "string",
       "defaultValue": "Standard_DS2_v2",
       "metadata": {
-        "description": "User name for the virtual machine."
+        "description": "User name for the virtual machine"
       }
     },
     "diskType": {
       "type": "string",
       "defaultValue" : "Premium_LRS",
+      "metadata": {
+        "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
+      }
+    },
+    "licenseType": {
+      "type": "string",
+      "defaultValue" : "M5",
       "metadata": {
         "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
       }
@@ -66,62 +100,123 @@
       "maxValue": 6,
       "defaultValue": 2
     },
-    "nodeCount": {
-      "type": "int",
-      "minValue": 1,
-      "maxValue": 50,
-      "defaultValue": 2
-    },
     "publicAccessCIDR": {
       "type": "string",
       "defaultValue": "*",
       "metadata": {
-        "description": "Public access CIDR. Use * for all internet traffic. Use 12.220.154.66/27 to restrict to internal MapR."
+        "description": "Public access CIDR. Use * for all internet traffic. Use 12.220.154.66/27 to restrict to internal MapR"
       }
     },
-    "mepVersion": {
+    "installOpenVPN": {
       "type": "string",
-      "defaultValue" : "3.0",
+      "defaultValue": "true",
       "metadata": {
-        "description": "Type MEP version to install."
+        "description": "Enable access to private cluster"
       }
     },
-    "serviceTemplate": {
+    "openVpnUser": {
       "type": "string",
-      "defaultValue": "template-40-maprstreams",
+      "defaultValue": "openvpn",
       "metadata": {
-        "description": "Services for specific use cases."
+        "description": "OpenVPN login user"
+      }
+    },
+    "openVpnPassword": {
+      "type": "securestring",
+      "defaultValue": "openvpn",
+      "metadata": {
+        "description": "OpenVPN user password (Please use a strong password to protect your cluster)"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual network name"
+      }
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual network resource group"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "172.24.0.0/16",
+      "metadata": {
+        "description": "Virtual network address prefix"
+      }
+    },
+    "vnetNewOrExisting": {
+      "type": "string",
+      "defaultValue": "new",
+      "metadata": {
+        "description": "Virtual network new or existing"
+      }
+    },
+    "vnetPrivateSubnetName": {
+      "type": "string",
+      "defaultValue": "mapr-private-subnet",
+      "metadata": {
+        "description": "Virtual network private subnet name"
+      }
+    },
+    "vnetPrivateSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "172.24.8.0/24",
+      "metadata": {
+        "description": "Virtual network private subnet address prefix"
+      }
+    },
+    "vnetPrivateSubnetStartAddress": {
+      "type": "string",
+      "defaultValue": "172.24.8.4",
+      "metadata": {
+        "description": "Virtual network private subnet start address"
+      }
+    },
+    "vnetPublicSubnetName": {
+      "type": "string",
+      "defaultValue": "mapr-public-subnet",
+      "metadata": {
+        "description": "Virtual network public subnet name"
+      }
+    },
+    "vnetPublicSubnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "172.24.0.0/28",
+      "metadata": {
+        "description": "Virtual network public subnet address prefix"
+      }
+    },
+    "vnetPublicSubnetStartAddress": {
+      "type": "string",
+      "defaultValue": "172.24.0.4",
+      "metadata": {
+        "description": "Virtual network public subnet start address"
       }
     }
   },
   "variables": {
+    "maprimageName": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MAPRIMAGECREATERG/providers/Microsoft.Compute/images/MapRImage",
+
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
     "nonDashClusterName": "[replace(parameters('clusterName'), '.', '')]",
-    "dnsLabelPrefix": "[concat('dns-', variables('nonDotClusterName'), '-', uniqueString(resourceGroup().id, deployment().name))]",
-    "publicIPAddressType": "Dynamic",
-    "virtualNetworkName": "[concat(variables('nonDotClusterName'), '-vnet')]",
-    "virtualNetworkId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
 
-    "startOctet": "4",
-    "threeDotSubnetPublic": "28.1.0.",
-    "fourDotSubnetPublic": "[concat(variables('threeDotSubnetPublic'), '0')]",
-    "addressPrefixPublic": "[concat(variables('fourDotSubnetPublic'), '/16')]",
-    "subnetPrefixPublic": "[concat(variables('fourDotSubnetPublic'), '/24')]",
-    "subnetNamePublic": "[concat(variables('nonDotClusterName'), '-subnetpublic')]",
+    "virtualNetworkName": "[parameters('vnetName')]",
+    "virtualNetworkId": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+
+    "addressPrefix": "[parameters('vnetAddressPrefix')]",
+
+    "fourDotSubnetPublic": "[concat(take(parameters('vnetPublicSubnetStartAddress'), add(lastIndexOf(parameters('vnetPublicSubnetStartAddress'), '.'), 1)), '0')]",
+    "subnetPrefixPublic": "[parameters('vnetPublicSubnetAddressPrefix')]",
+    "subnetNamePublic": "[parameters('vnetPublicSubnetName')]",
     "subnetRefPublic": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetNamePublic'))]",
 
-    "threeDotSubnetPrivate": "28.1.8.",
-    "subnetPrefixPrivate": "[concat(variables('threeDotSubnetPrivate'), '0/22')]",
-    "subnetNamePrivate": "[concat(variables('nonDotClusterName'), '-subnetprivate')]",
+    "subnetPrefixPrivate": "[parameters('vnetPrivateSubnetAddressPrefix')]",
+    "subnetNamePrivate": "[parameters('vnetPrivateSubnetName')]",
     "subnetRefPrivate": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetNamePrivate'))]",
 
-    "openvpnnicName": "[concat(variables('nonDotClusterName'), '-openvpn-nic')]",
-    "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
-    "openvpnvmName": "[concat(variables('nonDotClusterName'), '-openvpn-vm')]",
-    "openvpnvmSize": "Standard_DS1_v2",
-    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]",
-
-    "maprimageName": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MAPRIMAGECREATERG/providers/Microsoft.Compute/images/MapRImage",
     "maprnicName": "[concat(variables('nonDotClusterName'), '-mapr-nic')]",
     "maprsgName": "[concat(variables('nonDotClusterName'), '-mapr-sg')]",
     "maprvmName": "[concat(variables('nonDotClusterName'), '-mapr-vm')]",
@@ -129,8 +224,7 @@
 
     "maprNetworkTemplate": "MapR.Network.Template",
     "maprVMTemplate": "MapR.VM.Template",
-
-    "maprPassword": "mapr",
+    "maprOpenVPNTemplate": "MapR.OpenVPN.Template",
 
     "osImageSg": "https://baseimagergsa.blob.core.windows.net/",
     "osImageBase": "[concat(variables('osImageSg'), 'system/Microsoft.Compute/Images/vhds/maprbaseimageprep1-osDisk.vhd')]",
@@ -158,13 +252,13 @@
           ]
         }
       }
-    },
-    "osProfile_mapr": "[variables(concat(parameters('adminAuthType'), '_osProfile'))]"
+    }
   },
   "resources": [
     {
       "name": "[variables('maprNetworkTemplate')]",
       "type": "Microsoft.Resources/deployments",
+      "condition": "[equals(parameters('vnetNewOrExisting'), 'new')]",
       "apiVersion": "[variables('deploymentsVersion')]",
       "properties": {
         "mode": "Incremental",
@@ -176,8 +270,8 @@
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
-          "addressPrefixPublic": {
-            "value": "[variables('addressPrefixPublic')]"
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
           },
           "subnetNamePublic": {
             "value": "[variables('subnetNamePublic')]"
@@ -194,6 +288,9 @@
           "publicAccessCIDR": {
             "value": "[parameters('publicAccessCIDR')]"
           },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
           "maprsgName": {
             "value": "[variables('maprsgName')]"
           }
@@ -202,125 +299,58 @@
     },
 
     {
-      "apiVersion": "[variables('networkApiVersion')]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('openvpnpublicIPAddressName')]",
-      "location": "[resourceGroup().location]",
+      "name": "[variables('maprOpenVPNTemplate')]",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[equals(parameters('installOpenVPN'), 'true')]",
+      "apiVersion": "[variables('deploymentsVersion')]",
+      "dependsOn": ["[concat('Microsoft.Resources/deployments/', variables('maprNetworkTemplate'))]"],
       "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('dnsLabelPrefix')]"
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('artifactsBaseUrl'), '/openvpn.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
+          "adminAuthType": {
+            "value": "[parameters('adminAuthType')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "adminPublicKey": {
+            "value": "[parameters('adminPublicKey')]"
+          },
+          "diskType": {
+            "value": "[parameters('diskType')]"
+          },
+          "fourDotSubnetPublic": {
+            "value": "[variables('fourDotSubnetPublic')]"
+          },
+          "ipAddress": {
+            "value": "[parameters('vnetPublicSubnetStartAddress')]"
+          },
+          "subnetRefPublic": {
+            "value": "[variables('subnetRefPublic')]"
+          },
+          "openVpnUser": {
+            "value": "[parameters('openVpnUser')]"
+          },
+          "openVpnPassword": {
+            "value": "[parameters('openVpnPassword')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          }
         }
       }
     },
 
-    {
-      "apiVersion": "[variables('networkApiVersion')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('openvpnnicName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "cluster": "[variables('nonDotClusterName')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]",
-        "[concat('Microsoft.Resources/deployments/', variables('maprNetworkTemplate'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(variables('threeDotSubnetPublic'), variables('startOctet'))]",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('openvpnpublicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetRefPublic')]"
-              }
-            }
-          }
-        ]
-      }
-    },
-
-    {
-      "apiVersion": "[variables('computeApiVersion')]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[variables('openvpnvmName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": ["[resourceId('Microsoft.Network/networkInterfaces/', variables('openvpnnicName'))]"],
-      "tags": {
-        "Role": "MapR OpenVPN Access",
-        "SubRole": "OpenVPN Node"
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('openvpnvmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[variables('openvpnvmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference" : {
-            "publisher": "Canonical",
-            "offer": "UbuntuServer",
-            "sku": "14.04.2-LTS",
-            "version": "latest"
-          },
-          "osDisk": {
-            "createOption": "FromImage",
-            "osType": "Linux",
-            "name": "[variables('openvpnosDiskName')]",
-            "managedDisk": {
-              "storageAccountType": "[parameters('diskType')]"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('openvpnnicName'))]"
-            }
-          ]
-        }
-      },
-      "resources": [{
-        "apiVersion": "[variables('computeApiVersion')]",
-        "name": "run-configure",
-        "type": "extensions",
-        "location": "[resourceGroup().location]",
-        "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachines/', variables('openvpnvmName'))]"
-        ],
-        "tags": {
-          "displayName": "openvpn-installer"
-        },
-        "properties": {
-          "publisher": "Microsoft.Azure.Extensions",
-          "type": "CustomScript",
-          "typeHandlerVersion": "2.0",
-          "autoUpgradeMinorVersion": true,
-          "settings": {
-            "fileUris": [
-              "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/openvpn-access-server-ubuntu/install_openvpn_access_server.sh",
-              "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-vpn-configure.sh"
-            ]
-          },
-          "protectedSettings": {
-            "commandToExecute": "[concat('bash install_openvpn_access_server.sh ', parameters('adminPassword'), ' && bash mapr-vpn-configure.sh ', parameters('adminUsername'), ' ', parameters('adminPassword'), ' ', variables('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn)]"
-          }
-        }
-      }]
-    },
-
-    
-    
-    
-    
     {
       "name": "[variables('maprVMTemplate')]",
       "type": "Microsoft.Resources/deployments",
@@ -329,7 +359,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('artifactsBaseUrl'), '/vm.json')]",
+          "uri": "[concat(parameters('artifactsBaseUrl'), '/vm_', parameters('adminAuthType'), '.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -342,11 +372,17 @@
           "instanceType": {
             "value": "[parameters('instanceType')]"
           },
+          "adminAuthType": {
+            "value": "[parameters('adminAuthType')]"
+          },
           "adminUsername": {
             "value": "[parameters('adminUsername')]"
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "adminPublicKey": {
+            "value": "[parameters('adminPublicKey')]"
           },
           "maprimageName": {
             "value": "[variables('maprimageName')]"
@@ -369,11 +405,8 @@
           "clusterName": {
             "value": "[parameters('clusterName')]"
           },
-          "threeDotSubnetPrivate": {
-            "value": "[variables('threeDotSubnetPrivate')]"
-          },
-          "startOctet": {
-            "value": "[variables('startOctet')]"
+          "ipAddress": {
+            "value": "[parameters('vnetPrivateSubnetStartAddress')]"
           },
           "nodeCount": {
             "value": "[parameters('nodeCount')]"
@@ -384,29 +417,32 @@
           "subnetRefPrivate": {
             "value": "[variables('subnetRefPrivate')]"
           },
-          "maprPassword": {
-            "value": "[variables('maprPassword')]"
+          "clusterAdminPassword": {
+            "value": "[parameters('clusterAdminPassword')]"
+          },
+          "licenseType": {
+            "value": "[parameters('licenseType')]"
           }
         }
       }
     }
-
-
-
-
   ],
   "outputs": {
-    "openvpn_fqdn": {
+    "MaprInstallerIp": {
       "type": "string",
-      "value": "[reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn]"
+      "value": "[parameters('vnetPrivateSubnetStartAddress')]"
     },
-    "installer_url": {
-      "type" : "string",
-      "value": "Need installer URL here..."
+    "SSHUser": {
+      "type": "string",
+      "value": "[parameters('adminUsername')]"
     },
-    "somelinkedtemplate": {
-      "type": "object",
-      "value": "[reference(variables('maprVMTemplate')).outputs.ateststring]"
+    "ClusterName": {
+      "type": "string",
+      "value": "[parameters('clusterName')]"
+    },
+    "MaprInstallerUrl": {
+      "type": "string",
+      "value": "[concat('https://', parameters('vnetPrivateSubnetStartAddress'), ':9443/#/status')]"
     }
   }
 }
