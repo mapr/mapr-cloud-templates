@@ -184,8 +184,8 @@
           "settings": {
             "fileUris": [
               "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/openvpn-access-server-ubuntu/install_openvpn_access_server.sh",
-              "[concat(parameters('artifactsBaseUrl'), 'mapr-vpn-configure.sh')]",
-              "[concat(parameters('artifactsBaseUrl'), 'mapr-vpn.sh')]"
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-vpn-configure.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-vpn.sh')]"
             ]
           },
           "protectedSettings": {
