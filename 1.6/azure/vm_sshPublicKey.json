@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "providerID": {
+      "type": "string"
+    },
     "maprvmName": {
       "type": "string"
     },
@@ -130,6 +133,7 @@
       "name": "[concat(parameters('maprnicName'), '0')]",
       "location": "[parameters('location')]",
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
         "cluster": "[parameters('clusterName')]"
       },
@@ -156,6 +160,7 @@
       "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
       "location": "[parameters('location')]",
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
         "cluster": "[parameters('clusterName')]"
       },
@@ -188,6 +193,7 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
       ],
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
         "subRole": "Installer and Server Node",
         "cluster": "[parameters('clusterName')]"
@@ -243,6 +249,7 @@
           "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), '0')]"
         ],
         "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
           "displayName": "mapr-installer",
           "cluster": "[parameters('clusterName')]"
         },
@@ -278,6 +285,7 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
       ],
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
         "subRole": "Server Node",
         "cluster": "[parameters('clusterName')]"
@@ -334,6 +342,7 @@
           "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), add(copyIndex(), 1))]"
         ],
         "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
           "displayName": "mapr-init",
           "cluster": "[parameters('clusterName')]"
         },

@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "providerID": {
+      "type": "string"
+    },
     "clusterName": {
       "type": "string"
     },
@@ -85,6 +88,9 @@
   "resources": [
     {
       "apiVersion": "[variables('networkApiVersion')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]"
+      },
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('openvpnpublicIPAddressName')]",
       "location": "[parameters('location')]",
@@ -102,6 +108,7 @@
       "name": "[variables('openvpnnicName')]",
       "location": "[parameters('location')]",
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR OpenVPN Access",
         "cluster": "[parameters('clusterName')]"
       },
@@ -198,6 +205,7 @@
       "location": "[parameters('location')]",
       "dependsOn": ["[resourceId('Microsoft.Network/networkInterfaces/', variables('openvpnnicName'))]"],
       "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR OpenVPN Access",
         "subRole": "OpenVPN Node",
         "cluster": "[parameters('clusterName')]"
@@ -240,6 +248,7 @@
           "[concat('Microsoft.Compute/virtualMachines/', variables('openvpnvmName'))]"
         ],
         "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
           "displayName": "openvpn-configure",
           "cluster": "[parameters('clusterName')]"
         },
