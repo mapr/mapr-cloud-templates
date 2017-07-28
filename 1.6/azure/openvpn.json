@@ -117,7 +117,7 @@
       ],
       "properties": {
         "networkSecurityGroup": {
-          "id": "[concat(parameters('clusterName'), '-nsg']",
+          "id": "[concat(parameters('clusterName'), '-nsg')]",
           "location": "[parameters('location')]",
           "properties": {
             "securityRules": [
