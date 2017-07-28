@@ -20,13 +20,7 @@
     "subnetPrefixPrivate": {
       "type": "string"
     },
-    "publicAccessCIDR": {
-      "type": "string"
-    },
     "clusterName": {
-      "type": "string"
-    },
-    "maprsgName": {
       "type": "string"
     },
     "location": {
@@ -39,77 +33,6 @@
   "resources": [
     {
       "apiVersion": "[variables('networkApiVersion')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[parameters('maprsgName')]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "displayName": "MapR Security Group",
-        "cluster": "[parameters('clusterName')]"
-      },
-      "properties": {
-        "securityRules": [
-          {
-            "name": "openvpn-rule1",
-            "properties": {
-              "description": "Allow 943",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "943",
-              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "openvpn-rule2",
-            "properties": {
-              "description": "Allow 443",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 200,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "openvpn-rule3",
-            "properties": {
-              "description": "Allow 1194",
-              "protocol": "Udp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "1194",
-              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 300,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "openvpn-rule4",
-            "properties": {
-              "description": "Allow 22",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "22",
-              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 400,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
-
-    {
-      "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
@@ -117,9 +40,6 @@
         "displayName": "MapR Virtual Network",
         "cluster": "[parameters('clusterName')]"
       },
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
-      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -131,9 +51,6 @@
             "name": "[parameters('subnetNamePublic')]",
             "properties": {
               "addressPrefix": "[parameters('subnetPrefixPublic')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('maprsgName'))]"
-              }
             }
           },
           {
