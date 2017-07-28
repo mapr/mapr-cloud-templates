@@ -117,7 +117,7 @@
       ],
       "properties": {
         "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OpenVPN-nsg'))]",
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'OpenVPN-nsg')]",
           "location": "[parameters('location')]",
           "properties": {
             "securityRules": [
