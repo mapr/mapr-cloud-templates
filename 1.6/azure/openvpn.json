@@ -38,9 +38,6 @@
     "addressPrefix": {
       "type": "string"
     },
-    "maprsgName": {
-      "type": "string"
-    },
     "publicAccessCIDR": {
       "type": "string"
     },
@@ -109,8 +106,7 @@
         "cluster": "[parameters('clusterName')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]"
       ],
       "properties": {
         "networkSecurityGroup": {
