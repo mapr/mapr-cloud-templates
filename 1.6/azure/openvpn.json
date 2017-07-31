@@ -290,6 +290,10 @@
       "type": "string",
       "value": "[reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn]"
     },
+    "OpenVpnConnect": {
+      "type": "string",
+      "value": "[concat('https://', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ':943')]"
+    },
     "OpenVpnAdmin": {
       "type": "string",
       "value": "[concat('https://', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ':943/admin')]"
