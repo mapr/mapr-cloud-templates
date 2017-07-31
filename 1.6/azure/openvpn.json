@@ -289,6 +289,10 @@
     "OpenVpnFqdn": {
       "type": "string",
       "value": "[reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn]"
+    },
+    "OpenVpnAdmin": {
+      "type": "string",
+      "value": "[concat('https://', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ':943/admin')]"
     }
   }
 }
