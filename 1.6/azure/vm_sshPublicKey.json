@@ -70,6 +70,9 @@
     },
     "imageReference": {
       "type": "object"
+    },
+    "plan": {
+      "type": "object"
     }
   },
   "variables": {
@@ -194,6 +197,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
       ],
+      "plan": "[parameters('plan')]",
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
@@ -284,6 +288,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
       ],
+      "plan": "[parameters('plan')]",
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
