@@ -56,8 +56,8 @@
             "toolTip": "A name that will uniquely identify the MapR cluster",
             "constraints": {
               "required": true,
-              "regex": "^[a-zA-Z0-9]{1}[a-zA-Z0-9_\\-\\.]{3,98}[a-zA-Z0-9]{1}$",
-              "validationMessage": "Cluster name must be between 5 and 100 characters long, and can contain only numbers, lowercase letters, _ or -; Must not begin or end in _ or -."
+              "regex": "^[a-zA-Z0-9]{1}[a-zA-Z0-9_\\-\\.]{5,50}[a-zA-Z0-9]{1}$",
+              "validationMessage": "Cluster name must be between 5 and 50 characters long, and can contain only numbers, lowercase letters, _ or -; Must not begin or end in _ or -."
             }
           },
           {
@@ -69,8 +69,8 @@
             },
             "constraints": {
               "required": true,
-              "regex": ".{4,}",
-              "validationMessage": "Must be 4 characters or more"
+              "regex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}$",
+              "validationMessage": "Password must be at least 6 characters, no more than 30 characters, and must include at least one upper case letter, one lower case letter, and one numeric digit."
             },
             "toolTip": "Password for UID mapr",
             "options": {
@@ -210,14 +210,7 @@
                 "Standard_L4s",
                 "Standard_L8s",
                 "Standard_L16s",
-                "Standard_L32s",
-                "Standard_NC6",
-                "Standard_NC12",
-                "Standard_NC24",
-                "Standard_NC24r",
-                "Standard_NV6",
-                "Standard_NV12",
-                "Standard_NV24"
+                "Standard_L32s"
               ]
             },
             "imageReference": {
@@ -297,7 +290,7 @@
             "constraints": {
               "required": true,
               "regex": "^[0-9]{1,4}$",
-              "validationMessage": "Must be a number between 1 and 9999"
+              "validationMessage": "Must be a number between 1 and 4095"
             },
             "defaultValue": "127"
           }
@@ -325,10 +318,10 @@
             },
             "defaultValue": {
               "name": "mapr-vnet",
-              "addressPrefixSize": "/16"
+              "addressPrefixSize": "/22"
             },
             "constraints": {
-              "minAddressPrefixSize": "/16"
+              "minAddressPrefixSize": "/24"
             },
             "subnets": {
               "mapr-private-subnet": {
@@ -339,7 +332,7 @@
                 },
                 "constraints": {
                   "minAddressPrefixSize": "/24",
-                  "minAddressCount": 100,
+                  "minAddressCount": 50,
                   "requireContiguousAddresses": true
                 }
               },
@@ -356,6 +349,16 @@
                 }
               }
             }
+          },
+          {
+            "name": "publicAccessCIDR",
+            "label": "Public internet access CIDR",
+            "type": "Microsoft.Common.TextBox",
+            "constraints": {
+              "required": true
+            },
+            "defaultValue": "*",
+            "toolTip": "Public internet access CIDR. Use * for all internet traffic"
           },
           {
             "type": "Microsoft.Common.OptionsGroup",
@@ -396,8 +399,8 @@
             },
             "constraints": {
               "required": true,
-              "regex": ".{4,}",
-              "validationMessage": "Must be 4 characters or more"
+              "regex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}$",
+              "validationMessage": "Password must be at least 6 characters, no more than 30 characters, and must include at least one upper case letter, one lower case letter, and one numeric digit."
             },
             "toolTip": "Always use a strong password to protect your cluster",
             "options": {
@@ -435,7 +438,8 @@
       "vnetPrivateSubnetStartAddress": "[steps('accessSecurity').virtualNetwork.subnets.mapr-private-subnet.startAddress]",
       "vnetPublicSubnetName": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.name]",
       "vnetPublicSubnetAddressPrefix": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.addressPrefix]",
-      "vnetPublicSubnetStartAddress": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.startAddress]"
+      "vnetPublicSubnetStartAddress": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.startAddress]",
+      "location": "[location()]"
     }
   }
 }

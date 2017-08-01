@@ -91,20 +91,20 @@
     "diskSize":  {
       "type": "int",
       "minValue": 31,
-      "maxValue": 1023,
+      "maxValue": 4095,
       "defaultValue": 31
     },
     "diskCount": {
       "type": "int",
       "minValue": 1,
-      "maxValue": 6,
-      "defaultValue": 2
+      "maxValue": 8,
+      "defaultValue": 3
     },
     "publicAccessCIDR": {
       "type": "string",
       "defaultValue": "*",
       "metadata": {
-        "description": "Public access CIDR. Use * for all internet traffic. Use 12.220.154.66/27 to restrict to internal MapR"
+        "description": "Public internet access CIDR. Use * for all internet traffic"
       }
     },
     "installOpenVPN": {
@@ -195,10 +195,16 @@
       "metadata": {
         "description": "Virtual network public subnet start address"
       }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Region"
+      }
     }
   },
   "variables": {
-    "maprimageName": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MAPRIMAGECREATERG/providers/Microsoft.Compute/images/MapRImage",
+    "providerID": "CD79582D-BEB4-4325-9DD6-34E684A304DB",
 
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
     "nonDashClusterName": "[replace(parameters('clusterName'), '.', '')]",
@@ -232,6 +238,22 @@
     "networkApiVersion": "2017-04-01",
     "computeApiVersion": "2017-03-30",
     "deploymentsVersion": "2016-06-01",
+
+    "imagePublisher": "mapr-technologies",
+    "imageOffer": "mapr52-base-dev-preview",
+    "imageSKU": "52",
+    "imageVersion": "latest",
+    "imageReference": {
+      "publisher": "[variables('imagePublisher')]",
+      "offer": "[variables('imageOffer')]",
+      "sku": "[variables('imageSKU')]",
+      "version": "[variables('imageVersion')]"
+    },
+    "plan": {
+      "name": "[variables('imageSKU')]",
+      "publisher": "[variables('imagePublisher')]",
+      "product": "[variables('imageOffer')]"
+    },
 
     "password_osProfile": {
       "computername": "[variables('maprvmName')]",
@@ -267,6 +289,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "providerID": {
+            "value": "[variables('providerID')]"
+          },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
@@ -285,14 +310,11 @@
           "subnetPrefixPrivate": {
             "value": "[variables('subnetPrefixPrivate')]"
           },
-          "publicAccessCIDR": {
-            "value": "[parameters('publicAccessCIDR')]"
-          },
           "clusterName": {
             "value": "[parameters('clusterName')]"
           },
-          "maprsgName": {
-            "value": "[variables('maprsgName')]"
+          "location": {
+            "value": "[parameters('location')]"
           }
         }
       }
@@ -311,6 +333,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "providerID": {
+            "value": "[variables('providerID')]"
+          },
           "clusterName": {
             "value": "[parameters('clusterName')]"
           },
@@ -346,6 +371,18 @@
           },
           "addressPrefix": {
             "value": "[variables('addressPrefix')]"
+          },
+          "publicAccessCIDR": {
+            "value": "[parameters('publicAccessCIDR')]"
+          },
+          "maprsgName": {
+            "value": "[variables('maprsgName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
           }
         }
       }
@@ -363,6 +400,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "providerID": {
+            "value": "[variables('providerID')]"
+          },
           "maprvmName": {
             "value": "[variables('maprvmName')]"
           },
@@ -383,9 +423,6 @@
           },
           "adminPublicKey": {
             "value": "[parameters('adminPublicKey')]"
-          },
-          "maprimageName": {
-            "value": "[variables('maprimageName')]"
           },
           "maprosDiskName": {
             "value": "[variables('maprosDiskName')]"
@@ -422,6 +459,18 @@
           },
           "licenseType": {
             "value": "[parameters('licenseType')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "imageReference": {
+            "value": "[variables('imageReference')]"
+          },
+          "plan": {
+            "value": "[variables('plan')]"
           }
         }
       }
@@ -443,6 +492,10 @@
     "MaprInstallerUrl": {
       "type": "string",
       "value": "[concat('https://', parameters('vnetPrivateSubnetStartAddress'), ':9443/#/status')]"
+    },
+    "Location": {
+      "type": "string",
+      "value": "[parameters('location')]"
     }
   }
 }
