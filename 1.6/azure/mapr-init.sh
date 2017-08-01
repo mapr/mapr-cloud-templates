@@ -84,6 +84,11 @@ passwordless_sudo() {
         msg_err "Could not set passwordless ssh for OS admin user"
 }
 
+[ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $MAPR_HOME/conf/env
+[ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $MAPR_HOME/conf/env
+[ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $MAPR_HOME/conf/env
+[ -f $MAPR_HOME/conf/env ] && cat $MAPR_HOME/conf/env >> /etc/environment && . $MAPR_HOME/conf/env
+
 mapr_user_properties_json $PROPERTIES_JSON
 echo "MapR user from properties file is: '$RESULT'"
 MAPR_USER_PROPERTIES=$RESULT
@@ -98,10 +103,3 @@ MAPR_USER=$RESULT
 
 change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
-
-[ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $MAPR_HOME/conf/env
-[ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $MAPR_HOME/conf/env
-[ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $MAPR_HOME/conf/env
-[ -f $MAPR_HOME/conf/env ] && cat $MAPR_HOME/conf/env >> /etc/environment && . $MAPR_HOME/conf/env
-
-exit 0
