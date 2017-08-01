@@ -244,10 +244,7 @@
     "imageSKU": "52",
     "imageVersion": "latest",
     "imageReference": {
-      "publisher": "[variables('imagePublisher')]",
-      "offer": "[variables('imageOffer')]",
-      "sku": "[variables('imageSKU')]",
-      "version": "[variables('imageVersion')]"
+      "id": "<path to image here>"
     },
     "plan": {
       "name": "[variables('imageSKU')]",
