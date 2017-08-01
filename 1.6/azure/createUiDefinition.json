@@ -184,11 +184,9 @@
             ],
             "constraints": {
               "allowedSizes": [
-                "Standard_DS4_v3",
-                "Standard_DS8_v3",
-                "Standard_DS16_v3",
-                "Standard_DS32_v3",
-                "Standard_DS64_v3",
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
                 "Standard_F8s",
                 "Standard_F16s",
                 "Standard_DS3_v2",
