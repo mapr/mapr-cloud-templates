@@ -67,10 +67,12 @@
     },
     "artifactsBaseUrl": {
       "type": "string"
+    },
+    "imageReference": {
+      "type": "object"
     }
   },
   "variables": {
-    "maprimageName": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MAPRIMAGECREATERG/providers/Microsoft.Compute/images/MapRImage",
     "imagePublisher": "mapr-technologies",
     "imageOffer": "mapr52-base-dev-preview",
     "imageSKU": "52",
@@ -219,9 +221,7 @@
           }
         },
         "storageProfile": {
-          "imageReference": {
-            "id": "[variables('maprimageName')]"
-          },
+          "imageReference": "[parameters('imageReference')]",
           "osDisk": {
             "createOption": "FromImage",
             "osType": "Linux",
@@ -311,9 +311,7 @@
           }
         },
         "storageProfile": {
-          "imageReference": {
-            "id": "[variables('maprimageName')]"
-          },
+          "imageReference": "[parameters('imageReference')]",
           "osDisk": {
             "createOption": "FromImage",
             "osType": "Linux",
