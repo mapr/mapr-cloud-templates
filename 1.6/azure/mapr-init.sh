@@ -99,11 +99,9 @@ MAPR_USER=$RESULT
 change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
 
-#IF THE VPC REQUIRES PROXY SETTINGS ON THE HOST,
-#UNCOMMENT AND UPDATE WITH THE PROXY SETTINGS
-#export http_proxy=INSERT CORRECT VALUE
-#export https_proxy=INSERT CORRECT VALUE
-#export no_proxy=169.254.169.254
-#echo http_proxy=$http_proxy >> /etc/environment
-#echo https_proxy=$https_proxy >> /etc/environment
-#echo no_proxy=$no_proxy >> /etc/environment
+[ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $MAPR_HOME/conf/env
+[ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $MAPR_HOME/conf/env
+[ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $MAPR_HOME/conf/env
+[ -f $MAPR_HOME/conf/env ] && cat $MAPR_HOME/conf/env >> /etc/environment && . $MAPR_HOME/conf/env
+
+exit 0
