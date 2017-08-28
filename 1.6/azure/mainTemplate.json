@@ -240,7 +240,7 @@
     "deploymentsVersion": "2016-06-01",
 
     "imagePublisher": "mapr-technologies",
-    "imageOffer": "mapr52-base-dev-preview",
+    "imageOffer": "mapr52-base-dev",
     "imageSKU": "52",
     "imageVersion": "latest",
     "imageReference": {

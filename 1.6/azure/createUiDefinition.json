@@ -211,7 +211,7 @@
             },
             "imageReference": {
               "publisher": "mapr-technologies",
-              "offer": "mapr52-base-dev-preview",
+              "offer": "mapr52-base-dev",
               "sku": "52"
             }
           },
