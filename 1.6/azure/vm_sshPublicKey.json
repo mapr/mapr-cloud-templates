@@ -1,0 +1,382 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "providerID": {
+      "type": "string"
+    },
+    "maprvmName": {
+      "type": "string"
+    },
+    "maprnicName": {
+      "type": "string"
+    },
+    "instanceType": {
+      "type": "string"
+    },
+    "adminAuthType": {
+      "type": "string"
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "string"
+    },
+    "adminPublicKey": {
+      "type": "string"
+    },
+    "maprosDiskName": {
+      "type": "string"
+    },
+    "diskType": {
+      "type": "string"
+    },
+    "diskCount": {
+      "type": "int"
+    },
+    "diskSize": {
+      "type": "int"
+    },
+    "mepVersion": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "nodeCount": {
+      "type": "int"
+    },
+    "serviceTemplate": {
+      "type": "string"
+    },
+    "subnetRefPrivate": {
+      "type": "string"
+    },
+    "clusterAdminPassword": {
+      "type": "securestring"
+    },
+    "licenseType": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "artifactsBaseUrl": {
+      "type": "string"
+    },
+    "imageReference": {
+      "type": "object"
+    },
+    "plan": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "computeApiVersion": "2017-03-30",
+    "networkApiVersion": "2017-04-01",
+    "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
+    "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
+
+    "threeDotSubnetPrivate": "[take(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.')))]",
+    "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
+    "startOctetPlus1": "[add(1, variables('startOctet'))]",
+
+    "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
+    "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString')))]",
+
+    "maprdataDiskCache": "ReadOnly",
+    "diskArray": [{
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 0,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 1,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 2,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 3,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 4,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 5,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 6,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    },
+    {
+      "diskSizeGB": "[parameters('diskSize')]",
+      "lun": 7,
+      "createOption": "Empty",
+      "caching": "[variables('maprdataDiskCache')]"
+    }]
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('maprnicName'), '0')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR Cluster",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('ipAddress')]",
+              "subnet": {
+                "id": "[parameters('subnetRefPrivate')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "condition": "[greater(parameters('nodeCount'), 1)]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR Cluster",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "copy": {
+        "name": "nicopy",
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[concat('ipconfig', add(2, copyIndex()))]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex()))]",
+              "subnet": {
+                "id": "[parameters('subnetRefPrivate')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "[variables('computeApiVersion')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('maprvmName'), '0')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
+      ],
+      "plan": "[parameters('plan')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR Cluster",
+        "subRole": "Installer and Server Node",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('instanceType')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('maprvmName'), '0')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[variables('unusedPassword')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "false",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": "[parameters('imageReference')]",
+          "osDisk": {
+            "createOption": "FromImage",
+            "osType": "Linux",
+            "name": "[concat(parameters('maprosDiskName'), '0')]",
+            "managedDisk": {
+              "storageAccountType": "[parameters('diskType')]"
+            }
+          },
+          "dataDisks": "[take(variables('diskArray'), parameters('diskCount'))]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
+            }
+          ]
+        }
+      },
+      "resources": [{
+        "apiVersion": "[variables('computeApiVersion')]",
+        "name": "mapr-installer",
+        "type": "extensions",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), '0')]"
+        ],
+        "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
+          "displayName": "mapr-installer",
+          "cluster": "[parameters('clusterName')]"
+        },
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-init.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-cloud-configure.sh')]"
+            ]
+          },
+          "protectedSettings": {
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', variables('threeDotSubnetPrivate'), ' ', variables('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', subscription().subscriptionId, ' ', subscription().tenantId, ' ', parameters('licenseType'))]"
+          }
+        }
+      }]
+    },
+
+    {
+      "condition": "[greater(parameters('nodeCount'), 1)]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "vmcopy",
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
+      ],
+      "plan": "[parameters('plan')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR Cluster",
+        "subRole": "Server Node",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('instanceType')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[variables('unusedPassword')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "false",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": "[parameters('imageReference')]",
+          "osDisk": {
+            "createOption": "FromImage",
+            "osType": "Linux",
+            "name": "[concat(parameters('maprosDiskName'), add(copyIndex(), 1))]",
+            "managedDisk": {
+              "storageAccountType": "[parameters('diskType')]"
+            }
+          },
+          "dataDisks": "[take(variables('diskArray'), parameters('diskCount'))]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
+            }
+          ]
+        }
+      },
+      "resources": [{
+        "condition": "[greater(parameters('nodeCount'), 1)]",
+        "apiVersion": "[variables('computeApiVersion')]",
+        "name": "mapr-init",
+        "type": "extensions",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('maprvmName'), add(copyIndex(), 1))]"
+        ],
+        "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
+          "displayName": "mapr-init",
+          "cluster": "[parameters('clusterName')]"
+        },
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-init.sh')]"
+            ]
+          },
+          "protectedSettings": {
+            "commandToExecute": "[concat('bash mapr-init.sh ', parameters('clusterAdminPassword'))]"
+          }
+        }
+      }]
+    }
+  ],
+  "outputs": {
+    "MaprInstallerNic": {
+      "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0')), variables('networkApiVersion'))]",
+      "type": "object"
+    }
+  }
+}

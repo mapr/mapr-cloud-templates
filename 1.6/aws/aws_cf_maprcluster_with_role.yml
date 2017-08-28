@@ -1,0 +1,488 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create the AWS role required and setup a MapR cluster'
+# This template OPTIONALLY creates an OpenVPN instance.
+# This is just a template. The AMI images listed are invalid. Please replace with
+# valid AMI images before use. Also, update the SSH_USER to match the root user
+# for your AMI.
+Parameters:
+  clusterName:
+    Description: Cluster name
+    Default: my.cluster.com
+    Type: String
+    #MaxLength:
+    #AllowedPattern:
+  MEP:
+    Description: MapR Ecosystem Pack version
+    Type: String
+    AllowedValues: [ 3.0.1 ]
+    Default: 3.0.1
+  provisioningTemplate:
+    Description: Auto-provisioning templates for specific use cases
+    Type: String
+    AllowedValues: ["Converged-Platform", "Data-Lake", "Data-Exploration", "Operational-Analytics", "Real-Time-Analytics", "Custom-Configuration" ]
+    Default: "Converged-Platform"
+  nodeCount:
+    Description: Number of nodes in cluster
+    Type: Number
+    Default: 3
+  useInstanceStore:
+    Description: If the machine type supports instance stores (ephemeral disks), use only those disks. No EBS volumes will be attached.
+    Type: String
+    AllowedValues: [True, False]
+    Default: False
+  diskType:
+    Description: AWS EBS volume types - http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html. Min for st1 volumes is 500G
+    Type: String
+    AllowedValues: [ "gp2", "io1", "st1" ]
+    Default: "gp2"
+  diskSize:
+    Description: GB
+    Type: Number
+    Default: 100
+  diskCount:
+    Description: Number of EBS volumes per node
+    Type: Number
+    AllowedValues: [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+    Default: 3
+  clusterAdminPassword:
+    Description: Password for UID mapr
+    Type: String
+    NoEcho: True
+    AllowedPattern: ".+"
+    ConstraintDescription: must provide a password
+  keyName:
+    Description: AWS key pair used to create nodes
+    Type: AWS::EC2::KeyPair::KeyName
+    AllowedPattern: ".+"
+    ConstraintDescription: must select an existing EC2 KeyPair
+  instanceType:
+    Description: AWS Instance types - https://aws.amazon.com/ec2/instance-types
+    Type: String
+    AllowedValues: [ m4.xlarge, m4.4xlarge, m4.10xlarge, m4.16xlarge, d2.xlarge, d2.2xlarge, d2.4xlarge, d2.8xlarge, i3.large, i3.xlarge, i3.2xlarge, i3.4xlarge, i3.8xlarge, m3.xlarge, m3.2xlarge, c4.2xlarge, c4.4xlarge, c4.8xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, r4.large, r4.xlarge, r4.2xlarge, r4.4xlarge, r4.8xlarge, r3.large, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge  ]
+    Default: m4.xlarge
+  installerOnItsOwn:
+    Description: Setup the cluster installer on a separate node
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+  useExistingSubnet:
+    Description: Id of subnet to be used (e.g. subnet-123456). The subnet should be able to access the Internet. Leave it empty to create a new VPC and subnets.
+    Type: String
+    Default: ""
+  securityGroups:
+    Description: Security group ids for an existing subnet if specified above, otherwise empty. Include all required security group ids including "default".
+    Type: CommaDelimitedList
+    Default: ""
+  installOpenVPN:
+    Description: Enable public Internet access to MapR cluster with OpenVPN. If you are using an existing subnet, this is ignored.
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+  openVPNuser:
+    Description: OpenVPN login user
+    Type: String
+    Default: openvpn
+  openVPNpassword:
+    Description: OpenVPN login user password. Always use a strong password to protect your cluster.
+    Type: String
+    NoEcho: True
+  publicAccessCIDR:
+    Description: Recommended to restrict to your corporate IP range
+    Type: String
+    Default: 0.0.0.0/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+Conditions:
+  InstallOpenVPN: !And [!Equals [!Ref installOpenVPN, true], !Equals [!Ref useExistingSubnet, ""]]
+  CreateVPC: !Equals [!Ref useExistingSubnet, ""]
+  UseInstallerNode: !Equals [!Ref installerOnItsOwn, false]
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "AWS Infrastructure Configuration"
+        Parameters:
+          - keyName
+      -
+        Label:
+          default: "MapR Cluster Configuration"
+        Parameters:
+          - clusterName
+          - clusterAdminPassword
+          - MEP
+          - provisioningTemplate
+          - nodeCount
+          - installerOnItsOwn
+      -
+        Label:
+          default: "Node Configuration"
+        Parameters:
+          - instanceType
+          - useInstanceStore
+          - diskCount
+          - diskType
+          - diskSize
+      -
+        Label:
+          default: "Network, Access and Security"
+        Parameters:
+          - useExistingSubnet
+          - securityGroups
+          - installOpenVPN
+          - openVPNuser
+          - openVPNpassword
+          - publicAccessCIDR
+Mappings:
+  Variables:
+    Keys:
+      SSHUSER: "centos"
+      MAPRCORE: "5.2.2"
+      # Update the proxy settings if your environment requires proxy. NOPROXY must include 169.254.169.254,localhost
+      HTTPPROXY: ""
+      HTTPSPROXY: ""
+      NOPROXY: ""
+  StanzaURL:
+    "Custom-Configuration":
+      URL: ""
+      serviceTemplate: ""
+    "Converged-Platform":
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
+      serviceTemplate: "template-05-converged"
+    "Data-Lake":
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
+      serviceTemplate: "template-10-hadoop"
+    "Data-Exploration":
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
+      serviceTemplate: "template-20-drill"
+    "Operational-Analytics":
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
+      serviceTemplate: "template-30-maprdb"
+    "Real-Time-Analytics":
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
+      serviceTemplate: "template-40-maprstreams"
+  SubnetConfig:
+    VPC:
+      CIDR: 172.24.0.0/16
+    Public:
+      CIDR: 172.24.0.0/24
+    Private:
+      CIDR: 172.24.8.0/22
+  RegionMap:
+    #If you update these AMI, make sure to update the login user used in this template
+    #Update with AMI before using the template
+#    us-east-1: # N Viriginia
+#      AMI: ami-0103267a
+#    us-east-2: # Ohio
+#      AMI: ami-a01030c5
+#    us-west-1: # California
+#      AMI: ami-63e6ce03
+#    us-west-2: # Oregon
+#      AMI: ami-accf2bd4
+#    eu-central-1: # Frankfurt
+#      AMI: ami-9bf712f4
+#    eu-west-1: # Ireland
+#      AMI: ami-51da3828
+#    ap-northeast-2: # Seoul
+#      AMI: ami-b1eb35df
+  OpenVPNAMIMap:
+    us-east-1: # N Viriginia
+      AMI: ami-d7576bc1
+      domain: ec2.internal
+    us-east-2: # Ohio
+      AMI: ami-5f35143a
+      domain: us-east-2.compute.internal
+    us-west-1: # California
+      AMI: ami-ee89a58e
+      domain: us-west-1.compute.internal
+    us-west-2: # Oregon
+      AMI: ami-d10819a8
+      domain: us-west-2.compute.internal
+    eu-central-1: # Frankfurt
+      AMI: ami-906ccdff
+      domain: eu-central-1.compute.internal
+    eu-west-1: # Ireland
+      AMI: ami-015fbb78
+      domain: eu-west-1.compute.internal
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Condition: CreateVPC
+    Properties:
+      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws/aws_cf_maprcluster_vpc.yml
+      Parameters:
+        name: !Join ["-", [!Ref clusterName, "vpc"]]
+        publicAccessCIDR: !Ref publicAccessCIDR
+  ClusterNodes:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws/aws_cf_maprcluster_nodes.yml
+      Parameters:
+        clusterName: !Ref clusterName
+        nodeCount: 0
+        diskType: !Ref diskType
+        diskSize: !Ref diskSize
+        diskCount: !Ref diskCount
+        privateSubnets: !If [CreateVPC, !GetAtt VPC.Outputs.PrivateSubnet, !Ref useExistingSubnet]
+        keyName: !Ref keyName
+        instanceType: !Ref instanceType
+        imageId: !FindInMap [ RegionMap, !Ref "AWS::Region", "AMI" ]
+        securityGroups: !Join [",", !If [CreateVPC, [!GetAtt VPC.Outputs.DefaultSecurityGroup], !Ref securityGroups]]
+        userData:
+          Fn::Base64: !Sub
+            - |
+              #!/bin/bash
+              M_HOME=/opt/mapr/installer
+              [ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $M_HOME/conf/env
+              [ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $M_HOME/conf/env
+              [ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $M_HOME/conf/env
+              [ -f $M_HOME/conf/env ] && cat $M_HOME/conf/env >> /etc/environment
+            - HTTP_PROXY: !FindInMap [Variables, "Keys", "HTTPPROXY"]
+              HTTPS_PROXY: !FindInMap [Variables, "Keys", "HTTPSPROXY"]
+              NO_PROXY: !FindInMap [Variables, "Keys", "NOPROXY"]
+  ClusterRole:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws/aws_cf_maprcluster_role.yml
+      Parameters:
+        name: !Ref "AWS::StackName"
+  InstallWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  InstallWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: MaprInstaller
+    Properties:
+      Handle: !Ref "InstallWaitHandle"
+      Timeout: "3000"
+  MaprInstaller:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - ClusterNodes
+      - ClusterRole
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref clusterName, "Installer"]]
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - Ref: AWS::Region
+        - AMI
+      KeyName:
+        Ref: keyName
+      InstanceType: !If [UseInstallerNode, !Ref instanceType, t2.small]
+      IamInstanceProfile: !GetAtt ClusterRole.Outputs.InstanceProfileReference
+      NetworkInterfaces:
+        - DeleteOnTermination: "true"
+          DeviceIndex: 0
+          SubnetId: !If [CreateVPC, !GetAtt VPC.Outputs.PrivateSubnet, !Ref useExistingSubnet]
+          GroupSet: !If [CreateVPC, !Ref "AWS::NoValue", !Ref securityGroups]
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash
+            MAPR_CORE=${MAPR_CORE}
+            SSH_USER=${SSH_USER}
+            M_HOME=/opt/mapr/installer
+            M_USER_PWD=${clusterAdminPassword}
+            statusFile=$M_HOME/logs/cf_status
+            [ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $M_HOME/conf/env
+            [ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $M_HOME/conf/env
+            [ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $M_HOME/conf/env
+            [ -f $M_HOME/conf/env ] && cat $M_HOME/conf/env >> /etc/environment && . $M_HOME/conf/env
+            if ! wget -q -t 10 --retry-connrefused --waitretry=30 http://aws.amazon.com; then
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${clusterName}\", \"Data\" : \"No Internet connection\", \"Reason\" : \"No Internet Connection\" }" > $statusFile
+              curl -T $statusFile '${InstallWaitHandle}'
+              exit 1
+            fi
+            $M_HOME/bin/mapr-setup.sh -y upgrade
+            service mapr-installer start
+            systemctl enable mapr-installer
+            M_USER=$(grep installer_admin_id "$M_HOME/data/properties.json" | cut -d\" -f4)
+            M_GROUP=$(grep installer_admin_group "$M_HOME/data/properties.json" | cut -d\" -f4)
+            echo "$M_USER:$M_USER_PWD" | chpasswd
+            H=$(hostname -f)
+            # Create key to be used by MapR
+            key=$(date | md5sum | head -c 8)
+            key="${clusterName}-$key"
+            key_file=$M_HOME/data/$key
+            . $M_HOME/build/installer/bin/activate
+            #aws ec2 create-key-pair --region ${AWS::Region} --key-name $key --query KeyMaterial --output text > $key_file
+            ssh-keygen -b 2048 -t rsa -f $key_file -q -N '' -C "maprinstaller@${clusterName}"
+            aws ec2 import-key-pair --key-name $key --region ${AWS::Region} --public-key-material "`cat $key_file.pub`"
+            auth_file=$(getent passwd $SSH_USER | cut -d':' -f6)
+            cat $key_file.pub >> $auth_file/.ssh/authorized_keys
+            stackId=$(aws cloudformation describe-stack-resource --region ${AWS::Region} --stack-name ${AWS::StackName} --logical-resource-id ClusterNodes --query 'StackResourceDetail.PhysicalResourceId' --output text)
+            asgId=$(aws cloudformation describe-stack-resources --region ${AWS::Region} --stack-name $stackId --query 'StackResources[?ResourceType==`AWS::AutoScaling::AutoScalingGroup`].PhysicalResourceId' --output text)
+            deactivate
+            chown $M_USER:$M_GROUP $key_file
+            chmod 400 $key_file
+            input=$M_HOME/conf/stanza_input.yml
+            if ${installerOnItsOwn}; then useInstaller=False; else useInstaller=True; fi
+            if ${useInstanceStore}; then use_ephemeral=True; else use_ephemeral=False; fi
+            echo "environment.mapr_core_version=$MAPR_CORE " > $input
+            echo "config.mep_version=${MEP} " >> $input
+            echo "config.cluster_name=${clusterName} " >> $input
+            echo "config.ssh_id=$SSH_USER " >> $input
+            echo "config.ssh_key_file=$key_file " >> $input
+            echo "config.provider.config.aws_region=${AWS::Region} " >> $input
+            echo "config.provider.config.auto_scaling_group=$asgId " >> $input
+            echo "config.provider.config.count=${nodeCount} " >> $input
+            echo "config.provider.config.disk_type=${diskType} " >> $input
+            echo "config.provider.config.disk_size=${diskSize} " >> $input
+            echo "config.provider.config.disk_count=${diskCount} " >> $input
+            echo "config.provider.config.key_name=$key " >> $input
+            echo "config.provider.config.use_installer=$useInstaller " >> $input
+            echo "config.provider.config.use_ephemeral=$use_ephemeral " >> $input
+            chown $M_USER:$M_USER $input
+            status="SUCCESS"
+            reason="No reason provided"
+            data="MapR Installer"
+            # Run stanza if an URL is defined
+            url=${URL}
+            if [ -n "$url" ]; then
+              wget -q -t 10 --retry-connrefused --waitretry=30 --no-check-certificate https://localhost:9443/api/swagger.json -O /tmp/swagger.json
+              if [ -n "${serviceTemplate}" ]; then
+                echo "config.services={\"${serviceTemplate}\":{}}" >> $input
+              fi
+              cd $M_HOME
+              cmd="bin/mapr-installer-cli install -f -n -t $url -u $M_USER:$M_USER_PWD@localhost:9443 -o @$input -o config.cluster_admin_password=$M_USER_PWD -o config.db_admin_password=$M_USER_PWD"
+              sudo -u $M_USER $cmd || status="FAILURE"
+              if [ "$status" == "SUCCESS" ]; then
+                t=$(curl -s -k  "https://$M_USER:$M_USER_PWD@localhost:9443/api/config/services?name=mapr-webserver")
+                p=$(echo $t | sed -e 's/.*"ui_ports":\[\([^,]*\).*/\1/')
+                data=";"
+                for h in $(echo $t | sed -e 's/.*"hosts":\[\([^]]*\).*/\1/' | sed -e 's/,/ /g' -e 's/"//g'); do
+                  data+="https://$h:$p "
+                done
+                data+=";"
+              else
+                t=$(curl -s -k  "https://$M_USER:$M_USER_PWD@localhost:9443/api/process")
+                reason=$(echo $t | sed -n -e 's/.*"status":"\([^",]*\).*/\1/')
+                [ -z $reason ] && reason="Unable to find error reason. Probably failed early provisiong AWS resources. Check installer logs."
+              fi
+            else
+              input=$M_HOME/conf/config.yml
+              echo "environment: " > $input
+              echo "  mapr_core_version: $MAPR_CORE " >> $input
+              echo "config: " >> $input
+              echo "  ssh_id: $SSH_USER " >> $input
+              echo "  ssh_key_file: $key_file " >> $input
+              echo "  cluster_name: ${clusterName} " >> $input
+              echo "  mep_version: ${MEP} " >> $input
+              echo "  provider: " >> $input
+              echo "    id: AWS " >> $input
+              echo "    config: " >> $input
+              echo "      aws_region: ${AWS::Region} " >> $input
+              echo "      auto_scaling_group: $asgId " >> $input
+              echo "      count: ${nodeCount} " >> $input
+              echo "      disk_type: ${diskType} " >> $input
+              echo "      disk_size: ${diskSize} " >> $input
+              echo "      disk_count: ${diskCount} " >> $input
+              echo "      key_name: $key " >> $input
+              echo "  hosts: [] " >> $input
+              cd $M_HOME
+              cmd="bin/mapr-installer-cli import -f -n --config -t $input -u $M_USER:$M_USER_PWD@localhost:9443"
+              sudo -u $M_USER $cmd
+            fi
+            statusFile=$M_HOME/logs/cf_status
+            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${clusterName}\", \"Data\" : \"$data\", \"Reason\" : \"$reason\" }" > $statusFile
+            curl -T $statusFile '${InstallWaitHandle}'
+          - URL: !FindInMap [ StanzaURL, !Ref "provisioningTemplate", "URL" ]
+            serviceTemplate: !FindInMap [ StanzaURL, !Ref "provisioningTemplate", "serviceTemplate" ]
+            SSH_USER: !FindInMap [Variables, "Keys", "SSHUSER"]
+            MAPR_CORE: !FindInMap [Variables, "Keys", "MAPRCORE"]
+            HTTP_PROXY: !FindInMap [Variables, "Keys", "HTTPPROXY"]
+            HTTPS_PROXY: !FindInMap [Variables, "Keys", "HTTPSPROXY"]
+            NO_PROXY: !FindInMap [Variables, "Keys", "NOPROXY"]
+  OpenVPNSG:
+    Type: AWS::EC2::SecurityGroup
+    Condition: InstallOpenVPN
+    Properties:
+      GroupDescription: "OpenVPN Access"
+      VpcId: !GetAtt VPC.Outputs.VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '943'
+        ToPort: '943'
+        CidrIp:
+           Ref: publicAccessCIDR
+      - IpProtocol: tcp
+        FromPort: '443'
+        ToPort: '443'
+        CidrIp:
+           Ref: publicAccessCIDR
+      - IpProtocol: udp
+        FromPort: '1194'
+        ToPort: '1194'
+        CidrIp:
+           Ref: publicAccessCIDR
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp:
+          Fn::FindInMap:
+          - SubnetConfig
+          - VPC
+          - CIDR
+  OpenVPNInstance:
+    Type: AWS::EC2::Instance
+    Condition: InstallOpenVPN
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join: ["-", [Ref: clusterName, "openvpn"]]
+      ImageId:
+        Fn::FindInMap:
+        - OpenVPNAMIMap
+        - Ref: AWS::Region
+        - AMI
+      KeyName:
+        Ref: keyName
+      InstanceType: t2.micro
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeleteOnTermination: "true"
+          DeviceIndex: 0
+          SubnetId: !GetAtt VPC.Outputs.PublicSubnet
+          GroupSet: !If [CreateVPC, [!GetAtt VPC.Outputs.DefaultSecurityGroup, !Ref OpenVPNSG], !Ref "AWS::NoValue"]
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash -x
+            admin_user=${openVPNuser}
+            admin_pw=${openVPNpassword}
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min -v 1.2 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min_strict -v true ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.server.tls_version_min -v 1.2 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.network -v ${CIDRRange} ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.netmask_bits -v 24 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.routing.reroute_dns -v true ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.server.dhcp_option.domain -v ${domain} ConfigPut
+            /usr/local/openvpn_as/scripts/sacli start
+            /usr/local/openvpn_as/scripts/sacli --user router --key prop_autologin --value true UserPropPut
+            systemctl enable openvpnas
+          - CIDRRange: !Select [0, !Split ["/",  !FindInMap [ SubnetConfig, "Public", "CIDR" ]]]
+            domain: !FindInMap [ OpenVPNAMIMap, !Ref "AWS::Region", "domain" ]
+Outputs:
+  ClusterName:
+    Description: Cluster name
+    Value: !Ref clusterName
+  MaprInstallerIp:
+    Description: MapR installer IP Address
+    Value: !GetAtt MaprInstaller.PrivateIp
+  MaprInstallerUrl:
+    Description: MapR installer URL
+    Value: !Join [ "", ["https://", !GetAtt MaprInstaller.PrivateIp, ":9443/#/status"]]
+  SSHUser:
+    Description: SSH userid
+    Value: !FindInMap [Variables, "Keys", "SSHUSER"]
+  OpenVPNIp:
+    Condition: InstallOpenVPN
+    Description: OpenVPN IP Address.
+    Value: !GetAtt OpenVPNInstance.PublicIp
+  OpenVPNUrl:
+    Condition: InstallOpenVPN
+    Description: OpenVPN Admin URL. Login credential openvpn/openvpn.
+    Value: !Join [ "", ["https://", !GetAtt OpenVPNInstance.PublicIp, ":943/admin"]]
