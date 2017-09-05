@@ -1,0 +1,302 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "providerID": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    },
+    "adminAuthType": {
+      "type": "string"
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "adminPublicKey": {
+      "type": "string"
+    },
+    "diskType": {
+      "type": "string"
+    },
+    "fourDotSubnetPublic": {
+      "type": "string"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "subnetRefPublic": {
+      "type": "string"
+    },
+    "openVpnUser": {
+      "type": "string"
+    },
+    "openVpnPassword": {
+      "type": "securestring"
+    },
+    "addressPrefix": {
+      "type": "string"
+    },
+    "publicAccessCIDR": {
+      "type": "string"
+    },
+    "maprsgName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "artifactsBaseUrl": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "computeApiVersion": "2017-03-30",
+    "networkApiVersion": "2017-04-01",
+
+    "publicIPAddressType": "Dynamic",
+    "dnsLabelPrefix": "[toLower(concat(variables('nonDotClusterName'), '-', substring(uniqueString(resourceGroup().id, deployment().name), 0, 4)))]",
+    "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
+    "openvpnnicName": "[concat(variables('nonDotClusterName'), '-openvpn-nic')]",
+    "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
+    "openvpnvmName": "[concat(variables('nonDotClusterName'), '-openvpn-vm')]",
+    "openvpnvmSize": "Standard_DS1_v2",
+    "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]",
+
+    "osProfile_password": {
+      "computerName": "[variables('openvpnvmName')]",
+      "adminUsername": "[parameters('adminUsername')]",
+      "adminPassword": "[parameters('adminPassword')]"
+    },
+    "osProfile_sshPublicKey": {
+      "computerName": "[variables('openvpnvmName')]",
+      "adminUsername": "[parameters('adminUsername')]",
+      "linuxConfiguration": {
+        "disablePasswordAuthentication": "true",
+        "ssh": {
+          "publicKeys": [
+            {
+              "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+              "keyData": "[parameters('adminPublicKey')]"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]"
+      },
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('openvpnpublicIPAddressName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('dnsLabelPrefix')]"
+        }
+      }
+    },
+
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('maprsgName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "displayName": "MapR Security Group",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "openvpn-rule1",
+            "properties": {
+              "description": "Allow 943",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "943",
+              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "openvpn-rule2",
+            "properties": {
+              "description": "Allow 443",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "openvpn-rule3",
+            "properties": {
+              "description": "Allow 1194",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1194",
+              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "openvpn-rule4",
+            "properties": {
+              "description": "Allow 22",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "[parameters('publicAccessCIDR')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 400,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('openvpnnicName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR OpenVPN Access",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('openvpnpublicIPAddressName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
+      ],
+      "properties": {
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('maprsgName'))]"
+        },
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('ipAddress')]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('openvpnpublicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[parameters('subnetRefPublic')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "[variables('computeApiVersion')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('openvpnvmName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[resourceId('Microsoft.Network/networkInterfaces/', variables('openvpnnicName'))]"],
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "role": "MapR OpenVPN Access",
+        "subRole": "OpenVPN Node",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('openvpnvmSize')]"
+        },
+        "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
+        "storageProfile": {
+          "imageReference" : {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "17.04",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "osType": "Linux",
+            "name": "[variables('openvpnosDiskName')]",
+            "managedDisk": {
+              "storageAccountType": "[parameters('diskType')]"
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('openvpnnicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [{
+        "apiVersion": "[variables('computeApiVersion')]",
+        "name": "openvpn-configure",
+        "type": "extensions",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', variables('openvpnvmName'))]"
+        ],
+        "tags": {
+          "provider": "[toUpper(parameters('providerID'))]",
+          "displayName": "openvpn-configure",
+          "cluster": "[parameters('clusterName')]"
+        },
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.0",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "[concat(parameters('artifactsBaseUrl'), '/install_openvpn_access_server.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-vpn-configure.sh')]",
+              "[concat(parameters('artifactsBaseUrl'), '/mapr-vpn.sh')]"
+            ]
+          },
+          "protectedSettings": {
+            "commandToExecute": "[concat('bash mapr-vpn.sh ', parameters('openVpnUser'), ' ', parameters('openVpnPassword'), ' ', parameters('fourDotSubnetPublic'), ' ', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ' ', parameters('addressPrefix'))]"
+          }
+        }
+      }]
+    } ],
+  "outputs": {
+    "OpenVpnFqdn": {
+      "type": "string",
+      "value": "[reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn]"
+    },
+    "OpenVpnConnect": {
+      "type": "string",
+      "value": "[concat('https://', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ':943')]"
+    },
+    "OpenVpnAdmin": {
+      "type": "string",
+      "value": "[concat('https://', reference(variables('openvpnpublicIPAddressName')).dnsSettings.fqdn, ':943/admin')]"
+    }
+  }
+}

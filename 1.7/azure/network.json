@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "providerID": {
+      "type": "string"
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "addressPrefix": {
+      "type": "string"
+    },
+    "subnetNamePublic": {
+      "type": "string"
+    },
+    "subnetPrefixPublic": {
+      "type": "string"
+    },
+    "subnetNamePrivate": {
+      "type": "string"
+    },
+    "subnetPrefixPrivate": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "networkApiVersion": "2017-04-01"
+  },
+  "resources": [
+    {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]",
+        "displayName": "MapR Virtual Network",
+        "cluster": "[parameters('clusterName')]"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetNamePublic')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefixPublic')]"
+            }
+          },
+          {
+            "name": "[parameters('subnetNamePrivate')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefixPrivate')]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
