@@ -197,7 +197,7 @@
         },
         "ipConfigurations": [
           {
-            "name": "ipconfig1",
+            "name": "ipconfig-vpn",
             "properties": {
               "privateIPAllocationMethod": "Static",
               "privateIPAddress": "[parameters('ipAddress')]",
