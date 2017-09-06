@@ -226,7 +226,7 @@
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
-          "linuxConfiguration": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
+          "linuxConfiguration": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
           "imageReference": "[parameters('imageReference')]",
@@ -307,7 +307,7 @@
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
-          "linuxConfiguration": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
+          "linuxConfiguration": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
           "imageReference": "[parameters('imageReference')]",
