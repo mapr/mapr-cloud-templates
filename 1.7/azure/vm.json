@@ -85,9 +85,14 @@
     "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
     "startOctetPlus1": "[add(1, variables('startOctet'))]",
 
-    "publicKeyData": {
-      "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-      "keyData": "[parameters('adminPublicKey')]"
+    "linuxConfiguration": {
+      "disablePasswordAuthentication": "false",
+      "ssh": {
+        "publicKeys": {
+          "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+          "keyData": "[parameters('adminPublicKey')]"
+        }
+      }
     },
 
     "maprdataDiskCache": "ReadOnly",
@@ -221,12 +226,7 @@
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "false",
-            "ssh": {
-              "publicKeys": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('publicKeyData'), json('null'))]"
-            }
-          }
+          "linuxConfiguration": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
           "imageReference": "[parameters('imageReference')]",
@@ -306,7 +306,8 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminPassword": "[parameters('adminPassword')]",
+          "linuxConfiguration": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
           "imageReference": "[parameters('imageReference')]",
