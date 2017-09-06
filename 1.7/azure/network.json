@@ -11,6 +11,12 @@
     "addressPrefix": {
       "type": "string"
     },
+    "subnetNamePublic": {
+      "type": "string"
+    },
+    "subnetPrefixPublic": {
+      "type": "string"
+    },
     "subnetNamePrivate": {
       "type": "string"
     },
@@ -45,6 +51,12 @@
           ]
         },
         "subnets": [
+          {
+            "name": "[parameters('subnetNamePublic')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetPrefixPublic')]"
+            }
+          },
           {
             "name": "[parameters('subnetNamePrivate')]",
             "properties": {
