@@ -88,10 +88,10 @@
     "linuxConfiguration": {
       "disablePasswordAuthentication": "false",
       "ssh": {
-        "publicKeys": {
+        "publicKeys": [ {
           "path": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
           "keyData": "[parameters('adminPublicKey')]"
-        }
+        } ]
       }
     },
 
