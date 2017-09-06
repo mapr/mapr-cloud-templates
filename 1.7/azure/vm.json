@@ -221,8 +221,11 @@
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
-          "ssh": {
-            "publicKeys": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('publicKeyData'), json('null'))]"
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "false",
+            "ssh": {
+              "publicKeys": "if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('publicKeyData'), json('null'))]"
+            }
           }
         },
         "storageProfile": {
