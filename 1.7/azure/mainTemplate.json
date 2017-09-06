@@ -179,27 +179,6 @@
         "description": "Virtual network private subnet start address"
       }
     },
-    "vnetPublicSubnetName": {
-      "type": "string",
-      "defaultValue": "mapr-public-subnet",
-      "metadata": {
-        "description": "Virtual network public subnet name"
-      }
-    },
-    "vnetPublicSubnetAddressPrefix": {
-      "type": "string",
-      "defaultValue": "172.24.0.0/28",
-      "metadata": {
-        "description": "Virtual network public subnet address prefix"
-      }
-    },
-    "vnetPublicSubnetStartAddress": {
-      "type": "string",
-      "defaultValue": "172.24.0.4",
-      "metadata": {
-        "description": "Virtual network public subnet start address"
-      }
-    },
     "location": {
       "type": "string",
       "metadata": {
@@ -218,14 +197,16 @@
 
     "addressPrefix": "[parameters('vnetAddressPrefix')]",
 
-    "fourDotSubnetPublic": "[concat(take(parameters('vnetPublicSubnetStartAddress'), add(lastIndexOf(parameters('vnetPublicSubnetStartAddress'), '.'), 1)), '0')]",
-    "subnetPrefixPublic": "[parameters('vnetPublicSubnetAddressPrefix')]",
-    "subnetNamePublic": "[parameters('vnetPublicSubnetName')]",
-    "subnetRefPublic": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetNamePublic'))]",
+    "fourDotSubnet": "[concat(take(parameters('vnetPrivateSubnetStartAddress'), add(lastIndexOf(parameters('vnetPrivateSubnetStartAddress'), '.'), 1)), '0')]",
 
     "subnetPrefixPrivate": "[parameters('vnetPrivateSubnetAddressPrefix')]",
     "subnetNamePrivate": "[parameters('vnetPrivateSubnetName')]",
     "subnetRefPrivate": "[concat(variables('virtualNetworkId'), '/subnets/', variables('subnetNamePrivate'))]",
+
+    "threeDotSubnetPrivate": "[take(parameters('vnetPrivateSubnetStartAddress'), add(1, lastIndexOf(parameters('vnetPrivateSubnetStartAddress'), '.')))]",
+    "startOctet": "[int(skip(parameters('vnetPrivateSubnetStartAddress'), add(1, lastIndexOf(parameters('vnetPrivateSubnetStartAddress'), '.'))))]",
+    "startOctetPlus1": "[add(1, variables('startOctet'))]",
+    "vmIpAddress": "[concat(variables('threeDotSubnetPrivate'), variables('startOctetPlus1'))]",
 
     "maprnicName": "[concat(variables('nonDotClusterName'), '-mapr-nic')]",
     "maprsgName": "[concat(variables('nonDotClusterName'), '-mapr-sg')]",
@@ -236,9 +217,6 @@
     "maprVMTemplate": "MapR.VM.Template",
     "maprOpenVPNTemplate": "MapR.OpenVPN.Template",
 
-    "osImageSg": "https://baseimagergsa.blob.core.windows.net/",
-    "osImageBase": "[concat(variables('osImageSg'), 'system/Microsoft.Compute/Images/vhds/maprbaseimageprep1-osDisk.vhd')]",
-    "osImageDiskTarget": "[concat(variables('osImageSg'), 'vhds/', parameters('clusterName'), '.vhd')]",
     "networkApiVersion": "2017-04-01",
     "computeApiVersion": "2017-03-30",
     "deploymentsVersion": "2016-06-01",
@@ -257,27 +235,6 @@
       "name": "[variables('imageSKU')]",
       "publisher": "[variables('imagePublisher')]",
       "product": "[variables('imageOffer')]"
-    },
-
-    "password_osProfile": {
-      "computername": "[variables('maprvmName')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "adminPassword": "[parameters('adminPassword')]"
-    },
-    "sshPublicKey_osProfile": {
-      "computername": "[variables('maprvmName')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": "true",
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPublicKey')]"
-            }
-          ]
-        }
-      }
     }
   },
   "resources": [
@@ -301,12 +258,6 @@
           },
           "addressPrefix": {
             "value": "[variables('addressPrefix')]"
-          },
-          "subnetNamePublic": {
-            "value": "[variables('subnetNamePublic')]"
-          },
-          "subnetPrefixPublic": {
-            "value": "[variables('subnetPrefixPublic')]"
           },
           "subnetNamePrivate": {
             "value": "[variables('subnetNamePrivate')]"
@@ -359,13 +310,13 @@
             "value": "[parameters('diskType')]"
           },
           "fourDotSubnetPublic": {
-            "value": "[variables('fourDotSubnetPublic')]"
+            "value": "[variables('fourDotSubnet')]"
           },
           "ipAddress": {
-            "value": "[parameters('vnetPublicSubnetStartAddress')]"
+            "value": "[parameters('vnetPrivateSubnetStartAddress')]"
           },
           "subnetRefPublic": {
-            "value": "[variables('subnetRefPublic')]"
+            "value": "[variables('subnetRefPrivate')]"
           },
           "openVpnUser": {
             "value": "[parameters('openVpnUser')]"
@@ -447,7 +398,7 @@
             "value": "[parameters('clusterName')]"
           },
           "ipAddress": {
-            "value": "[parameters('vnetPrivateSubnetStartAddress')]"
+            "value": "[variables('vmIpAddress')]"
           },
           "nodeCount": {
             "value": "[parameters('nodeCount')]"
