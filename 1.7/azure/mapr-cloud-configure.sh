@@ -168,6 +168,33 @@ LICENSE_TYPE=${12}
 check_os
 OS=$RESULT
 
+echo "MEP: $MEP"
+echo "CLUSTER_NAME: $CLUSTER_NAME"
+echo "MAPR_PASSWORD: <hidden>"
+echo "THREE_DOT_SUBNET_PRIVATE: $THREE_DOT_SUBNET_PRIVATE"
+echo "START_OCTET: $START_OCTET"
+echo "NODE_COUNT: $NODE_COUNT"
+echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
+echo "RESOURCE_GROUP: $RESOURCE_GROUP"
+echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
+echo "MAPR_USER: $MAPR_USER"
+echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
+echo "TENANT_ID: $TENANT_ID"
+echo "LICENSE_TYPE: $LICENSE_TYPE"
+echo "OS: $OS"
+echo "IS_PREPPED: $IS_PREPPED"
+
+create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
+NODE_LIST=$RESULT
+echo "NODE_LIST: $NODE_LIST"
+
+if [ "$IS_PREPPED" == "true" ]; then
+    echo "Upgrading MapR installer if necessary..."
+    /opt/mapr/installer/bin/mapr-setup.sh -y upgrade
+else
+    echo "Downloading mapr-setup to install the MapR installer..."
+fi
+
 build_version
 BUILD_FILE_VERSION=$RESULT
 package_version_$OS
@@ -184,30 +211,10 @@ PACKAGE_VERSION=$RESULT
 compare_versions $BUILD_FILE_VERSION $PACKAGE_VERSION
 echo "Final MapR Core version: '$RESULT'"
 MAPR_CORE=$RESULT
-
-echo "MEP: $MEP"
-echo "CLUSTER_NAME: $CLUSTER_NAME"
-echo "MAPR_PASSWORD: <hidden>"
-echo "THREE_DOT_SUBNET_PRIVATE: $THREE_DOT_SUBNET_PRIVATE"
-echo "START_OCTET: $START_OCTET"
-echo "NODE_COUNT: $NODE_COUNT"
-echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
-echo "RESOURCE_GROUP: $RESOURCE_GROUP"
-echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
 echo "MAPR_CORE: $MAPR_CORE"
-echo "MAPR_USER: $MAPR_USER"
-echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
-echo "TENANT_ID: $TENANT_ID"
-echo "LICENSE_TYPE: $LICENSE_TYPE"
-echo "OS: $OS"
-
-create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
-NODE_LIST=$RESULT
-echo "NODE_LIST: $NODE_LIST"
 
 . $MAPR_HOME/build/installer/bin/activate
 
-/opt/mapr/installer/bin/mapr-setup.sh -y upgrade
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 

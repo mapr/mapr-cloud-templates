@@ -33,8 +33,8 @@ mapr_user_properties_json() {
 
 mapr_owner_properties_json() {
     local output=$(ls -l $1)
-    if [ $? -ne 0 ]; then
-        echo "WARNING: Could not ls $1: $output"
+    if [ -z "${output}" ]; then
+        echo "WARNING: Could not ls $1"
         RESULT=""
         return
     fi
@@ -107,12 +107,12 @@ MAPR_PROPERTIES_OWNER=$RESULT
 
 if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
-    IS_PREPPED=0
+    IS_PREPPED="false"
     MAPR_USER="mapr"
     create_user_and_group
 else
     echo "A MapR user was found so this installation will proceed as a prepped image install."
-    IS_PREPPED=1
+    IS_PREPPED="true"
     compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
     MAPR_USER=$RESULT
 fi
