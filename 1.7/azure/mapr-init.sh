@@ -105,7 +105,7 @@ mapr_owner_properties_json $PROPERTIES_JSON
 echo "MapR user from file owner is: '$RESULT'"
 MAPR_PROPERTIES_OWNER=$RESULT
 
-if [ -n "${MAPR_USER_PROPERTIES}" -a -n "${MAPR_PROPERTIES_OWNER}" ]; then
+if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
     MAPR_USER="mapr"
     create_user_and_group
