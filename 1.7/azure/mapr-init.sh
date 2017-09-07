@@ -107,9 +107,12 @@ MAPR_PROPERTIES_OWNER=$RESULT
 
 if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
+    IS_PREPPED=0
     MAPR_USER="mapr"
     create_user_and_group
 else
+    echo "A MapR user was found so this installation will proceed as a prepped image install."
+    IS_PREPPED=1
     compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
     MAPR_USER=$RESULT
 fi
