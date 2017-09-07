@@ -85,6 +85,9 @@
     "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
     "startOctetPlus1": "[add(1, variables('startOctet'))]",
 
+    "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
+    "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString')))]",
+
     "linuxConfiguration": {
       "disablePasswordAuthentication": "false",
       "ssh": {
@@ -225,7 +228,7 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), '0')]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]",
+          "adminPassword": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('unusedPassword'), parameters('adminPassword'))]",
           "linuxConfiguration": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
@@ -306,7 +309,7 @@
         "osProfile": {
           "computerName": "[concat(parameters('maprvmName'), add(copyIndex(), 1))]",
           "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]",
+          "adminPassword": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('unusedPassword'), parameters('adminPassword'))]",
           "linuxConfiguration": "[if(equals(parameters('adminAuthType'), 'sshPublicKey'), variables('linuxConfiguration'), json('null'))]"
         },
         "storageProfile": {
