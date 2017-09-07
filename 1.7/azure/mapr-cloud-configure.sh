@@ -10,6 +10,7 @@ PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
+MAPR_CORE_UNPREPPED="5.2.2"
 
 msg_err() {
     echo "ERROR: $1"
@@ -194,7 +195,26 @@ echo "NODE_LIST: $NODE_LIST"
 if [ "$IS_PREPPED" == "true" ]; then
     echo "Upgrading MapR installer if necessary..."
     /opt/mapr/installer/bin/mapr-setup.sh -y upgrade
+
+    build_version
+    BUILD_FILE_VERSION=$RESULT
+    package_version_$OS
+    PACKAGE_VERSION=$RESULT
+
+    find_installed_core_version $BUILD_FILE_VERSION
+    echo "Build file version: '$RESULT'"
+    BUILD_FILE_VERSION=$RESULT
+
+    find_installed_core_version $PACKAGE_VERSION
+    echo "Package version: '$RESULT'"
+    PACKAGE_VERSION=$RESULT
+
+    compare_versions $BUILD_FILE_VERSION $PACKAGE_VERSION
+    echo "Final MapR Core version: '$RESULT'"
+    MAPR_CORE=$RESULT
 else
+    echo "Setting MAPR_CORE to default unprepped version of $MAPR_CORE_UNPREPPED"
+    MAPR_CORE=$MAPR_CORE_UNPREPPED
     echo "Downloading mapr-setup to install MapR installer..."
     wget http://package.mapr.com/releases/installer/mapr-setup.sh
     [ $? -ne 0 ] && msg_err "Could not download mapr-installer"
@@ -204,22 +224,6 @@ else
     [ $? -ne 0 ] && msg_err "Could not install MapR installer"
 fi
 
-build_version
-BUILD_FILE_VERSION=$RESULT
-package_version_$OS
-PACKAGE_VERSION=$RESULT
-
-find_installed_core_version $BUILD_FILE_VERSION
-echo "Build file version: '$RESULT'"
-BUILD_FILE_VERSION=$RESULT
-
-find_installed_core_version $PACKAGE_VERSION
-echo "Package version: '$RESULT'"
-PACKAGE_VERSION=$RESULT
-
-compare_versions $BUILD_FILE_VERSION $PACKAGE_VERSION
-echo "Final MapR Core version: '$RESULT'"
-MAPR_CORE=$RESULT
 echo "MAPR_CORE: $MAPR_CORE"
 
 . $MAPR_HOME/build/installer/bin/activate
