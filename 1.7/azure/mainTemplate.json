@@ -400,7 +400,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('artifactsBaseUrl'), '/vm_', parameters('adminAuthType'), '.json')]",
+          "uri": "[concat(parameters('artifactsBaseUrl'), '/vm.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
