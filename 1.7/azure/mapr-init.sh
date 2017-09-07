@@ -65,15 +65,6 @@ compare_users() {
     msg_err "Could not find User '$1' or '$2' is in the list of OS users"
 }
 
-create_user_and_group() {
-    groupadd -g 5000 $MAPR_USER
-    [ $? -ne 0 ] && msg_err "Could not add group $MAPR_USER"
-    echo "Group $MAPR_USER created"
-    useradd -g 5000 -m -u 5000 $MAPR_USER
-    [ $? -ne 0 ] && msg_err "Could not add user $MAPR_USER"
-    echo "User $MAPR_USER created"
-}
-
 change_password() {
     echo "$1:$2" | chpasswd
     [ $? -ne 0 ] && msg_err "Could not change password"
@@ -109,15 +100,13 @@ if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
     IS_PREPPED="false"
     MAPR_USER="mapr"
-    create_user_and_group
 else
     echo "A MapR user was found so this installation will proceed as a prepped image install."
     IS_PREPPED="true"
     compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
     MAPR_USER=$RESULT
+    change_password $MAPR_USER $MAPR_PASSWORD
 fi
 
 echo "MapR user is: $MAPR_USER"
-
-change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
