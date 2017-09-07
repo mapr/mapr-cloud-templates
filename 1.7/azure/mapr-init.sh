@@ -69,7 +69,7 @@ create_user_and_group() {
     groupadd -g 5000 $MAPR_USER
     [ $? -ne 0 ] && msg_err "Could not add group $MAPR_USER"
     echo "Group $MAPR_USER created"
-    useradd -g 5000 -m -u $MAPR_USER
+    useradd -g 5000 -m -u 5000 $MAPR_USER
     [ $? -ne 0 ] && msg_err "Could not add user $MAPR_USER"
     echo "User $MAPR_USER created"
 }
