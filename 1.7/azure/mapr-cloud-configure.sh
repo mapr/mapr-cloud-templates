@@ -104,8 +104,10 @@ check_os() {
 build_version() {
     RESULT=$(cat $MAPR/MapRBuildVersion)
     if [ $? -ne 0 ]; then
-        echo "ERROR: Could not find $MAPR/MapRBuildVersion"
+        echo "WARNING: Could not find $MAPR/MapRBuildVersion"
         RESULT=""
+    else
+        echo "build_version: $RESULT"
     fi
 }
 
@@ -117,9 +119,8 @@ package_version_redhat() {
         RESULT=""
     else
         RESULT="${RESULT/$INTERNAL/}"
+        echo "package_version: $RESULT"
     fi
-    echo "$RESULT"
-
 }
 
 package_version_ubuntu() {
@@ -130,6 +131,7 @@ package_version_ubuntu() {
         RESULT=""
     else
         RESULT="${RESULT/$INTERNAL/}"
+        echo "package_version: $RESULT"
     fi
 }
 
@@ -141,6 +143,7 @@ package_version_suse() {
         RESULT=""
     else
         RESULT="${RESULT/$INTERNAL/}"
+        echo "package_version: $RESULT"
     fi
 }
 
@@ -192,7 +195,13 @@ if [ "$IS_PREPPED" == "true" ]; then
     echo "Upgrading MapR installer if necessary..."
     /opt/mapr/installer/bin/mapr-setup.sh -y upgrade
 else
-    echo "Downloading mapr-setup to install the MapR installer..."
+    echo "Downloading mapr-setup to install MapR installer..."
+    wget http://package.mapr.com/releases/installer/mapr-setup.sh
+    [ $? -ne 0 ] && msg_err "Could not download mapr-installer"
+    chmod +x mapr-setup.sh
+    echo "Installing MapR installer..."
+    ./mapr-setup.sh -y
+    [ $? -ne 0 ] && msg_err "Could not install MapR installer"
 fi
 
 build_version
