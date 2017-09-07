@@ -39,8 +39,7 @@ mapr_owner_properties_json() {
         return
     fi
 
-    output=$(echo $output | awk 'NR==1 {print $3}')
-    RESULT="$output"
+    RESULT="$(echo $output | awk 'NR==1 {print $3}')"
 }
 
 compare_users() {
@@ -64,6 +63,15 @@ compare_users() {
     fi
 
     msg_err "Could not find User '$1' or '$2' is in the list of OS users"
+}
+
+create_user_and_group() {
+    groupadd -g 5000 $MAPR_USER
+    [ $? -ne 0 ] && msg_err "Could not add group $MAPR_USER"
+    echo "Group $MAPR_USER created"
+    useradd -g 5000 -m -u $MAPR_USER
+    [ $? -ne 0 ] && msg_err "Could not add user $MAPR_USER"
+    echo "User $MAPR_USER created"
 }
 
 change_password() {
@@ -97,9 +105,16 @@ mapr_owner_properties_json $PROPERTIES_JSON
 echo "MapR user from file owner is: '$RESULT'"
 MAPR_PROPERTIES_OWNER=$RESULT
 
-compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
-echo "MapR user is: $RESULT"
-MAPR_USER=$RESULT
+if [ -n "${MAPR_USER_PROPERTIES}" -a -n "${MAPR_PROPERTIES_OWNER}" ]; then
+    echo "A MapR user was not found so this installation will proceed as an unprepped image install."
+    MAPR_USER="mapr"
+    create_user_and_group
+else
+    compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
+    MAPR_USER=$RESULT
+fi
+
+echo "MapR user is: $MAPR_USER"
 
 change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
