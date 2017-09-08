@@ -54,6 +54,9 @@
     "mepVersion": {
       "type": "string",
       "defaultValue" : "3.0.1",
+      "allowedValues": [
+        "3.0.1"
+      ],
       "metadata": {
         "description": "Type MEP version to install"
       }
@@ -255,27 +258,6 @@
       "name": "[variables('imageSKU')]",
       "publisher": "[variables('imagePublisher')]",
       "product": "[variables('imageOffer')]"
-    },
-
-    "password_osProfile": {
-      "computername": "[variables('maprvmName')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "adminPassword": "[parameters('adminPassword')]"
-    },
-    "sshPublicKey_osProfile": {
-      "computername": "[variables('maprvmName')]",
-      "adminUsername": "[parameters('adminUsername')]",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": "true",
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPublicKey')]"
-            }
-          ]
-        }
-      }
     }
   },
   "resources": [
