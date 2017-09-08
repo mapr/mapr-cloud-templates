@@ -4,7 +4,7 @@
   "parameters": {
     "artifactsBaseUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/azure",
+      "defaultValue": "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/azure/unprepped",
       "metadata": {
         "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
       }
@@ -244,9 +244,9 @@
     "osImageDiskTarget": "[concat(variables('osImageSg'), 'vhds/', parameters('clusterName'), '.vhd')]",
     "deploymentsVersion": "2016-09-01",
 
-    "imagePublisher": "mapr-technologies",
-    "imageOffer": "mapr52-base-dev",
-    "imageSKU": "52",
+    "imagePublisher": "OpenLogic",
+    "imageOffer": "Centos",
+    "imageSKU": "7.3",
     "imageVersion": "latest",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",

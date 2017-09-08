@@ -1,0 +1,28 @@
+environment:
+ #DOC mapr core version (required, must be 5.1.0 and above)
+ mapr_core_version: CORE_VERSION
+
+#DOC attributes for /config api
+config:
+  #DOC list of hosts we want to install packages on (required)
+  #DOC installer host must be one of the hosts in this list
+  hosts: [HOSTS]
+
+  provider:
+    id: AZURE
+
+  #DOC user id, must be present for every host defined above (required)
+  ssh_id: SSH_USER
+  ssh_password: PASSWORD
+  #DOC license type (M3 = community edition, M5 = enterprise edition)
+  license_type: M5
+  #DOC MEP version (required only for Mapr 5.2.0 and above)
+  mep_version: MEP_VERSION
+  #DOC list of disks to install packages on (required)
+  disks: []
+  #DOC disk stripe width (optional)
+  #disk_stripe: 3
+  #DOC name of the cluster (required)
+  cluster_name: CLUSTER_NAME
+  #DOC hashmap of services to be installed (optional)
+  services:
