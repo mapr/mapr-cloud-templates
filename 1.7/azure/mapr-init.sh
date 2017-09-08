@@ -4,6 +4,7 @@ RESULT=""
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
+MAPR_SUDOERS_FILE="/etc/sudoers.d/mapr_user"
 
 MAPR_PASSWORD="$1"
 
@@ -65,10 +66,27 @@ compare_users() {
     msg_err "Could not find User '$1' or '$2' is in the list of OS users"
 }
 
+create_user_and_group() {
+    groupadd -g 5000 $MAPR_USER
+    [ $? -ne 0 ] && msg_err "Could not add group $MAPR_USER"
+    echo "Group $MAPR_USER created"
+    useradd -g 5000 -m -u 5000 $MAPR_USER
+    [ $? -ne 0 ] && msg_err "Could not add user $MAPR_USER"
+    echo "User $MAPR_USER created"
+}
+
 change_password() {
     echo "$1:$2" | chpasswd
     [ $? -ne 0 ] && msg_err "Could not change password"
     echo "Password changed"
+}
+
+sudoers_add() {
+    cat > $MAPR_SUDOERS_FILE << EOM
+$MAPR_USER	ALL=(ALL)	NOPASSWD:ALL
+Defaults:$MAPR_USER		!requiretty
+EOM
+    chmod 0440 $MAPR_SUDOERS_FILE
 }
 
 passwordless_sudo() {
@@ -100,13 +118,15 @@ if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
     IS_PREPPED="false"
     MAPR_USER="mapr"
+    create_user_and_group
+    sudoers_add
 else
     echo "A MapR user was found so this installation will proceed as a prepped image install."
     IS_PREPPED="true"
     compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
     MAPR_USER=$RESULT
-    change_password $MAPR_USER $MAPR_PASSWORD
 fi
 
 echo "MapR user is: $MAPR_USER"
+change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
