@@ -239,9 +239,7 @@
     "osImageSg": "https://baseimagergsa.blob.core.windows.net/",
     "osImageBase": "[concat(variables('osImageSg'), 'system/Microsoft.Compute/Images/vhds/maprbaseimageprep1-osDisk.vhd')]",
     "osImageDiskTarget": "[concat(variables('osImageSg'), 'vhds/', parameters('clusterName'), '.vhd')]",
-    "networkApiVersion": "2017-04-01",
-    "computeApiVersion": "2017-03-30",
-    "deploymentsVersion": "2016-06-01",
+    "deploymentsVersion": "2016-09-01",
 
     "imagePublisher": "mapr-technologies",
     "imageOffer": "mapr52-base-dev",
