@@ -244,6 +244,7 @@ environment:
   mapr_core_version: $MAPR_CORE
 config:
   ssh_id: $MAPR_USER
+  ssh_method: PASSWORD
   cluster_name: $CLUSTER_NAME
   mep_version: $MEP
   provider:
@@ -262,6 +263,7 @@ EOM
 else
     echo "environment.mapr_core_version=$MAPR_CORE " >> $INPUT
     echo "config.ssh_id=$MAPR_USER " >> $INPUT
+    echo "config.ssh_method=PASSWORD " >> $INPUT
     echo "config.mep_version=$MEP " >> $INPUT
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
     echo "config.cluster_admin_id=$MAPR_USER " >> $INPUT
