@@ -244,7 +244,6 @@ environment:
   mapr_core_version: $MAPR_CORE
 config:
   cluster_name: $CLUSTER_NAME
-  hosts:
   mep_version: $MEP
   provider:
     config:
@@ -259,6 +258,7 @@ config:
       enabled: true
   ssh_id: $MAPR_USER
   ssh_method: PASSWORD
+  hosts:
 EOM
     add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
 
