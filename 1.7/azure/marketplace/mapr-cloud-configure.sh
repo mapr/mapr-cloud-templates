@@ -243,18 +243,22 @@ if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
 environment:
   mapr_core_version: $MAPR_CORE
 config:
-  ssh_id: $MAPR_USER
-  ssh_method: PASSWORD
   cluster_name: $CLUSTER_NAME
+  hosts:
   mep_version: $MEP
   provider:
-    id: AZURE
     config:
-      resource_group: $RESOURCE_GROUP
       admin_auth_type: $ADMIN_AUTH_TYPE
+      resource_group: $RESOURCE_GROUP
       subscription_id: $SUBSCRIPTION_ID
       tenant_id: $TENANT_ID
-  hosts:
+    id: AZURE
+  services:
+    mapr-core:
+      version: $MAPR_CORE
+      enabled: true
+  ssh_id: $MAPR_USER
+  ssh_method: PASSWORD
 EOM
     add_nodes_yaml $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE $INPUT
 
