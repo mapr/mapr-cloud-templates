@@ -7,7 +7,7 @@ INTERNAL="${INTERNAL_ONLY}-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
-STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/azure/mapr-core.yml"
+STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/azure/unprepped/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 MAPR_CORE_UNPREPPED="6.0.0"
@@ -228,6 +228,7 @@ echo "MAPR_CORE: $MAPR_CORE"
 
 . $MAPR_HOME/build/installer/bin/activate
 
+systemctl enable mapr-installer
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 
