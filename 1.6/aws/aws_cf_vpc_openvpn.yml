@@ -1,0 +1,306 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Setup a VPC with public and private subnet, NAT Gateway and Internet Gateway'
+# This template creates a VPC with public and private subnet. It creates
+# an Internet Gateway attached to the public subnet. And a NAT Gateway for the
+# subnet to communicate out.
+Parameters:
+  name:
+    Default: maprinstaller
+    Type: String
+  publicAccessCIDR:
+    Description: Public access CIDR (You would want to restrict this to your corporate IP range)
+    Type: String
+    Default: 0.0.0.0/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+  installOpenVPN:
+    Description: Install OpenVPN to enable public access to the VPC
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+  keyName:
+    Description: AWS key pair used to create openVPN node
+    Type: AWS::EC2::KeyPair::KeyName
+    AllowedPattern: ".+"
+    ConstraintDescription: must select an existing EC2 KeyPair
+  openVPNuser:
+    Description: OpenVPN login user
+    Type: String
+    Default: openvpn
+  openVPNpassword:
+    Description: OpenVPN login user password. Always use a strong password to protect your VPC.
+    Type: String
+    NoEcho: True
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "VPC Information"
+        Parameters:
+          - name
+          - publicAccessCIDR
+      -
+        Label:
+          default: "OpenVPN"
+        Parameters:
+          - installOpenVPN
+          - openVPNuser
+          - openVPNpassword
+          - keyName
+Conditions:
+  InstallOpenVPN: !Equals [!Ref installOpenVPN, true]
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: 172.24.0.0/16
+    Public:
+      CIDR: 172.24.0.0/24
+    Private:
+      CIDR: 172.24.8.0/22
+  OpenVPNAMIMap:
+    us-east-1: # N Viriginia
+      AMI: ami-d7576bc1
+      domain: ec2.internal
+    us-east-2: # Ohio
+      AMI: ami-5f35143a
+      domain: us-east-2.compute.internal
+    us-west-1: # California
+      AMI: ami-ee89a58e
+      domain: us-west-1.compute.internal
+    us-west-2: # Oregon
+      AMI: ami-d10819a8
+      domain: us-west-2.compute.internal
+    eu-central-1: # Frankfurt
+      AMI: ami-906ccdff
+      domain: eu-central-1.compute.internal
+    eu-west-1: # Ireland
+      AMI: ami-015fbb78
+      domain: eu-west-1.compute.internal
+    ca-central-1: # Québec
+      AMI: ami-9d912ef9
+    eu-west-2: # London
+      AMI: ami-022f3966
+    ap-southeast-1: # Singapore
+      AMI: ami-76ef6715
+    ap-southeast-2: # Sydney
+      AMI: ami-f981929a
+    ap-south-1 : # Mumbai
+      AMI: ami-fca0de93
+    ap-northeast-1: # Tokoyo
+      AMI: ami-eb9c8f8c
+    ap-northeast-2: # Seoul
+      AMI: ami-d4459aba
+    sa-east-1: # São Paulo
+      AMI: ami-349af058
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock:
+        Fn::FindInMap:
+        - SubnetConfig
+        - VPC
+        - CIDR
+      Tags:
+      - Key: Name
+        Value: !Join ["-", [!Ref name, "vpc"]]
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock:
+        Fn::FindInMap:
+        - SubnetConfig
+        - Public
+        - CIDR
+      Tags:
+      - Key: Name
+        Value: !Join ["-", [!Ref name, "public"]]
+      - Key: Network
+        Value: Public
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock:
+        Fn::FindInMap:
+        - SubnetConfig
+        - Private
+        - CIDR
+      Tags:
+      - Key: Name
+        Value: !Join ["-", [!Ref name, "private"]]
+      - Key: Network
+        Value: Private
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Join ["-", [!Ref name, "ig"]]
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  NATEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+      - Key: Name
+        Value: !Join ["-", [!Ref name, "public"]]
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+      - Key: Name
+        Value:  !Join ["-", [!Ref name, "internal"]]
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  NATRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+  OpenVPNSG:
+    Type: AWS::EC2::SecurityGroup
+    Condition: InstallOpenVPN
+    Properties:
+      GroupDescription: "OpenVPN Access"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '943'
+        ToPort: '943'
+        CidrIp: !Ref publicAccessCIDR
+      - IpProtocol: tcp
+        FromPort: '443'
+        ToPort: '443'
+        CidrIp: !Ref publicAccessCIDR
+      - IpProtocol: udp
+        FromPort: '1194'
+        ToPort: '1194'
+        CidrIp: !Ref publicAccessCIDR
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp:
+          Fn::FindInMap:
+          - SubnetConfig
+          - VPC
+          - CIDR
+  OpenVPNWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Condition: InstallOpenVPN
+  OpenVPNWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    Condition: InstallOpenVPN
+    DependsOn: VPC
+    Properties:
+      Handle: !Ref "OpenVPNWaitHandle"
+      Timeout: "600"
+  OpenVPNInstance:
+    Type: AWS::EC2::Instance
+    Condition: InstallOpenVPN
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ["-", [!Ref name, "openvpn"]]
+      ImageId:
+        Fn::FindInMap:
+        - OpenVPNAMIMap
+        - Ref: AWS::Region
+        - AMI
+      KeyName: !Ref keyName
+      InstanceType: t2.micro
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeleteOnTermination: "true"
+          DeviceIndex: 0
+          SubnetId: !Ref PublicSubnet
+          GroupSet: [!GetAtt VPC.DefaultSecurityGroup, !Ref OpenVPNSG]
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash
+            statusFile=/tmp/cf_status
+            if [ -z "${openVPNuser}" -o -z "${openVPNpassword}" ]; then
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"Openvpn setup requires admin user and password\", \"Reason\" : \"Openvpn setup requires admin user and password\" }" > $statusFile
+              curl -T $statusFile '${OpenVPNWaitHandle}'
+              exit 1
+            fi
+            admin_user=${openVPNuser}
+            admin_pw=${openVPNpassword}
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min -v 1.2 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min_strict -v true ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.server.tls_version_min -v 1.2 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.network -v ${CIDRRange} ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.netmask_bits -v 24 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.client.routing.reroute_dns -v true ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.server.dhcp_option.domain -v ${domain} ConfigPut
+            /usr/local/openvpn_as/scripts/sacli start
+            if [ $? -ne 0 ]; then
+              message="Openvpn did not start successfully"
+              status="FAILURE"
+            else
+              message="Success!"
+              status="SUCCESS"
+            fi
+            # With the VPN server running, the CURL is not able to resolve the AWS host
+            /usr/local/openvpn_as/scripts/sacli stop
+            sleep 5
+            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"message\" }" > $statusFile
+            curl -T $statusFile '${OpenVPNWaitHandle}'
+            /usr/local/openvpn_as/scripts/sacli start
+            /usr/local/openvpn_as/scripts/sacli --user router --key prop_autologin --value true UserPropPut
+            systemctl enable openvpnas
+          - CIDRRange: !Select [0, !Split ["/",  !FindInMap [ SubnetConfig, "Public", "CIDR" ]]]
+            domain: !FindInMap [ OpenVPNAMIMap, !Ref "AWS::Region", "domain" ]
+Outputs:
+  VPC:
+    Value: !Ref VPC
+  DefaultSecurityGroup:
+    Value: !GetAtt VPC.DefaultSecurityGroup
+  PrivateSubnet:
+    Value: !Ref PrivateSubnet
+  PublicSubnet:
+    Value: !Ref PublicSubnet
+  OpenVPNIp:
+    Condition: InstallOpenVPN
+    Description: OpenVPN IP Address.
+    Value: !GetAtt OpenVPNInstance.PublicIp
+  OpenVPNUrl:
+    Condition: InstallOpenVPN
+    Description: OpenVPN Admin URL. Login credential openvpn/openvpn.
+    Value: !Join [ "", ["https://", !GetAtt OpenVPNInstance.PublicIp, ":943/admin"]]
+
