@@ -117,31 +117,39 @@
             "name": "serviceTemplate",
             "label": "Provisioning template",
             "toolTip": "Auto-provisioning templates for specific use cases",
-            "defaultValue": "Converged Platform",
+            "defaultValue": "MapR Converged Cluster: Batch, interactive and real-time analytics",
             "constraints": {
               "allowedValues": [
                 {
-                  "label": "Converged Platform",
+                  "label": "MapR Converged Cluster: Batch, interactive and real-time analytics",
                   "value": "template-05-converged"
                 },
                 {
-                  "label": "Data Lake",
+                  "label": "Data Lake: Common Hadoop Services",
                   "value": "template-10-hadoop"
                 },
                 {
-                  "label": "Data Exploration",
+                  "label": "Data Exploration: Interactive SQL with Apache Drill",
                   "value": "template-20-drill"
                 },
                 {
-                  "label": "Operational Analytics",
+                  "label": "Analytics with MapR-DB",
                   "value": "template-30-maprdb"
                 },
                 {
-                  "label": "Real Time Analytics",
+                  "label": "Operational Applications with MapR-DB",
+                  "value": "template-30-maprdb2"
+                },
+                {
+                  "label": "Real-time Analytics: Apache Spark Streaming including SparkML and GraphX",
                   "value": "template-40-maprstreams"
                 },
                 {
-                  "label": "Custom Configuration",
+                  "label": "Real-time and batch analytics with Apache Spark on MapR including SparkML and GraphX",
+                  "value": "template-60-spark"
+                },
+                {
+                  "label": "Custom Configuration: Customize your MapR installation",
                   "value": "custom-configuration"
                 }
               ],
