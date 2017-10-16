@@ -202,7 +202,7 @@
         "provider": "[toUpper(parameters('providerID'))]"
       },
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('publicIPAddressName'), add(1, copyIndex())]",
+      "name": "[concat(variables('publicIPAddressName'), add(1, copyIndex()))]",
       "location": "[parameters('location')]",
       "copy": {
         "name": "nicopy",
@@ -220,7 +220,7 @@
       "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', concat(variables('publicIPAddressName'), add(1, copyIndex()))]"
+        "[resourceId('Microsoft.Network/publicIPAddresses/', concat(variables('publicIPAddressName'), add(1, copyIndex())))]"
       ],
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
@@ -237,7 +237,7 @@
             "name": "[concat('ipconfig', add(2, copyIndex()))]",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex()))]",
+              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex())))]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
               },
