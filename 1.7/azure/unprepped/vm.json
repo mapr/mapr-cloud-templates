@@ -237,12 +237,12 @@
             "name": "[concat('ipconfig', add(2, copyIndex()))]",
             "properties": {
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex())))]",
+              "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex()))]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
               },
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'), add(1, copyIndex()))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'), add(1, copyIndex())))]"
               }
             }
           }
