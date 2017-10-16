@@ -157,7 +157,7 @@
         "provider": "[toUpper(parameters('providerID'))]"
       },
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressName')]",
+      "name": "[concat(variables('publicIPAddressName'), '0')]",
       "location": "[parameters('location')]",
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
@@ -197,11 +197,31 @@
     },
 
     {
+      "apiVersion": "[variables('networkApiVersion')]",
+      "tags": {
+        "provider": "[toUpper(parameters('providerID'))]"
+      },
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "nicopy",
+        "count": "[max(variables('nodeCountSansInstaller'), 1)]"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
+      }
+    },
+
+    {
       "condition": "[greater(parameters('nodeCount'), 1)]",
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('maprnicName'), add(1, copyIndex()))]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'), copyIndex())]"
+      ],
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
@@ -220,6 +240,9 @@
               "privateIPAddress": "[concat(variables('threeDotSubnetPrivate'), add(variables('startOctetPlus1'), copyIndex()))]",
               "subnet": {
                 "id": "[parameters('subnetRefPrivate')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'), copyIndex())]"
               }
             }
           }
