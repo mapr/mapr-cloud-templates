@@ -240,14 +240,11 @@
     "maprVMTemplate": "MapR.VM.Template",
     "maprOpenVPNTemplate": "MapR.OpenVPN.Template",
 
-    "osImageSg": "https://baseimagergsa.blob.core.windows.net/",
-    "osImageBase": "[concat(variables('osImageSg'), 'system/Microsoft.Compute/Images/vhds/maprbaseimageprep1-osDisk.vhd')]",
-    "osImageDiskTarget": "[concat(variables('osImageSg'), 'vhds/', parameters('clusterName'), '.vhd')]",
     "deploymentsVersion": "2016-09-01",
 
     "imagePublisher": "mapr-technologies",
-    "imageOffer": "mapr52-base-dev",
-    "imageSKU": "52",
+    "imageOffer": "mapr60-base-preview",
+    "imageSKU": "60-byol",
     "imageVersion": "latest",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",
