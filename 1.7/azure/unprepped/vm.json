@@ -81,6 +81,8 @@
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
 
+    "availabilitySetName": "[concat(variables(nonDotClusterName), '-as')]",
+
     "threeDotSubnetPrivate": "[take(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.')))]",
     "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
     "startOctetPlus1": "[add(1, variables('startOctet'))]",
@@ -150,6 +152,18 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetName')]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformFaultDomainCount": "2",
+        "platformUpdateDomainCount": "6",
+        "managed" : "true"
+      }
+    },
+
+    {
       "apiVersion": "[variables('networkApiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(parameters('maprnicName'), '0')]",
@@ -212,9 +226,9 @@
       "name": "[concat(parameters('maprvmName'), '0')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
       ],
-
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
@@ -222,6 +236,9 @@
         "cluster": "[parameters('clusterName')]"
       },
       "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
@@ -293,9 +310,9 @@
         "count": "[max(variables('nodeCountSansInstaller'), 1)]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
       ],
-
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
@@ -303,6 +320,9 @@
         "cluster": "[parameters('clusterName')]"
       },
       "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        },
         "hardwareProfile": {
           "vmSize": "[parameters('instanceType')]"
         },
