@@ -156,10 +156,12 @@
       "name": "[variables('availabilitySetName')]",
       "apiVersion": "[variables('computeApiVersion')]",
       "location": "[parameters('location')]",
+      "sku": {
+        "name": "Aligned"
+      },
       "properties": {
         "platformFaultDomainCount": "2",
-        "platformUpdateDomainCount": "6",
-        "managed" : "true"
+        "platformUpdateDomainCount": "6"
       }
     },
 
