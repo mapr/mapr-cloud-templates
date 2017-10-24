@@ -81,7 +81,7 @@
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
 
-    "availabilitySetName": "[concat(variables(nonDotClusterName), '-as')]",
+    "availabilitySetName": "[concat(variables('nonDotClusterName'), '-as')]",
 
     "threeDotSubnetPrivate": "[take(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.')))]",
     "startOctet": "[int(skip(parameters('ipAddress'), add(1, lastIndexOf(parameters('ipAddress'), '.'))))]",
