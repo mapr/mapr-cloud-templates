@@ -122,6 +122,13 @@
         "description": "Enable access to private cluster"
       }
     },
+    "openvpnInstanceType": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "OpenVPN virtual machine instance type"
+      }
+    },
     "openVpnUser": {
       "type": "string",
       "defaultValue": "openvpn",
@@ -344,6 +351,9 @@
           },
           "subnetRefPublic": {
             "value": "[variables('subnetRefPublic')]"
+          },
+          "openvpnInstanceType": {
+            "value": "[parameters('openvpnInstanceType')]"
           },
           "openVpnUser": {
             "value": "[parameters('openVpnUser')]"
