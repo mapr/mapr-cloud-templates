@@ -219,8 +219,8 @@
             },
             "imageReference": {
               "publisher": "mapr-technologies",
-              "offer": "mapr52-base-dev",
-              "sku": "52"
+              "offer": "mapr60-base-preview",
+              "sku": "60-byol"
             }
           },
           {
@@ -421,9 +421,9 @@
               ]
             },
             "imageReference": {
-              "publisher": "Canonical",
-              "offer": "UbuntuServer",
-              "sku": "17.04"
+              "publisher": "mapr-technologies",
+              "offer": "mapr60-base-preview",
+              "sku": "60-byol"
             }
           },
           {

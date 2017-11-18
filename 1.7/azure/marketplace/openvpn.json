@@ -32,10 +32,10 @@
     "subnetRefPublic": {
       "type": "string"
     },
-    "openVpnUser": {
+    "openvpnInstanceType": {
       "type": "string"
     },
-    "openvpnInstanceType": {
+    "openVpnUser": {
       "type": "string"
     },
     "openVpnPassword": {

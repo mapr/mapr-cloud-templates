@@ -32,6 +32,9 @@
     "subnetRefPublic": {
       "type": "string"
     },
+    "openvpnInstanceType": {
+      "type": "string"
+    },
     "openVpnUser": {
       "type": "string"
     },
@@ -64,7 +67,6 @@
     "openvpnnicName": "[concat(variables('nonDotClusterName'), '-openvpn-nic')]",
     "openvpnpublicIPAddressName": "[concat(variables('nonDotClusterName'), '-openvpn-ip')]",
     "openvpnvmName": "[concat(variables('nonDotClusterName'), '-openvpn-vm')]",
-    "openvpnvmSize": "Standard_DS1_v2",
     "openvpnosDiskName": "[concat(variables('openvpnvmName'), '-osdisk')]",
 
     "osProfile_password": {
@@ -227,7 +229,7 @@
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('openvpnvmSize')]"
+          "vmSize": "[parameters('openvpnInstanceType')]"
         },
         "osProfile": "[variables(concat('osProfile_', parameters('adminAuthType')))]",
         "storageProfile": {
