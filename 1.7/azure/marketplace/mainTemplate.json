@@ -124,7 +124,7 @@
     },
     "openvpnInstanceType": {
       "type": "string",
-      "defaultValue": "Standard_D2s_v3",
+      "defaultValue": "Standard_DS1_v2",
       "metadata": {
         "description": "OpenVPN virtual machine instance type"
       }
