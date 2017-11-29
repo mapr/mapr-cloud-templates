@@ -250,7 +250,7 @@
     "deploymentsVersion": "2016-09-01",
 
     "imagePublisher": "mapr-technologies",
-    "imageOffer": "mapr60-base-preview",
+    "imageOffer": "mapr60-base",
     "imageSKU": "60-byol",
     "imageVersion": "latest",
     "imageReference": {

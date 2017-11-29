@@ -219,7 +219,7 @@
             },
             "imageReference": {
               "publisher": "mapr-technologies",
-              "offer": "mapr60-base-preview",
+              "offer": "mapr60-base",
               "sku": "60-byol"
             }
           },
@@ -422,7 +422,7 @@
             },
             "imageReference": {
               "publisher": "mapr-technologies",
-              "offer": "mapr60-base-preview",
+              "offer": "mapr60-base",
               "sku": "60-byol"
             }
           },
