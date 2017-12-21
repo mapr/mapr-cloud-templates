@@ -200,33 +200,33 @@ Mappings:
     #If you update these AMI, make sure to update the login user used in this template
     #Update with AMI before using the template
     us-east-1: # N Viriginia
-      AMI: ami-93e668e9
+      AMI: ami-2de76957
     us-east-2: # Ohio
-      AMI: ami-98133dfd
+      AMI: ami-bdeec0d8
     us-west-1: # California
-      AMI: ami-a6330bc6
+      AMI: ami-55310935
     us-west-2: # Oregon
-      AMI: ami-b3ef3dcb
-    ca-central-1: # Québec
-      AMI: ami-a19b20c5
+      AMI: ami-b6ed3fce
+    ca-central-1: # Qu��bec
+      AMI: ami-ac9a21c8
     eu-central-1: # Frankfurt
-      AMI: ami-4079fa2f
+      AMI: ami-627bf80d
     eu-west-1: # Ireland
-      AMI: ami-cd00b5b
+      AMI: ami-9802b7e1
     eu-west-2: # London
-      AMI: ami-4a233c2e
+      AMI: ami-27223d43
     ap-southeast-1: # Singapore
-      AMI: ami-55dd8936
+      AMI: ami-82d387e1
     ap-southeast-2: # Sydney
-      AMI: ami-a56a81c7
+      AMI: ami-53698231
     ap-south-1 : # Mumbai
-      AMI: ami-9eb9f6f1
+      AMI: ami-8fb6f9e0
     ap-northeast-1: # Tokoyo
-      AMI: ami-a73f8cc1
+      AMI: ami-40398a26
     ap-northeast-2: # Seoul
-      AMI: ami-5383243d
-    sa-east-1: # São Paulo
-      AMI: ami-0e591c62
+      AMI: ami-9e8225f0
+    sa-east-1: # S��o Paulo
+      AMI: ami-665e1b0al
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
