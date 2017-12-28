@@ -230,7 +230,6 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]",
         "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
       ],
-      "plan": "[parameters('plan')]",
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
@@ -315,7 +314,6 @@
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), add(copyIndex(), 1)))]",
         "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
       ],
-      "plan": "[parameters('plan')]",
       "tags": {
         "provider": "[toUpper(parameters('providerID'))]",
         "role": "MapR Cluster",
