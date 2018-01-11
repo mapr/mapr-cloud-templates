@@ -128,5 +128,7 @@ else
 fi
 
 echo "MapR user is: $MAPR_USER"
+authconfig --test | grep hashing
 change_password $MAPR_USER $MAPR_PASSWORD
+authconfig --test | grep hashing
 passwordless_sudo
