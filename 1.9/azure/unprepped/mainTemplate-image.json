@@ -254,10 +254,13 @@
 
     "imagePublisher": "OpenLogic",
     "imageOffer": "Centos",
-    "imageSKU": "7.3",
+    "imageSKU": "7.4",
     "imageVersion": "latest",
     "imageReference": {
-      "id": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MapRImageCreateRG/providers/Microsoft.Compute/images/MapRImage_1.9_201801041042-69047ca"
+      "publisher": "[variables('imagePublisher')]",
+      "offer": "[variables('imageOffer')]",
+      "sku": "[variables('imageSKU')]",
+      "version": "[variables('imageVersion')]"
     },
     "plan": {
       "name": "[variables('imageSKU')]",
