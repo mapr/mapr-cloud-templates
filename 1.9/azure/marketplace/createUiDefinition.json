@@ -1,0 +1,493 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Compute.MultiVm",
+  "version": "0.1.2-preview",
+  "parameters": {
+    "basics": [
+      {
+        "name": "adminUsername",
+        "type": "Microsoft.Compute.UserNameTextBox",
+        "label": "Admin username",
+        "toolTip": "Operating system admin username for all machines in the cluster",
+        "osPlatform": "Linux",
+        "constraints": {
+          "regex": "^(?!mapr).*$",
+          "required": true,
+          "validationMessage": "The admin username cannot start with mapr"
+        }
+      },
+      {
+        "name": "sshCredntials",
+        "type": "Microsoft.Compute.CredentialsCombo",
+        "label": {
+          "authenticationType": "Authentication type",
+          "password": "Admin password",
+          "confirmPassword": "Confirm admin password",
+          "sshPublicKey": "Admin SSH public key"
+        },
+        "toolTip": {
+          "authenticationType": "",
+          "password": "",
+          "sshPublicKey": ""
+        },
+        "options": {
+          "hideConfirmation": false
+        },
+        "osPlatform": "Linux",
+        "constraints": {
+          "required": true
+        }
+      }
+    ],
+    "steps": [
+      {
+        "name": "maprClusterConfig",
+        "label": "MapR",
+        "subLabel": {
+          "preValidation": "MapR cluster configuration",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "MapR cluster configuration",
+        "elements": [
+          {
+            "name": "clusterName",
+            "type": "Microsoft.Common.TextBox",
+            "defaultValue": "my.cluster.com",
+            "label": "Cluster name",
+            "toolTip": "A name that will uniquely identify the MapR cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-zA-Z0-9]{1}[a-zA-Z0-9_\\-\\.]{5,50}[a-zA-Z0-9]{1}$",
+              "validationMessage": "Cluster name must be between 5 and 50 characters long, and can contain only numbers, lowercase letters, _ or -; Must not begin or end in _ or -."
+            }
+          },
+          {
+            "name": "clusterAdminPassword",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "Cluster admin password",
+              "confirmPassword": "Confirm password"
+            },
+            "constraints": {
+              "required": true,
+              "regex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}$",
+              "validationMessage": "Password must be at least 6 characters, no more than 30 characters, and must include at least one upper case letter, one lower case letter, and one numeric digit."
+            },
+            "toolTip": "Password for UID mapr",
+            "options": {
+              "hideConfirmation": false
+            }
+          },
+          {
+            "type": "Microsoft.Common.OptionsGroup",
+            "name": "mepVersion",
+            "label": "MEP",
+            "toolTip": "MapR Ecosystem Pack version",
+            "defaultValue": "4.0.0",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "4.0.0",
+                  "value": "4.0.0"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "type": "Microsoft.Common.OptionsGroup",
+            "name": "licenseType",
+            "label": "License type",
+            "defaultValue": "Enterprise",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "Enterprise",
+                  "value": "M5"
+                },
+                {
+                  "label": "Community",
+                  "value": "M3"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "type": "Microsoft.Common.DropDown",
+            "name": "serviceTemplate",
+            "label": "Provisioning template",
+            "toolTip": "Auto-provisioning templates for specific use cases",
+            "defaultValue": "MapR Converged Cluster: Batch, interactive and real-time analytics",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "MapR Converged Cluster: Batch, interactive and real-time analytics",
+                  "value": "template-05-converged"
+                },
+                {
+                  "label": "Data Lake: Common Hadoop Services",
+                  "value": "template-10-hadoop"
+                },
+                {
+                  "label": "Data Exploration: Interactive SQL with Apache Drill",
+                  "value": "template-20-drill"
+                },
+                {
+                  "label": "Analytics with MapR-DB",
+                  "value": "template-30-maprdb"
+                },
+                {
+                  "label": "Operational Applications with MapR-DB",
+                  "value": "template-30-maprdb2"
+                },
+                {
+                  "label": "Real-time Analytics: Apache Spark Streaming including SparkML and GraphX",
+                  "value": "template-40-maprstreams"
+                },
+                {
+                  "label": "Real-time and batch analytics with Apache Spark on MapR including SparkML and GraphX",
+                  "value": "template-60-spark"
+                },
+                {
+                  "label": "Custom Configuration: Customize your MapR installation",
+                  "value": "custom-configuration"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "name": "nodeCount",
+            "label": "Node count",
+            "type": "Microsoft.Common.TextBox",
+            "constraints": {
+              "required": true,
+              "regex": "^([1-9]|[1-3][0-9]|40)$",
+              "validationMessage": "Must be a number between 1 and 40"
+            },
+            "defaultValue": "3",
+            "toolTip": "Number of nodes in cluster"
+          }
+        ]
+      },
+      {
+        "name": "nodeConfig",
+        "label": "Node",
+        "subLabel": {
+          "preValidation": "Node configuration",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Node configuration",
+        "elements": [
+          {
+            "type": "Microsoft.Compute.SizeSelector",
+            "name": "instanceType",
+            "label": "Virtual machine size",
+            "count": "[int(steps('maprClusterConfig').nodeCount)]",
+            "osPlatform": "Linux",
+            "recommendedSizes": [
+              "Standard_DS4_v2",
+              "Standard_DS14_v2",
+              "Standard_DS15_v2"
+            ],
+            "constraints": {
+              "allowedSizes": [
+                "Standard_D4s_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_F8s",
+                "Standard_F16s",
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_DS12_v2",
+                "Standard_DS13_v2",
+                "Standard_DS14_v2",
+                "Standard_DS15_v2",
+                "Standard_E4s_v3",
+                "Standard_E8s_v3",
+                "Standard_E16s_v3",
+                "Standard_E32s_v3",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_L4s",
+                "Standard_L8s",
+                "Standard_L16s",
+                "Standard_L32s"
+              ]
+            },
+            "imageReference": {
+              "publisher": "mapr-technologies",
+              "offer": "mapr60-base",
+              "sku": "60-byol"
+            }
+          },
+          {
+            "type": "Microsoft.Common.DropDown",
+            "name": "diskCount",
+            "label": "Disk count",
+            "toolTip": "Number of managed disks per node",
+            "defaultValue": "3",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "1",
+                  "value": "1"
+                },
+                {
+                  "label": "2",
+                  "value": "2"
+                },
+                {
+                  "label": "3",
+                  "value": "3"
+                },
+                {
+                  "label": "4",
+                  "value": "4"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "6",
+                  "value": "6"
+                },
+                {
+                  "label": "7",
+                  "value": "7"
+                },
+                {
+                  "label": "8",
+                  "value": "8"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "type": "Microsoft.Common.OptionsGroup",
+            "name": "diskType",
+            "label": "Disk type",
+            "defaultValue": "SSD",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "SSD",
+                  "value": "Premium_LRS"
+                },
+                {
+                  "label": "HDD",
+                  "value": "Standard_LRS"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "name": "diskSize",
+            "label": "Disk size",
+            "toolTip": "Disk size in GB",
+            "type": "Microsoft.Common.TextBox",
+            "constraints": {
+              "required": true,
+              "regex": "^[0-9]{1,4}$",
+              "validationMessage": "Must be a number between 1 and 4095"
+            },
+            "defaultValue": "127"
+          }
+        ]
+      },
+      {
+        "name": "accessSecurity",
+        "label": "Global",
+        "subLabel": {
+          "preValidation": "Network, access and security",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Network, access and security",
+        "elements": [
+          {
+            "name": "virtualNetwork",
+            "type": "Microsoft.Network.VirtualNetworkCombo",
+            "options": {
+              "hideExisting": true
+            },
+            "label": {
+              "virtualNetwork": "Virtual network",
+              "subnets": "Subnets"
+            },
+            "toolTip": {
+              "virtualNetwork": "",
+              "subnets": ""
+            },
+            "defaultValue": {
+              "name": "mapr-vnet",
+              "addressPrefixSize": "/22"
+            },
+            "constraints": {
+              "minAddressPrefixSize": "/24"
+            },
+            "subnets": {
+              "mapr-private-subnet": {
+                "label": "Private subnet",
+                "defaultValue": {
+                  "name": "mapr-private-subnet",
+                  "addressPrefixSize": "/24"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/24",
+                  "minAddressCount": 50,
+                  "requireContiguousAddresses": true
+                }
+              },
+              "mapr-public-subnet": {
+                "label": "Public subnet",
+                "defaultValue": {
+                  "name": "mapr-public-subnet",
+                  "addressPrefixSize": "/29"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/29",
+                  "minAddressCount": 1,
+                  "requireContiguousAddresses": false
+                }
+              }
+            }
+          },
+          {
+            "name": "publicAccessCIDR",
+            "label": "Public internet access CIDR",
+            "type": "Microsoft.Common.TextBox",
+            "constraints": {
+              "regex": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$|^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|(^\\*$)",
+              "required": true,
+              "validationMessage": "Must be an IP Address, CIDR, or * for all access"
+            },
+            "defaultValue": "*",
+            "toolTip": "Public internet access CIDR. Use * for all internet traffic"
+          },
+          {
+            "type": "Microsoft.Common.OptionsGroup",
+            "name": "installOpenVPN",
+            "label": "Install OpenVPN",
+            "toolTip": "Enable public internet access to MapR cluster with OpenVPN",
+            "defaultValue": "True",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "True",
+                  "value": "true"
+                },
+                {
+                  "label": "False",
+                  "value": "false"
+                }
+              ],
+              "required": true
+            }
+          },
+          {
+            "type": "Microsoft.Compute.SizeSelector",
+            "name": "openvpnInstanceType",
+            "label": "OpenVPN machine size",
+            "count": "1",
+            "osPlatform": "Linux",
+            "recommendedSizes": [
+              "Standard_D2s_v3",
+              "Standard_A2_v2",
+              "Standard_E2s_v3"
+            ],
+
+            "constraints": {
+              "allowedSizes": [
+                "Standard_A2_v2",
+                "Standard_A4_v2",
+                "Standard_A8_v2",
+                "Standard_D1_v2",
+                "Standard_DS1_v2",
+                "Standard_DS2_v2",
+                "Standard_D2_v2",
+                "Standard_DS3_v2",
+                "Standard_D3_v2",
+                "Standard_D2s_v3",
+                "Standard_D2_v3",
+                "Standard_D4s_v3",
+                "Standard_D4_v3",
+                "Standard_E2s_v3",
+                "Standard_E2_v3"
+              ]
+            },
+            "imageReference": {
+              "publisher": "mapr-technologies",
+              "offer": "mapr60-base",
+              "sku": "60-byol"
+            }
+          },
+          {
+            "name": "openVpnUser",
+            "label": "OpenVPN login user",
+            "type": "Microsoft.Common.TextBox",
+            "constraints": {
+              "required": true
+            },
+            "defaultValue": "openvpn",
+            "toolTip": "Number of nodes in cluster"
+          },
+          {
+            "name": "openVpnPassword",
+            "type": "Microsoft.Common.PasswordBox",
+            "label": {
+              "password": "OpenVPN login user password",
+              "confirmPassword": "Confirm password"
+            },
+            "constraints": {
+              "required": true,
+              "regex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,30}$",
+              "validationMessage": "Password must be at least 6 characters, no more than 30 characters, and must include at least one upper case letter, one lower case letter, and one numeric digit."
+            },
+            "toolTip": "Always use a strong password to protect your cluster",
+            "options": {
+              "hideConfirmation": false
+            }
+          }
+        ]
+      }
+    ],
+    "outputs": {
+      "adminUsername": "[basics('adminUsername')]",
+      "adminAuthType": "[basics('sshCredntials').authenticationType]",
+      "adminPassword": "[basics('sshCredntials').password]",
+      "adminPublicKey": "[basics('sshCredntials').sshPublicKey]",
+      "clusterName": "[steps('maprClusterConfig').clusterName]",
+      "clusterAdminPassword": "[steps('maprClusterConfig').clusterAdminPassword]",
+      "mepVersion": "[steps('maprClusterConfig').mepVersion]",
+      "serviceTemplate": "[steps('maprClusterConfig').serviceTemplate]",
+      "nodeCount": "[int(steps('maprClusterConfig').nodeCount)]",
+      "licenseType": "[steps('maprClusterConfig').licenseType]",
+      "instanceType": "[steps('nodeConfig').instanceType]",
+      "diskType": "[steps('nodeConfig').diskType]",
+      "diskSize": "[int(steps('nodeConfig').diskSize)]",
+      "diskCount": "[int(steps('nodeConfig').diskCount)]",
+      "publicAccessCIDR": "[steps('accessSecurity').publicAccessCIDR]",
+      "installOpenVPN": "[steps('accessSecurity').installOpenVPN]",
+      "openVpnUser": "[steps('accessSecurity').openVpnUser]",
+      "openVpnPassword": "[steps('accessSecurity').openVpnPassword]",
+      "openvpnInstanceType": "[steps('accessSecurity').openvpnInstanceType]",
+      "vnetName": "[steps('accessSecurity').virtualNetwork.name]",
+      "vnetResourceGroup": "[steps('accessSecurity').virtualNetwork.resourceGroup]",
+      "vnetAddressPrefix": "[first(steps('accessSecurity').virtualNetwork.vnetPickerData.addressPrefixes)]",
+      "vnetNewOrExisting": "[steps('accessSecurity').virtualNetwork.newOrExisting]",
+      "vnetPrivateSubnetName": "[steps('accessSecurity').virtualNetwork.subnets.mapr-private-subnet.name]",
+      "vnetPrivateSubnetAddressPrefix": "[steps('accessSecurity').virtualNetwork.subnets.mapr-private-subnet.addressPrefix]",
+      "vnetPrivateSubnetStartAddress": "[steps('accessSecurity').virtualNetwork.subnets.mapr-private-subnet.startAddress]",
+      "vnetPublicSubnetName": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.name]",
+      "vnetPublicSubnetAddressPrefix": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.addressPrefix]",
+      "vnetPublicSubnetStartAddress": "[steps('accessSecurity').virtualNetwork.subnets.mapr-public-subnet.startAddress]",
+      "location": "[location()]"
+    }
+  }
+}
