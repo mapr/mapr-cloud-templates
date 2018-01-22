@@ -76,7 +76,7 @@ create_user_and_group() {
 }
 
 change_password() {
-    echo "$1:$2" | chpasswd
+    echo "$1:$2" | chpasswd --crypt-method SHA512
     [ $? -ne 0 ] && msg_err "Could not change password"
     echo "Password changed"
 }
