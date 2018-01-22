@@ -70,17 +70,23 @@ Parameters:
     Type: String
     AllowedValues: [true, false]
     Default: true
-  IAMInstanceProfile:
-    Description: IAM role name
+  awsAccessKeyId:
+    Description: AWS access key id for AWS SDK access. The value is stored in the MapR installer node. If you have concerns, create an IAM profile and use the template that uses it.
     Type: String
-    Default: maprinstaller
+    AllowedPattern: ".+"
+    ConstraintDescription: must provide AWS access key id
+  awsSecretAccessKey:
+    Description: AWS secret access key for AWS SDK access. The value is stored in the MapR installer node. If you have concerns, create an IAM profile and use the template that uses it.
+    Type: String
+    AllowedPattern: ".+"
+    ConstraintDescription: must provide AWS secret access key
   useExistingSubnet:
     Description: Id of subnet to be used (e.g. subnet-123456). The subnet should be able to access the Internet. Leave it empty to create a new VPC and subnets.
-    Type: AWS::EC2::Subnet::Id
+    Type: String
     Default: ""
   securityGroups:
     Description: Security group ids for an existing subnet if specified above, otherwise empty. Include all required security group ids including "default".
-    Type: List<AWS::EC2::SecurityGroup::Id>
+    Type: CommaDelimitedList
     Default: ""
   installOpenVPN:
     Description: Enable public Internet access to MapR cluster with OpenVPN. If you are using an existing subnet, this is ignored.
@@ -116,13 +122,8 @@ Rules:
   ValidSubnet:
     RuleCondition: !Not [!Equals [ !Ref useExistingSubnet, "" ]]
     Assertions:
-      - Assert:  !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
+      - Assert:  !Not [!Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]]
         AssertDescription: "Not a valid subnet"
-  SecurityGroupProvided:
-    RuleCondition: !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
-    Assertions:
-      - Assert: !EachMemberIn [ !Ref securityGroups, !RefAll "AWS::EC2::SecurityGroup::Id" ]
-        AssertDescription: "Must provide security group ids including default security group id"
 Conditions:
   InstallOpenVPN: !And [!Equals [!Ref installOpenVPN, true], !Equals [!Ref useExistingSubnet, ""]]
   CreateVPC: !Equals [!Ref useExistingSubnet, ""]
@@ -135,7 +136,8 @@ Metadata:
           default: "AWS Infrastructure Configuration"
         Parameters:
           - keyName
-          - IAMInstanceProfile
+          - awsAccessKeyId
+          - awsSecretAccessKey
       -
         Label:
           default: "MapR Cluster Configuration"
@@ -205,33 +207,33 @@ Mappings:
     #If you update these AMI, make sure to update the login user used in this template
     #Update with AMI before using the template
     us-east-1: # N Viriginia
-      AMI: ami-d78205ad
+      AMI: ami-93e668e9
     us-east-2: # Ohio
-      AMI: ami-7d517918
+      AMI: ami-98133dfd
     us-west-1: # California
-      AMI: ami-f494ab94
+      AMI: ami-a6330bc6
     us-west-2: # Oregon
-      AMI: ami-ec0caf94
-#    ca-central-1: # Québec
-#      AMI: ami-dbe28fbb
-#    eu-central-1: # Frankfurt
-#      AMI: ami-9bf712f4
-#    eu-west-1: # Ireland
-#      AMI: ami-7abd0209
-#    eu-west-2: # London
-#      AMI: ami-7abd0209
-#    ap-southeast-1: # Singapore
-#      AMI: ami-7abd0209
-#    ap-southeast-2: # Sydney
-#      AMI: ami-7abd020
-#    ap-south-1 : # Mumbai
-#      AMI: ami-7abd0209
-#    ap-northeast-1: # Tokoyo
-#      AMI: ami-7abd0209
-#    ap-northeast-2: # Seoul
-#      AMI: ami-7abd0209
-#    sa-east-1: # São Paulo
-#      AMI: ami-7abd0209
+      AMI: ami-b3ef3dcb
+    ca-central-1: # Québec
+      AMI: ami-a19b20c5
+    eu-central-1: # Frankfurt
+      AMI: ami-4079fa2f
+    eu-west-1: # Ireland
+      AMI: ami-cd00b5b
+    eu-west-2: # London
+      AMI: ami-4a233c2e
+    ap-southeast-1: # Singapore
+      AMI: ami-55dd8936
+    ap-southeast-2: # Sydney
+      AMI: ami-a56a81c7
+    ap-south-1 : # Mumbai
+      AMI: ami-9eb9f6f1
+    ap-northeast-1: # Tokoyo
+      AMI: ami-a73f8cc1
+    ap-northeast-2: # Seoul
+      AMI: ami-5383243d
+    sa-east-1: # São Paulo
+      AMI: ami-0e591c62
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -295,8 +297,6 @@ Resources:
       KeyName:
         Ref: keyName
       InstanceType: !If [UseInstallerNode, !Ref instanceType, t2.small]
-      IamInstanceProfile:
-        Ref: IAMInstanceProfile
       NetworkInterfaces:
         - DeleteOnTermination: "true"
           DeviceIndex: 0
@@ -305,7 +305,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub
           - |
-            #!/bin/bash
+            #!/bin/bash -x
             MAPR_CORE=${MAPR_CORE}
             SSH_USER=${SSH_USER}
             M_HOME=/opt/mapr/installer
@@ -334,6 +334,13 @@ Resources:
               curl -T $statusFile '${InstallWaitHandle}'
               exit 1
             fi
+            mkdir -p ~/.aws
+            echo "[default]" > ~/.aws/credentials
+            echo "aws_access_key_id = ${awsAccessKeyId}" >> ~/.aws/credentials
+            echo "aws_secret_access_key = ${awsSecretAccessKey}" >> ~/.aws/credentials
+            M_USER_HOME=$(getent passwd $M_USER | cut -d: -f6)
+            mkdir -p $M_USER_HOME/.aws
+            ln -s ~/.aws/credentials $M_USER_HOME/.aws/credentials
             if [ -f $M_HOME/bin/aws/keypair ]; then
               $M_HOME/bin/aws/keypair init ${clusterName}
               if [ ! -f $M_HOME/data/aws_key ]; then
