@@ -91,6 +91,10 @@ Parameters:
     Description: OpenVPN login user password. Always use a strong password to protect your cluster.
     Type: String
     NoEcho: True
+  openVPNpasswordConfirm:
+    Description: Confirm the password typed in above
+    Type: String
+    NoEcho: True
   publicAccessCIDR:
     Description: Recommended to restrict to your corporate IP range
     Type: String
