@@ -91,6 +91,10 @@ Parameters:
     Description: OpenVPN login user password. Always use a strong password to protect your cluster.
     Type: String
     NoEcho: True
+  openVPNpasswordConfirm:
+    Description: Confirm the password typed in above
+    Type: String
+    NoEcho: True
   publicAccessCIDR:
     Description: Recommended to restrict to your corporate IP range
     Type: String
@@ -166,57 +170,57 @@ Mappings:
       URL: ""
       serviceTemplate: ""
     "Converged-Platform":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-05-converged"
     "Data-Lake":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-10-hadoop"
     "Data-Exploration":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-20-drill"
     "Operational-Analytics":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-30-maprdb2"
     "Operational-Analytics-using-MapR-DB":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-30-maprdb"
     "Real-Time-Analytics-with-Spark":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-60-spark"
     "Real-Time-Analytics-with-Streams":
-      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.7/aws/mapr-core.yml"
+      URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/aws/mapr-core.yml"
       serviceTemplate: "template-40-maprstreams"
   RegionMap:
     #If you update these AMI, make sure to update the login user used in this template
     #Update with AMI before using the template
     us-east-1: # N Viriginia
-      AMI: ami-2de76957
-    us-east-2: # Ohio
-      AMI: ami-bdeec0d8
-    us-west-1: # California
-      AMI: ami-55310935
-    us-west-2: # Oregon
-      AMI: ami-b6ed3fce
-    ca-central-1: # Qu��bec
-      AMI: ami-ac9a21c8
-    eu-central-1: # Frankfurt
-      AMI: ami-627bf80d
-    eu-west-1: # Ireland
-      AMI: ami-9802b7e1
-    eu-west-2: # London
-      AMI: ami-27223d43
-    ap-southeast-1: # Singapore
-      AMI: ami-82d387e1
-    ap-southeast-2: # Sydney
-      AMI: ami-53698231
-    ap-south-1 : # Mumbai
-      AMI: ami-8fb6f9e0
-    ap-northeast-1: # Tokoyo
-      AMI: ami-40398a26
-    ap-northeast-2: # Seoul
-      AMI: ami-9e8225f0
-    sa-east-1: # S��o Paulo
-      AMI: ami-665e1b0al
+      AMI: ami-6d1c2007
+#    us-east-2: # Ohio
+#      AMI: ami-1fc2ef7a
+#    us-west-1: # California
+#      AMI: ami-af4333cf
+#    us-west-2: # Oregon
+#      AMI: ami-dbe28fbb
+#    ca-central-1: # Québec
+#      AMI: ami-dbe28fbb
+#    eu-central-1: # Frankfurt
+#      AMI: ami-9bf712f4
+#    eu-west-1: # Ireland
+#      AMI: ami-7abd0209
+#    eu-west-2: # London
+#      AMI: ami-7abd0209
+#    ap-southeast-1: # Singapore
+#      AMI: ami-7abd0209
+#    ap-southeast-2: # Sydney
+#      AMI: ami-7abd020
+#    ap-south-1 : # Mumbai
+#      AMI: ami-7abd0209
+#    ap-northeast-1: # Tokoyo
+#      AMI: ami-7abd0209
+#    ap-northeast-2: # Seoul
+#      AMI: ami-7abd0209
+#    sa-east-1: # São Paulo
+#      AMI: ami-7abd0209
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -315,6 +319,9 @@ Resources:
             $M_HOME/bin/mapr-setup.sh -y upgrade
             service mapr-installer start
             systemctl enable mapr-installer
+            # FIX FOR IN-1390
+            sed -i -e 's/private_ip_address/private_dns_name/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
+            sed -i -e 's/local-ipv4/local-hostname/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
             M_USER=$(grep installer_admin_id "$M_HOME/data/properties.json" | cut -d\" -f4)
             M_GROUP=$(grep installer_admin_group "$M_HOME/data/properties.json" | cut -d\" -f4)
             echo "$M_USER:$M_USER_PWD" | chpasswd
