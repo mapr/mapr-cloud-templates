@@ -31,7 +31,7 @@
     }
   },
   "variables": {
-    "networkApiVersion": "2017-09-01",
+    "networkApiVersion": "2017-09-01"
   },
   "resources": [
     {
