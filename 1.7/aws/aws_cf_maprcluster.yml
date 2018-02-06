@@ -76,11 +76,11 @@ Parameters:
     Default: maprinstaller
   useExistingSubnet:
     Description: Id of subnet to be used (e.g. subnet-123456). The subnet should be able to access the Internet. Leave it empty to create a new VPC and subnets.
-    Type: AWS::EC2::Subnet::Id
+    Type: String
     Default: ""
   securityGroups:
     Description: Security group ids for an existing subnet if specified above, otherwise empty. Include all required security group ids including "default".
-    Type: List<AWS::EC2::SecurityGroup::Id>
+    Type: CommaDelimitedList
     Default: ""
   installOpenVPN:
     Description: Enable public Internet access to MapR cluster with OpenVPN. If you are using an existing subnet, this is ignored.
@@ -113,16 +113,6 @@ Rules:
     Assertions:
       - Assert: !Equals [ !Ref openVPNpassword, !Ref openVPNpasswordConfirm ]
         AssertDescription: “OpenVPN user passwords do not match"
-  ValidSubnet:
-    RuleCondition: !Not [!Equals [ !Ref useExistingSubnet, "" ]]
-    Assertions:
-      - Assert:  !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
-        AssertDescription: "Not a valid subnet"
-  SecurityGroupProvided:
-    RuleCondition: !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
-    Assertions:
-      - Assert: !EachMemberIn [ !Ref securityGroups, !RefAll "AWS::EC2::SecurityGroup::Id" ]
-        AssertDescription: "Must provide security group ids including default security group id"
 Conditions:
   InstallOpenVPN: !And [!Equals [!Ref installOpenVPN, true], !Equals [!Ref useExistingSubnet, ""]]
   CreateVPC: !Equals [!Ref useExistingSubnet, ""]
