@@ -57,8 +57,8 @@
             "toolTip": "A name that will uniquely identify the MapR cluster",
             "constraints": {
               "required": true,
-              "regex": "^[a-zA-Z0-9]{1}[a-zA-Z0-9_\\-\\.]{5,50}[a-zA-Z0-9]{1}$",
-              "validationMessage": "Cluster name must be between 5 and 50 characters long, and can contain only numbers, lowercase letters, _ or -; Must not begin or end in _ or -."
+              "regex": "^[a-zA-Z0-9]{1}[a-zA-Z0-9_\\-\\.]{5,48}[a-zA-Z0-9]{1}$",
+              "validationMessage": "Cluster name must be between 7 and 50 characters long, and can contain only numbers, lowercase letters, _ or -; Must not begin or end in _ or -."
             }
           },
           {
@@ -83,12 +83,16 @@
             "name": "mepVersion",
             "label": "MEP",
             "toolTip": "MapR Ecosystem Pack version",
-            "defaultValue": "4.0.0",
+            "defaultValue": "4.1.0",
             "constraints": {
               "allowedValues": [
                 {
                   "label": "4.0.0",
                   "value": "4.0.0"
+                },
+                {
+                  "label": "4.1.0",
+                  "value": "4.1.0"
                 }
               ],
               "required": true
@@ -187,15 +191,17 @@
             "count": "[int(steps('maprClusterConfig').nodeCount)]",
             "osPlatform": "Linux",
             "recommendedSizes": [
+              "Standard_E8s_v3",
               "Standard_DS4_v2",
-              "Standard_DS14_v2",
-              "Standard_DS15_v2"
+              "Standard_D32s_v3"
             ],
             "constraints": {
               "allowedSizes": [
                 "Standard_D4s_v3",
                 "Standard_D8s_v3",
                 "Standard_D16s_v3",
+                "Standard_D32s_v3",
+                "Standard_D64s_v3",
                 "Standard_F8s",
                 "Standard_F16s",
                 "Standard_DS3_v2",
@@ -212,6 +218,7 @@
                 "Standard_GS2",
                 "Standard_GS3",
                 "Standard_GS4",
+                "Standard_GS5",
                 "Standard_L4s",
                 "Standard_L8s",
                 "Standard_L16s",
@@ -405,18 +412,15 @@
             "constraints": {
               "allowedSizes": [
                 "Standard_A2_v2",
-                "Standard_A4_v2",
-                "Standard_A8_v2",
+                "Standard_A3_v2",
                 "Standard_D1_v2",
+                "Standard_D2_v2",
                 "Standard_DS1_v2",
                 "Standard_DS2_v2",
-                "Standard_D2_v2",
-                "Standard_DS3_v2",
-                "Standard_D3_v2",
-                "Standard_D2s_v3",
                 "Standard_D2_v3",
-                "Standard_D4s_v3",
                 "Standard_D4_v3",
+                "Standard_D2s_v3",
+                "Standard_D4s_v3",
                 "Standard_E2s_v3",
                 "Standard_E2_v3"
               ]

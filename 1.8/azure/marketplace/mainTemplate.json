@@ -53,10 +53,10 @@
     },
     "mepVersion": {
       "type": "string",
-      "defaultValue" : "4.0.0",
+      "defaultValue" : "4.1.0",
       "allowedValues": [
-        "3.0.1",
-        "4.0.0"
+        "4.0.0",
+        "4.1.0"
       ],
       "metadata": {
         "description": "Type MEP version to install"
@@ -77,7 +77,7 @@
     },
     "instanceType": {
       "type": "string",
-      "defaultValue": "Standard_DS4_v2",
+      "defaultValue": "Standard_E4s_v3",
       "metadata": {
         "description": "User name for the virtual machine"
       }
@@ -98,9 +98,9 @@
     },
     "diskSize":  {
       "type": "int",
-      "minValue": 31,
+      "minValue": 63,
       "maxValue": 4095,
-      "defaultValue": 31
+      "defaultValue": 63
     },
     "diskCount": {
       "type": "int",
@@ -124,7 +124,7 @@
     },
     "openvpnInstanceType": {
       "type": "string",
-      "defaultValue": "Standard_DS1_v2",
+      "defaultValue": "Standard_A2_v2",
       "metadata": {
         "description": "OpenVPN virtual machine instance type"
       }
