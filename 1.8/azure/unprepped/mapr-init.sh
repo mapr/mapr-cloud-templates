@@ -101,10 +101,6 @@ passwordless_sudo() {
         msg_err "Could not set passwordless ssh for OS admin user"
 }
 
-echo "Pausing to make sure password is encrypted in the supplied SHA512..."
-sleep 60
-echo "Pause complete. Continue processing"
-
 [ -n "${HTTP_PROXY}" ] && echo export http_proxy=${HTTP_PROXY} >> $MAPR_HOME/conf/env
 [ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $MAPR_HOME/conf/env
 [ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $MAPR_HOME/conf/env
