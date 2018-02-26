@@ -405,24 +405,17 @@
             "osPlatform": "Linux",
             "recommendedSizes": [
               "Standard_D2s_v3",
-              "Standard_A2_v2",
-              "Standard_E2s_v3"
+              "Standard_E2s_v3",
+              "Standard_DS1_v2"
             ],
 
             "constraints": {
               "allowedSizes": [
-                "Standard_A2_v2",
-                "Standard_A3_v2",
-                "Standard_D1_v2",
-                "Standard_D2_v2",
                 "Standard_DS1_v2",
                 "Standard_DS2_v2",
-                "Standard_D2_v3",
-                "Standard_D4_v3",
                 "Standard_D2s_v3",
                 "Standard_D4s_v3",
-                "Standard_E2s_v3",
-                "Standard_E2_v3"
+                "Standard_E2s_v3"
               ]
             },
             "imageReference": {
