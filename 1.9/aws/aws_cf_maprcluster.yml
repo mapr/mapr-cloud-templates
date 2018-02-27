@@ -76,11 +76,11 @@ Parameters:
     Default: maprinstaller
   useExistingSubnet:
     Description: Id of subnet to be used (e.g. subnet-123456). The subnet should be able to access the Internet. Leave it empty to create a new VPC and subnets.
-    Type: AWS::EC2::Subnet::Id
+    Type: String
     Default: ""
   securityGroups:
     Description: Security group ids for an existing subnet if specified above, otherwise empty. Include all required security group ids including "default".
-    Type: List<AWS::EC2::SecurityGroup::Id>
+    Type: CommaDelimitedList
     Default: ""
   installOpenVPN:
     Description: Enable public Internet access to MapR cluster with OpenVPN. If you are using an existing subnet, this is ignored.
@@ -118,11 +118,6 @@ Rules:
     Assertions:
       - Assert:  !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
         AssertDescription: "Not a valid subnet"
-  SecurityGroupProvided:
-    RuleCondition: !Contains [ !RefAll "AWS::EC2::Subnet::Id", !Ref useExistingSubnet ]
-    Assertions:
-      - Assert: !EachMemberIn [ !Ref securityGroups, !RefAll "AWS::EC2::SecurityGroup::Id" ]
-        AssertDescription: "Must provide security group ids including default security group id"
 Conditions:
   InstallOpenVPN: !And [!Equals [!Ref installOpenVPN, true], !Equals [!Ref useExistingSubnet, ""]]
   CreateVPC: !Equals [!Ref useExistingSubnet, ""]
@@ -325,9 +320,6 @@ Resources:
             $M_HOME/bin/mapr-setup.sh -y upgrade
             service mapr-installer start
             systemctl enable mapr-installer
-            # FIX FOR IN-1390
-            sed -i -e 's/private_ip_address/private_dns_name/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
-            sed -i -e 's/local-ipv4/local-hostname/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
             M_USER=$(grep installer_admin_id "$M_HOME/data/properties.json" | cut -d\" -f4)
             M_GROUP=$(grep installer_admin_group "$M_HOME/data/properties.json" | cut -d\" -f4)
             echo "$M_USER:$M_USER_PWD" | chpasswd

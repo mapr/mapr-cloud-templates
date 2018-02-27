@@ -307,9 +307,6 @@ Resources:
             wget http://package.mapr.com/releases/installer/mapr-setup.sh
             chmod +x mapr-setup.sh
             ./mapr-setup.sh -y
-            # FIX FOR IN-1390
-            sed -i -e 's/private_ip_address/private_dns_name/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
-            sed -i -e 's/local-ipv4/local-hostname/' $M_HOME/ansible/playbooks/roles/aws/tasks/main.yml
             if ( $? != 0); then
               echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${clusterName}\", \"Data\" : \"Error installing mapr installer\", \"Reason\" : \"Error installing mapr installer\" }" > $statusFile
               curl -T $statusFile '${InstallWaitHandle}'
