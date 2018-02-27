@@ -15,8 +15,8 @@ Parameters:
   MEP:
     Description: MapR Ecosystem Pack version
     Type: String
-    AllowedValues: [ 3.0.1, 4.0.0 ]
-    Default: 4.0.0
+    AllowedValues: [ 4.0.0, 4.1.0 ]
+    Default: 4.1.0
   provisioningTemplate:
     Description: Auto-provisioning templates for specific use cases
     Type: String
