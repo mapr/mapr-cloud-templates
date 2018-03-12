@@ -146,6 +146,10 @@
                   "value": "template-30-maprdb2"
                 },
                 {
+                  "label": "Operational Applications with MapR-DB and DQS",
+                  "value": "template-30-maprdb3"
+                },
+                {
                   "label": "Real-time Analytics: Apache Spark Streaming including SparkML and GraphX",
                   "value": "template-40-maprstreams"
                 },

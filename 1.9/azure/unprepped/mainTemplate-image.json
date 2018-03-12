@@ -53,11 +53,10 @@
     },
     "mepVersion": {
       "type": "string",
-      "defaultValue" : "4.0.0",
+      "defaultValue" : "4.1.0",
       "allowedValues": [
-        "3.0.1",
-        "3.0.2",
-        "4.0.0"
+        "4.0.0",
+        "4.1.0"
       ],
       "metadata": {
         "description": "Type MEP version to install"

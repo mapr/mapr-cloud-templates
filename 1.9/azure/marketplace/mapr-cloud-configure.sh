@@ -285,6 +285,7 @@ else
     CMD="$CLI install -f -n -t $STANZA_URL -u $MAPR_USER:$MAPR_PASSWORD@localhost:9443 -o @$INPUT"
     CMD="$CMD -o config.ssh_password=$MAPR_PASSWORD"
     CMD="$CMD -o config.cluster_admin_password=$MAPR_PASSWORD"
+    CMD="$CMD -o config.metrics_ui_admin_password=$MAPR_PASSWORD"
     CMD="$CMD -o config.db_admin_password=$MAPR_PASSWORD"
     echo "MapR $SERVICE_TEMPLATE selected; Installation starting..."
 fi
