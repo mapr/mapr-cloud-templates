@@ -1,0 +1,41 @@
+environment:
+  #DOC mapr core version (required, must be 5.2.2 and above)
+  mapr_core_version: 6.0.0
+
+#DOC attributes for /config api
+#DOC for MapR cluster in AWS
+config:
+  #DOC list of hosts we want to install packages on (required)
+  #DOC installer host must be one of the hosts in this list
+  #For the cloud, hosts will be provisioned; no need to specify hosts here
+  hosts: []
+  #DOC update the attributes with your values
+  provider:
+    id: AWS
+    config:
+       aws_region: <AWS_REGION>
+       auto_scaling_group: <ASG_GROUP_NAME>
+       key_name: <AWS_KEY_NAME>
+       count: <NO_OF_MACHINES_IN_CLUSTER>
+       #If the launch configuration used in the auto-scale group does not
+       #have BlockDeviceMappings defined, you can define the disk_type,
+       #disk_size and disk_count and the MapR Installer will define it for you
+       #disk_type: DISK_TYPE
+       #disk_size: SIZE_IN_GB
+       #disk_count: NO_IN_EACH_NODE
+  #DOC user id, must be present for every host defined above (required)
+  #Update to the login user in your cloud image
+  ssh_id: <SSH_USER>
+  #DOC path to a file that contains the private key
+  ssh_key_file: <PATH_TO_PRIVATE_KEY_FILE>
+  #DOC license type (M3 = community edition, M5 = enterprise edition)
+  license_type: M5
+  #DOC MEP version (required only for Mapr 5.2.0 and above)
+  mep_version: 3.0
+  #DOC list of disks to install packages on (required)
+  #If you do not specifiy any disks, all available and usable disks will be used
+  disks: []
+  #DOC name of the cluster (required)
+  cluster_name: my.cluster
+  #DOC hashmap of services to be installed (optional)
+  services:

@@ -1,0 +1,114 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create launch configuration and auto-scaling group for MapR clusters.'
+Parameters:
+  clusterName:
+    Description: Cluster name
+    Default: my.cluster.com
+    Type: String
+  diskCount:
+    Description: Disks per node
+    Type: Number
+    AllowedValues: [ 0, 1, 2, 3, 4, 5, 6 ]
+    Default: 3
+  diskSize:
+    Description: GB
+    Type: Number
+    Default: 100
+  diskType:
+    Description: EBS volume type http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html
+    Type: String
+    AllowedValues: [ "gp2", "io1", "st1", "sc1" ]
+    Default: "gp2"
+  imageId:
+    Description: AMI Id
+    Type: String
+  userData:
+    Description: User Data
+    Type: String
+    Default: ""
+  securityGroups:
+    Description: Security Groups
+    Type: CommaDelimitedList
+    Default: ""
+  instanceType:
+    Description: https://aws.amazon.com/ec2/instance-types
+    Type: String
+    AllowedValues: [ m4.xlarge, m4.2xlarge, m4.4xlarge, m4.10xlarge, m4.16xlarge, d2.xlarge, d2.2xlarge, d2.4xlarge, d2.8xlarge, h1.2xlarge, h1.4xlarge, h1.8xlarge, h1.16xlarge, i3.large, i3.xlarge, i3.2xlarge, i3.4xlarge, i3.8xlarge, m3.xlarge, m3.2xlarge, c4.2xlarge, c4.4xlarge, c4.8xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, r4.large, r4.xlarge, r4.2xlarge, r4.4xlarge, r4.8xlarge, r3.large, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge  ]
+    Default: m4.xlarge
+  keyName:
+    Description: AWS Key to be used to create nodes
+    Type: AWS::EC2::KeyPair::KeyName
+  nodeCount:
+    Description: Number of nodes in cluster
+    Type: Number
+    Default: 3
+  privateSubnets:
+    Description: Private Subnets
+    Type: List<AWS::EC2::Subnet::Id>
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "AWS Infrastructure Configuration"
+        Parameters:
+          - keyName
+          - privateSubnets
+      -
+        Label:
+          default: "MapR Cluster Node Configuration"
+        Parameters:
+          - clusterName
+          - instanceType
+          - nodeCount
+          - imageId
+          - securityGroups
+          - userData
+      -
+        Label:
+          default: "MapR Cluster Node Disk Configuration"
+        Parameters:
+          - diskCount
+          - diskType
+          - diskSize
+
+Resources:
+  ClusterNodeConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref imageId
+      InstanceType: !Ref instanceType
+      KeyName: !Ref keyName
+      EbsOptimized: True
+      UserData: !Ref userData
+      SecurityGroups: !Ref securityGroups
+  ClusterNodes:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [":", ["Cluster", !Ref clusterName]]
+          PropagateAtLaunch: true
+          ResourceType: "auto-scaling-group"
+          ResourceId: !Ref clusterName
+        - Key: Cluster
+          Value: !Ref clusterName
+          PropagateAtLaunch: true
+          ResourceType: "auto-scaling-group"
+          ResourceId: !Ref clusterName
+      LaunchConfigurationName: !Ref ClusterNodeConfig
+      DesiredCapacity: !Ref nodeCount
+      MaxSize: !Ref nodeCount
+      MinSize: !Ref nodeCount
+      VPCZoneIdentifier: !Ref privateSubnets
+
+Outputs:
+  StackName:
+    Description: Stack name
+    Value: !Ref AWS::StackName
+  ClusterName:
+    Description: Cluster name
+    Value: !Ref clusterName
+

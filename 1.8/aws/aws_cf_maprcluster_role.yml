@@ -1,0 +1,71 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Create role used by MapR installer.'
+Parameters:
+  name:
+    Description: Role name
+    Default: maprinstaller
+    Type: String
+Resources:
+  MapRInstallerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join [ "-", ["mapr-role", !Ref "name", !Ref "AWS::Region"]]
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "maprinstaller"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              Effect: "Allow"
+              Resource: "*"
+              Action:
+                - "autoscaling:Describe*"
+                - "autoscaling:CreateLaunchConfiguration"
+                - "autoscaling:DeleteLaunchConfiguration"
+                - "autoscaling:UpdateAutoScalingGroup"
+                - "autoscaling:SuspendProcesses"
+                - "cloudformation:DescribeStack*"
+                - "cloudformation:GetTemplate"
+                - "cloudformation:UpdateStack"
+                - "ec2:CreateKeyPair"
+                - "ec2:DeleteKeyPair"
+                - "ec2:ImportKeyPair"
+                - "ec2:DescribeKeyPairs"
+                - "ec2:DescribeInstances"
+                - "ec2:DescribeInstanceAttribute"
+                - "ec2:ModifyInstanceAttribute"
+                - "ec2:DescribeSubnets"
+                - "ec2:RunInstances"
+                - "ec2:StartInstances"
+                - "ec2:StopInstances"
+                - "ec2:CreateVolume"
+                - "ec2:AttachVolume"
+                - "ec2:DescribeVolumes"
+  MapRInstanceProfile:
+      Type: "AWS::IAM::InstanceProfile"
+      Properties:
+        InstanceProfileName: !Join [ "-", ["mapr", !Ref "name", !Ref "AWS::Region"]]
+        Path: "/"
+        Roles:
+          -
+            !Ref MapRInstallerRole
+Outputs:
+  RoleReference:
+    Description: Role Reference
+    Value: !Ref MapRInstallerRole
+  InstanceProfileReference:
+    Description: Instance Profile Reference
+    Value: !Ref MapRInstanceProfile
+
