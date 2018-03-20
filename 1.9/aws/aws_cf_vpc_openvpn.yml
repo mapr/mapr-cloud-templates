@@ -60,49 +60,49 @@ Mappings:
       CIDR: 172.24.8.0/22
   OpenVPNAMIMap:
     us-east-1: # N Viriginia
-      AMI: ami-b1e82bcc
+      AMI: ami-548e4429
       domain: ec2.internal
     us-east-2: # Ohio
-      AMI: ami-83e9dfe6
+      AMI: ami-12ebf4fe 
       domain: us-east-2.compute.internal
     us-west-1: # California
-      AMI: ami-e51a0e85
+      AMI: ami-47091e27
       domain: us-west-1.compute.internal
     us-west-2: # Oregon
-      AMI: ami-8478e8fc
+      AMI: ami-7370ed0b
       domain: us-west-2.compute.internal
     ca-central-1: # Québec
-      AMI: ami-bf1790db
+      AMI: ami-68cb4d0c
       domain: ca-central-1.compute.internal
     eu-central-1: # Frankfurt
-      AMI: ami-7ed5bd11
+      AMI: ami-f7f3a21c
       domain: eu-central-1.compute.internal
     eu-west-1: # Ireland
-      AMI: ami-ea92db93
+      AMI: ami-c24d18bb
       domain: eu-west-1.compute.internal
     eu-west-2: # London
-      AMI: ami-b442a5d3
+      AMI: ami-a8f81ecf
       domain: eu-west-2.compute.internal
     eu-west-3: # Paris
-      AMI: ami-4458ee39
+      AMI: ami-3a358347
       domain: eu-west-3.compute.internal
     ap-southeast-1: # Singapore
-      AMI: ami-c92777b5
+      AMI: ami-a7e6b4db
       domain: ap-southeast-1.compute.internal
     ap-southeast-2: # Sydney
-      AMI: ami-571dde35
+      AMI: ami-03559761
       domain: ap-southeast-2.compute.internal
     ap-south-1 : # Mumbai
-      AMI: ami-ebd28b84
+      AMI: ami-26de8649
       domain: ap-south-1.compute.internal
     ap-northeast-1: # Tokoyo
-      AMI: ami-855a10e3
+      AMI: ami-17c99f71
       domain: ap-northeast-1.compute.internal
     ap-northeast-2: # Seoul
-      AMI: ami-148f237a
+      AMI:  ami-ec57fb82
       domain: ap-northeast-2.compute.internal
     sa-east-1: # São Paulo
-      AMI: ami-452a7f29
+      AMI: ami-7c1d4910
       domain: sa-east-1.compute.internal
 Resources:
   VPC:
