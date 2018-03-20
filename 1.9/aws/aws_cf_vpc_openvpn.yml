@@ -60,49 +60,49 @@ Mappings:
       CIDR: 172.24.8.0/22
   OpenVPNAMIMap:
     us-east-1: # N Viriginia
-      AMI: ami-548e4429
+      AMI: ami-43a15f3e
       domain: ec2.internal
     us-east-2: # Ohio
-      AMI: ami-12ebf4fe 
+      AMI: ami-916f59f4
       domain: us-east-2.compute.internal
     us-west-1: # California
-      AMI: ami-47091e27
+      AMI: ami-925144f2
       domain: us-west-1.compute.internal
     us-west-2: # Oregon
-      AMI: ami-7370ed0b
+      AMI: ami-4e79ed36
       domain: us-west-2.compute.internal
     ca-central-1: # Québec
-      AMI: ami-68cb4d0c
+      AMI: ami-ae55d2ca
       domain: ca-central-1.compute.internal
     eu-central-1: # Frankfurt
-      AMI: ami-f7f3a21c
+      AMI: ami-7c412f13
       domain: eu-central-1.compute.internal
     eu-west-1: # Ireland
-      AMI: ami-c24d18bb
+      AMI: ami-f90a4880
       domain: eu-west-1.compute.internal
     eu-west-2: # London
-      AMI: ami-a8f81ecf
+      AMI: ami-f4f21593
       domain: eu-west-2.compute.internal
     eu-west-3: # Paris
-      AMI: ami-3a358347
+      AMI: ami-0e55e373
       domain: eu-west-3.compute.internal
     ap-southeast-1: # Singapore
-      AMI: ami-a7e6b4db
+      AMI: ami-52d4802e
       domain: ap-southeast-1.compute.internal
     ap-southeast-2: # Sydney
-      AMI: ami-03559761
+      AMI: ami-d38a4ab1
       domain: ap-southeast-2.compute.internal
     ap-south-1 : # Mumbai
-      AMI: ami-26de8649
+      AMI: ami-0189d76e
       domain: ap-south-1.compute.internal
     ap-northeast-1: # Tokoyo
-      AMI: ami-17c99f71
+      AMI: ami-0d74386b
       domain: ap-northeast-1.compute.internal
     ap-northeast-2: # Seoul
-      AMI:  ami-ec57fb82
+      AMI: ami-a414b9ca
       domain: ap-northeast-2.compute.internal
     sa-east-1: # São Paulo
-      AMI: ami-7c1d4910
+      AMI: ami-423d772e
       domain: sa-east-1.compute.internal
 Resources:
   VPC:
@@ -265,14 +265,42 @@ Resources:
           - |
             #!/bin/bash -x
             statusFile=/tmp/cf_status
+            status="FAILURE"
+
+            admin_user=${openVPNuser}
+            admin_pw=${openVPNpassword}
             if [ -z "${openVPNuser}" -o -z "${openVPNpassword}" ]; then
-              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"Openvpn setup requires admin user and password\", \"Reason\" : \"Openvpn setup requires admin user and password\" }" > $statusFile
+              message="Openvpn setup requires admin user and password"
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"$message\" }" > $statusFile
               curl -T $statusFile '${OpenVPNWaitHandle}'
               exit 1
             fi
+
+            id $admin_user 2>/dev/null || useradd -m $admin_user
+            if [ $? -ne 0 ]; then
+              message="Failed to created $admin_user"
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"$message\" }" > $statusFile
+              curl -T $statusFile '${OpenVPNWaitHandle}'
+              exit 1
+            fi
+            echo "$admin_user:$admin_pw" | chpasswd
+
+
+            host_ip=$(curl -f -s http://169.254.169.254/latest/meta-data/public-ipv4)
+            if [ $? -ne 0 ]; then
+              status="The openvpn host must have a public ip"
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"$message\" }" > $statusFile
+              curl -T $statusFile '${OpenVPNWaitHandle}'
+              exit 1
+            fi
+
+            cd /tmp
+            wget -c http://swupdate.openvpn.org/as/openvpn-as-2.5-Ubuntu16.amd_64.deb
+            dpkg -i openvpn-as-2.5-Ubuntu16.amd_64.deb
+            echo "openvpn:$admin_pw" | chpasswd
             sleep 5
-            admin_user=${openVPNuser}
-            admin_pw=${openVPNpassword}
+
+            /usr/local/openvpn_as/scripts/sacli -k host.name -v $host_ip ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min -v 1.2 ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min_strict -v true ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.server.tls_version_min -v 1.2 ConfigPut
@@ -280,10 +308,11 @@ Resources:
             /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.netmask_bits -v 24 ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.routing.reroute_dns -v true ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.server.dhcp_option.domain -v ${domain} ConfigPut
+            /usr/local/openvpn_as/scripts/sacli --user $admin_user --key prop_superuser --value true UserPropPut
+            /usr/local/openvpn_as/scripts/sacli --user $admin_user --new_pass $admin_pw SetLocalPassword
             /usr/local/openvpn_as/scripts/sacli start
             if [ $? -ne 0 ]; then
               message="Openvpn did not start successfully"
-              status="FAILURE"
             else
               message="Success!"
               status="SUCCESS"
