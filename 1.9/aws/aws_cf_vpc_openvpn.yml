@@ -60,49 +60,49 @@ Mappings:
       CIDR: 172.24.8.0/22
   OpenVPNAMIMap:
     us-east-1: # N Viriginia
-      AMI: ami-f1dc388c
+      AMI: ami-548e4429
       domain: ec2.internal
     us-east-2: # Ohio
-      AMI: ami-c284b0a7
+      AMI: ami-12ebf4fe 
       domain: us-east-2.compute.internal
     us-west-1: # California
-      AMI: ami-2f747c4f
+      AMI: ami-47091e27
       domain: us-west-1.compute.internal
     us-west-2: # Oregon
-      AMI: ami-25cd415d
+      AMI: ami-7370ed0b
       domain: us-west-2.compute.internal
     ca-central-1: # Québec
-      AMI: ami-ca30b4ae
+      AMI: ami-68cb4d0c
       domain: ca-central-1.compute.internal
     eu-central-1: # Frankfurt
-      AMI: ami-99d0b0f6
+      AMI: ami-f7f3a21c
       domain: eu-central-1.compute.internal
     eu-west-1: # Ireland
-      AMI: ami-24f4885d
+      AMI: ami-c24d18bb
       domain: eu-west-1.compute.internal
     eu-west-2: # London
-      AMI: ami-f2b35795
+      AMI: ami-a8f81ecf
       domain: eu-west-2.compute.internal
     eu-west-3: # Paris
-      AMI: ami-55833528
+      AMI: ami-3a358347
       domain: eu-west-3.compute.internal
     ap-southeast-1: # Singapore
-      AMI: ami-167c336a
+      AMI: ami-a7e6b4db
       domain: ap-southeast-1.compute.internal
     ap-southeast-2: # Sydney
-      AMI: ami-5a17d338
+      AMI: ami-03559761
       domain: ap-southeast-2.compute.internal
     ap-south-1 : # Mumbai
-      AMI: ami-67194508
+      AMI: ami-26de8649
       domain: ap-south-1.compute.internal
     ap-northeast-1: # Tokoyo
-      AMI: ami-13295175
+      AMI: ami-17c99f71
       domain: ap-northeast-1.compute.internal
     ap-northeast-2: # Seoul
-      AMI: ami-43e24f2d
+      AMI:  ami-ec57fb82
       domain: ap-northeast-2.compute.internal
     sa-east-1: # São Paulo
-      AMI: ami-bcfdb4d0
+      AMI: ami-7c1d4910
       domain: sa-east-1.compute.internal
 Resources:
   VPC:
@@ -263,13 +263,14 @@ Resources:
       UserData:
         Fn::Base64: !Sub
           - |
-            #!/bin/bash
+            #!/bin/bash -x
             statusFile=/tmp/cf_status
             if [ -z "${openVPNuser}" -o -z "${openVPNpassword}" ]; then
               echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${name}\", \"Data\" : \"Openvpn setup requires admin user and password\", \"Reason\" : \"Openvpn setup requires admin user and password\" }" > $statusFile
               curl -T $statusFile '${OpenVPNWaitHandle}'
               exit 1
             fi
+            sleep 5
             admin_user=${openVPNuser}
             admin_pw=${openVPNpassword}
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min -v 1.2 ConfigPut
@@ -290,7 +291,7 @@ Resources:
             # With the VPN server running, the CURL is not able to resolve the AWS host
             /usr/local/openvpn_as/scripts/sacli stop
             sleep 5
-            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"message\" }" > $statusFile
+            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${name}\", \"Data\" : \"$message\", \"Reason\" : \"$message\" }" > $statusFile
             curl -T $statusFile '${OpenVPNWaitHandle}'
             /usr/local/openvpn_as/scripts/sacli start
             /usr/local/openvpn_as/scripts/sacli --user router --key prop_autologin --value true UserPropPut
@@ -314,3 +315,4 @@ Outputs:
     Condition: InstallOpenVPN
     Description: OpenVPN Admin URL. Login credential openvpn/openvpn.
     Value: !Join [ "", ["https://", !GetAtt OpenVPNInstance.PublicIp, ":943/admin"]]
+

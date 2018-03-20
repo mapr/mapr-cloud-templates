@@ -202,18 +202,19 @@ Resources:
             M_USER_PWD=${clusterAdminPassword}
             M_USER=$(grep installer_admin_id "$M_HOME/data/properties.json" | cut -d\" -f4)
             M_GROUP=$(grep installer_admin_group "$M_HOME/data/properties.json" | cut -d\" -f4)
+            clustername=${AWS::StackName}
             echo "$M_USER:$M_USER_PWD" | chpasswd
             localipv4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
             statusFile=$M_HOME/logs/cf_status
             if ( $? != 0); then
-              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${AWS::StackName}\", \"Data\" : \"Unable to reset password for $M_USER\", \"Reason\" : \"Unable to reset password for $M_USER\" }" > $statusFile
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"$clustername\", \"Data\" : \"Unable to reset password for $M_USER\", \"Reason\" : \"Unable to reset password for $M_USER\" }" > $statusFile
               curl -T $statusFile '${InstallWaitHandle}'
               exit 1
             fi
 
-            $M_HOME/bin/aws/keypair init ${AWS::StackName}
+            $M_HOME/bin/aws/keypair init $clustername
             if [ ! -f $M_HOME/data/aws_key ]; then
-              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${AWS::StackName}\", \"Data\" : \"AWS Key file not found. You may be using an old installer.\", \"Reason\" : \"AWS Key file not found. You may be using an old installer.\" }" > $statusFile
+              echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"$clustername\", \"Data\" : \"AWS Key file not found. You may be using an old installer.\", \"Reason\" : \"AWS Key file not found. You may be using an old installer.\" }" > $statusFile
               curl -T $statusFile '${InstallWaitHandle}'
               exit 1
             fi
@@ -229,7 +230,7 @@ Resources:
             echo "  mapr_core_version: $MAPR_CORE " >> $input
             echo "config:" >> $input
             echo "  mep_version: ${MAPR_MEP} " >> $input
-            echo "  cluster_name: ${AWS::StackName} " >> $input
+            echo "  cluster_name: $clustername " >> $input
             echo "  ssh_id: $SSH_USER " >> $input
             echo "  ssh_key_file: $key_file " >> $input
             echo "  disks: [] " >> $input
@@ -262,7 +263,9 @@ Resources:
             yum install -y docker
             service docker start
             service docker enable
-
+            uid=$(id $M_USER | sed 's/uid=\(.*\) gid=.*/\1/' | sed 's/\(.*\)(.*/\1/')
+            ticketfile=/tmp/maprticket_$uid
+            echo $M_USER_PWD | sudo -u $M_USER maprlogin password -out $ticketfile
             cat > /root/run_dsr.sh <<EOF
             docker run -it -d \
             -p 9995:9995 \
@@ -271,17 +274,18 @@ Resources:
             --cap-add SYS_ADMIN \
             --cap-add SYS_RESOURCE \
             --device /dev/fuse \
-            --security-opt apparmor:unconfined \
+            -v $ticketfile:$ticketfile:ro \
             -e HOST_IP=$localipv4 \
-            -e MAPR_CLUSTER=${AWS::StackName} \
+            -e MAPR_CLUSTER=$clustername \
             -e MAPR_CLDB_HOSTS=$localipv4 \
-            -e MAPR_CONTAINER_USER=mapr \
+            -e MAPR_CONTAINER_USER=$M_USER \
             -e MAPR_CONTAINER_PASSWORD=$M_USER_PWD \
-            -e MAPR_CONTAINER_GROUP=mapr \
+            -e MAPR_CONTAINER_GROUP=$M_GROUP \
             -e MAPR_CONTAINER_UID=5000 \
             -e MAPR_CONTAINER_GID=5000 \
             -e MAPR_MOUNT_PATH=/mapr \
             -e MAPR_HS_HOST=$localipv4 \
+            -e MAPR_TICKETFILE_LOCATION=$ticketfile \
             maprtech/data-science-refinery
             EOF
             chmod +x /root/run_dsr.sh
@@ -289,7 +293,7 @@ Resources:
 
             sleep 120
 
-            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${AWS::StackName}\", \"Data\" : \"$data\", \"Reason\" : \"$reason\" }" > $statusFile
+            echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"$clustername\", \"Data\" : \"$data\", \"Reason\" : \"$reason\" }" > $statusFile
             curl -T $statusFile '${InstallWaitHandle}'
           - serviceTemplate: !FindInMap [ StanzaURL, !FindInMap [Variables, "Keys", "provisioningTemplate"], "serviceTemplate" ]
             SSH_USER: !FindInMap [Variables, "Keys", "SSHUSER"]
