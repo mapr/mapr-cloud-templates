@@ -300,12 +300,16 @@ Resources:
             echo "openvpn:$admin_pw" | chpasswd
             sleep 5
 
+            ip_range=$(echo ${CIDRRange} | cut -d/ -f1)
+            netmask=$(echo ${CIDRRange} | cut -d/ -f2)
+
             /usr/local/openvpn_as/scripts/sacli -k host.name -v $host_ip ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.server.routing.private_network.0 -v ${addressSpace} ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min -v 1.2 ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.tls_version_min_strict -v true ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.server.tls_version_min -v 1.2 ConfigPut
-            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.network -v ${CIDRRange} ConfigPut
-            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.netmask_bits -v 24 ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.network -v $ip_range ConfigPut
+            /usr/local/openvpn_as/scripts/sacli -k vpn.daemon.0.client.netmask_bits -v $netmask ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.client.routing.reroute_dns -v true ConfigPut
             /usr/local/openvpn_as/scripts/sacli -k vpn.server.dhcp_option.domain -v ${domain} ConfigPut
             /usr/local/openvpn_as/scripts/sacli --user $admin_user --key prop_superuser --value true UserPropPut
@@ -325,7 +329,8 @@ Resources:
             /usr/local/openvpn_as/scripts/sacli start
             /usr/local/openvpn_as/scripts/sacli --user router --key prop_autologin --value true UserPropPut
             systemctl enable openvpnas
-          - CIDRRange: !Select [0, !Split ["/",  !FindInMap [ SubnetConfig, "Public", "CIDR" ]]]
+          - CIDRRange: !FindInMap [ SubnetConfig, "Public", "CIDR" ]
+            addressSpace: !FindInMap [ SubnetConfig, "VPC", "CIDR" ]
             domain: !FindInMap [ OpenVPNAMIMap, !Ref "AWS::Region", "domain" ]
 Outputs:
   VPC:
