@@ -42,7 +42,6 @@
     },
     "clusterAdminPassword": {
       "type": "securestring",
-      "defaultValue": "mapr",
       "metadata": {
         "description": "Password for UID mapr"
       }
@@ -127,7 +126,6 @@
     },
     "openVpnPassword": {
       "type": "securestring",
-      "defaultValue": "openvpn",
       "metadata": {
         "description": "OpenVPN user password (Please use a strong password to protect your cluster)"
       }
@@ -237,7 +235,6 @@
     "maprOpenVPNTemplate": "MapR.OpenVPN.Template",
 
     "osImageSg": "https://baseimagergsa.blob.core.windows.net/",
-    "osImageBase": "[concat(variables('osImageSg'), 'system/Microsoft.Compute/Images/vhds/maprbaseimageprep1-osDisk.vhd')]",
     "osImageDiskTarget": "[concat(variables('osImageSg'), 'vhds/', parameters('clusterName'), '.vhd')]",
     "networkApiVersion": "2017-04-01",
     "computeApiVersion": "2017-03-30",

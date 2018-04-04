@@ -440,6 +440,7 @@
             "label": "OpenVPN login user",
             "type": "Microsoft.Common.TextBox",
             "constraints": {
+              "regex": "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\\$)$",
               "required": true
             },
             "defaultValue": "openvpn",
