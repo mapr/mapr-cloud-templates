@@ -83,16 +83,12 @@
             "name": "mepVersion",
             "label": "MEP",
             "toolTip": "MapR Ecosystem Pack version",
-            "defaultValue": "4.1.0",
+            "defaultValue": "5.0.0",
             "constraints": {
               "allowedValues": [
                 {
-                  "label": "4.0.0",
-                  "value": "4.0.0"
-                },
-                {
-                  "label": "4.1.0",
-                  "value": "4.1.0"
+                  "label": "5.0.0",
+                  "value": "5.0.0"
                 }
               ],
               "required": true

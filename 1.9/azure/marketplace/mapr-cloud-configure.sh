@@ -10,7 +10,7 @@ PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
 STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.9/azure/marketplace/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
-MAPR_CORE_UNPREPPED="6.0.0"
+MAPR_CORE_UNPREPPED="6.0.1"
 
 msg_err() {
     echo "ERROR: $1"
