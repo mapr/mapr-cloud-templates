@@ -1,6 +1,6 @@
 environment:
   #DOC mapr core version (required, must be 5.2.2 and above)
-  mapr_core_version: 6.0.0
+  mapr_core_version: 6.0.1
 
 #DOC attributes for /config api
 #DOC for MapR cluster in AWS
