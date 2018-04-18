@@ -249,9 +249,9 @@
     "deploymentsVersion": "2016-09-01",
 
     "imagePublisher": "mapr-technologies",
-    "imageOffer": "mapr60-base-preview",
+    "imageOffer": "mapr60-base",
     "imageSKU": "60-byol",
-    "imageVersion": "latest",
+    "imageVersion": "1.9.0",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",
       "offer": "[variables('imageOffer')]",
