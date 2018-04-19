@@ -46,7 +46,6 @@
     },
     "clusterAdminPassword": {
       "type": "securestring",
-      "defaultValue": "mapr",
       "metadata": {
         "description": "Password for UID mapr"
       }

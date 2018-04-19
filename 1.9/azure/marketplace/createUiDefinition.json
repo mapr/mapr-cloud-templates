@@ -302,7 +302,7 @@
             "constraints": {
               "required": true,
               "regex": "^(6[3-9]|[7-9][0-9]|[1-9][0-9][0-9]|409[0-5]|40[0-8][0-9]|[1-3][0-9][0-9][0-9])$",
-              "validationMessage": "Must be a number between 1 and 4095"
+              "validationMessage": "Disk sizes must be a number between 63 and 4095"
             },
             "defaultValue": "127"
           }
