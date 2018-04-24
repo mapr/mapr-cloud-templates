@@ -1,0 +1,61 @@
+# invoked with
+# gcloud deployment-manager deployments create mapr --config mapr.jinja --properties cluster-name:nsen
+
+{% set VPC_NAME = env["deployment"] + "-vpc" %}
+{% set PROJECT = env["project"] %}
+
+resources:
+
+- name: {{ VPC_NAME }}
+  type: compute.v1.network
+  properties:
+    autoCreateSubnetworks: true
+
+#- name: {{ VPC_NAME }}-internet-egress
+#  type: compute.v1.route
+#  properties:
+#    network: $(ref.{{ VPC_NAME }}.selfLink)
+#    destRange: 0.0.0.0/0
+#    nextHopGateway: "projects/{{ PROJECT }}/global/gateways/default-internet-gateway"
+#    priority: 2000
+#    tags:
+#      - {{ VPC_NAME }}
+
+- name: {{ VPC_NAME }}-allow-internal
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ VPC_NAME }}.selfLink)
+    sourceRanges: [10.128.0.0/9]
+    allowed:
+        - IPProtocol: tcp
+          ports:
+            - 0-65535
+        - IPProtocol: udp
+          ports:
+            - 0-65535
+        - IPProtocol: icmp
+
+- name: {{ VPC_NAME }}-allow-ssh
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ VPC_NAME }}.selfLink)
+    allowed:
+      - IPProtocol: tcp
+        ports:
+          - 22
+
+- name: {{ VPC_NAME }}-web-access
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ VPC_NAME }}.selfLink)
+    allowed:
+      - IPProtocol: tcp
+        ports:
+          - 8443
+      - IPProtocol: tcp
+        ports:
+          - 9443
+
+outputs:
+- name: vpcName
+  value: {{ VPC_NAME }}

@@ -1,0 +1,55 @@
+# invoked with
+# gcloud deployment-manager deployments create <clustername> --config <this filename>
+# e.g. gcloud deployment-manager deployments create mycluster --config mapr_cluster.yaml
+
+imports:
+  - path: vpc.jinja
+  - path: mapr.jinja
+
+resources:
+
+- name: vpc
+  type: vpc.jinja
+
+- name: mapr-cluster
+  type: mapr.jinja
+  properties:
+    # password for the MapR cluster admin
+    cluster_admin_password: password
+    # no. of nodes in the cluster
+    node_count: 1
+    # type of disk to be used: https://cloud.google.com/compute/docs/disks/
+    # pd-standard, pd-ssd, local-ssd
+    disk_type: local-ssd
+    # size of each disk
+    disk_size: 20
+    # no of disks on each node
+    disk_count: 2
+    # MapR Eco-system version
+    MEP: 3.0.1
+    # URL to MapR installer stanza template
+    stanza_url: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.6/google/mapr-core.yml"
+    # MapR auto-provisioning template to be used
+    service_template: template-05-converged
+    # The Google Cloud Zone to deploy into
+    gce_zone: us-east1-d
+    # The machine type to be used for cluster nodes: https://cloud.google.com/compute/docs/machine-types
+    machine_type: n1-standard-4
+    # The image to be used to create the cluster nodes
+    image: maprinstaller-t
+    # Service account email in Google Cloud: https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances
+    service_account_email: "145040863995@developer.gserviceaccount.com"
+    # Public SSH key to ssh to the instances
+    ssh_key: "centos:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFZHopMJ/+HDeiaqCT1zK7W/Rje8X2YU5nXUEQIe9wfjwYOTWewmFrHFCQatXvfuv85QW/DDX42S9qov70oemTKO+WX8lqFltQ/jtzrX6OliT1OiF3Nnh/wh8sFVRlubg6n1N5GXQ5mSPiRBw+3ht+NQWaJy433yYSVQ/np2Ij0UEbGZa5rPr+hMZWvPhlZbSnVcjhS7a7fPzvEsg43i0mfBkvwnWFHxeSTkQbQ0TpNNFtGSvY/DfP7nMu5ZT8fGuIV9Vdin/nK2P/vXjxyhROXcJEcM02fYxzs/OP2uTdVyl0o5n7awQb222PsVrVBKZHeTfu/zNtNE7JQrPfPhib centos"
+
+
+outputs:
+- name: installerHost
+  value: $(ref.mapr-cluster.installerHost)
+- name: installerURL
+  value: "https://$(ref.mapr-cluster.installerHost):9443/"
+- name: sshUser
+  value: $(ref.mapr-cluster.sshUser)
+- name: mapRUser
+  value: $(ref.mapr-cluster.mapRUser)
+

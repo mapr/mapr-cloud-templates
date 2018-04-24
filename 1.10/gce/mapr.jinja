@@ -1,0 +1,152 @@
+# invoked with
+# gcloud deployment-manager deployments create mapr --config mapr.jinja --properties cluster-name:nsen
+
+{% set VPC_NAME = env["deployment"] + "-vpc" %}
+{% set TEMPLATE_NAME = env["deployment"] + "-template" %}
+{% set GROUP_NAME = env["deployment"] + "-group" %}
+{% set INSTALLER_NAME = env["deployment"] + "-installer" %}
+{% set PROJECT = env["project"] %}
+{% set INST_MACHINE_TYPE = "n1-standard-1" %}
+{% set IMAGE = properties["image"] %}
+{% set ZONE = properties["gce_zone"] %}
+{% set CONFIG = env["deployment"] + "-maprinstaller-config" %}
+{% set WAITER = env["deployment"] + "-maprinstaller-waiter" %}
+{% set SSH_USER = properties["ssh_user"]|default("centos", true) %}
+{% set MAPR_USER = properties["mapr_user"]|default("mapr", true) %}
+
+resources:
+
+- type: runtimeconfig.v1beta1.config
+  name: {{ CONFIG }}
+  properties:
+    config: {{ CONFIG }}
+
+- type: runtimeconfig.v1beta1.waiter
+  name: {{ WAITER }}
+  metadata:
+    dependsOn:
+    - {{ env["deployment"] }}-installer
+  properties:
+    parent: $(ref.{{ CONFIG }}.name)
+    waiter: {{ WAITER }}
+    timeout: 3000s #50min
+    success:
+      cardinality:
+        path: /status/success
+        number: 1
+    failure:
+      cardinality:
+        path: /status/failure
+        number: 1
+
+- name: {{ TEMPLATE_NAME }}
+  type: compute.v1.instanceTemplate
+  properties:
+    properties:
+      machineType: {{ properties["machine_type"] }}
+      canIpForward: False
+      networkInterfaces:
+      - network: $(ref.{{ VPC_NAME }}.selfLink)
+        #No internet access if this is not specified
+        accessConfigs:
+        - name: External NAT
+          type: ONE_TO_ONE_NAT
+      disks:
+      - deviceName: boot
+        type: PERSISTENT
+        boot: true
+        autoDelete: true
+        initializeParams:
+          sourceImage: https://www.googleapis.com/compute/v1/projects/{{ PROJECT }}/global/images/{{ IMAGE }}
+      {% if properties["disk_type"] == 'local-ssd' %}
+      {% for count in range(properties["disk_count"]) %}
+      - type: SCRATCH
+        autoDelete: true
+        initializeParams:
+          diskType: {{ properties["disk_type"] }}
+      {% endfor %}
+      {% endif %}
+      metadata:
+        items:
+        - key: ssh-keys
+          value: "{{ properties['ssh_key'] }}"
+        - key: cluster-name
+          value: {{ env["deployment"] }}
+
+- name: {{ GROUP_NAME }}
+  type: compute.v1.instanceGroupManagers
+  properties:
+    zone: {{ ZONE }}
+    instanceTemplate: $(ref.{{ TEMPLATE_NAME }}.selfLink)
+    targetSize: 0
+    baseInstanceName: {{ env["deployment"] }}
+
+- name: {{ INSTALLER_NAME }}
+  type: compute.v1.instance
+  properties:
+    zone: {{ ZONE }}
+    machineType: https://www.googleapis.com/compute/v1/projects/{{ PROJECT }}/zones/{{ ZONE }}/machineTypes/{{ INST_MACHINE_TYPE }}
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/{{ PROJECT }}/global/images/{{ IMAGE }}
+    networkInterfaces:
+    - network: $(ref.{{ VPC_NAME }}.selfLink)
+      #No internet access if this is not specified
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          /opt/mapr/installer/bin/google/startup.sh && rc=success || rc=failure
+          echo "End status is $rc"
+          gcloud beta runtime-config configs variables set \
+            /status/$rc/mapr-installer message --config-name {{ CONFIG }}
+      - key: cluster_admin_user
+        value: {{ MAPR_USER }}
+      - key: cluster_name
+        value: {{ env["deployment"] }}
+      - key: MEP
+        value: {{ properties["MEP"] }}
+      - key: cluster_admin_password
+        value: {{ properties["cluster_admin_password"] }}
+      - key: machine_type
+        value: {{ properties["machine_type"] }}
+      - key: node_count
+        value: {{ properties["node_count"] }}
+      - key: disk_type
+        value: {{ properties["disk_type"] }}
+      - key: disk_size
+        value: {{ properties["disk_size"] }}
+      - key: disk_count
+        value: {{ properties["disk_count"] }}
+      - key: instance_group_name
+        value: {{ GROUP_NAME }}
+      - key: ssh-keys
+        value: {{ properties["ssh_key"] }}
+      - key: stanza_url
+        value: {{ properties["stanza_url"] }}
+      - key: service_template
+        value: {{ properties["service_template"] }}
+      - key: ssh_user
+        value: {{ SSH_USER }}
+
+    serviceAccounts:
+      - email: {{ properties["service_account_email"] }}
+        scopes:
+          - https://www.googleapis.com/auth/compute
+          - https://www.googleapis.com/auth/cloudruntimeconfig
+
+outputs:
+- name: installerHost
+  value: $(ref.{{ INSTALLER_NAME }}.networkInterfaces[0].accessConfigs[0].natIP)
+- name: sshUser
+  value: {{ SSH_USER }}
+- name: mapRUser
+  value: {{ MAPR_USER }}
