@@ -84,6 +84,10 @@
     "diskType": {
       "type": "string",
       "defaultValue" : "Premium_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Standard_LRS"
+      ],
       "metadata": {
         "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
       }
@@ -140,6 +144,17 @@
       "defaultValue": "openvpn",
       "metadata": {
         "description": "OpenVPN user password (Please use a strong password to protect your cluster)"
+      }
+    },
+    "openVpnDiskType": {
+      "type": "string",
+      "defaultValue" : "Standard_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Standard_LRS"
+      ],
+      "metadata": {
+        "description": "Disk type to use for OpenVPN VM managed disks (Premium_LRS, Standard_LRS)"
       }
     },
     "vnetName": {
@@ -256,10 +271,7 @@
     "imageSKU": "7.4",
     "imageVersion": "latest",
     "imageReference": {
-      "publisher": "[variables('imagePublisher')]",
-      "offer": "[variables('imageOffer')]",
-      "sku": "[variables('imageSKU')]",
-      "version": "[variables('imageVersion')]"
+      "id": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MapRImageCreateRG/providers/Microsoft.Compute/images/MapRImage_6.0.1_Final"
     },
     "plan": {
       "name": "[variables('imageSKU')]",
@@ -343,7 +355,7 @@
             "value": "[parameters('adminPublicKey')]"
           },
           "diskType": {
-            "value": "[parameters('diskType')]"
+            "value": "[parameters('openVpnDiskType')]"
           },
           "fourDotSubnetPublic": {
             "value": "[variables('fourDotSubnetPublic')]"

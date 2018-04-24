@@ -411,18 +411,14 @@
 
             "constraints": {
               "allowedSizes": [
-                "Standard_A2_v2",
-                "Standard_A3_v2",
-                "Standard_D1_v2",
-                "Standard_D2_v2",
                 "Standard_DS1_v2",
                 "Standard_DS2_v2",
-                "Standard_D2_v3",
-                "Standard_D4_v3",
+                "Standard_DS3_v2",
                 "Standard_D2s_v3",
                 "Standard_D4s_v3",
+                "Standard_D8s_v3",
                 "Standard_E2s_v3",
-                "Standard_E2_v3"
+                "Standard_E4s_v3"
               ]
             },
             "imageReference": {
@@ -458,6 +454,25 @@
             "options": {
               "hideConfirmation": false
             }
+          },
+          {
+            "type": "Microsoft.Common.OptionsGroup",
+            "name": "openVpnDiskType",
+            "label": "Disk type",
+            "defaultValue": "HDD",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "SSD",
+                  "value": "Premium_LRS"
+                },
+                {
+                  "label": "HDD",
+                  "value": "Standard_LRS"
+                }
+              ],
+              "required": true
+            }
           }
         ]
       }
@@ -482,6 +497,7 @@
       "openVpnUser": "[steps('accessSecurity').openVpnUser]",
       "openVpnPassword": "[steps('accessSecurity').openVpnPassword]",
       "openvpnInstanceType": "[steps('accessSecurity').openvpnInstanceType]",
+      "openVpnDiskType": "[steps('accessSecurity').openVpnDiskType]",
       "vnetName": "[steps('accessSecurity').virtualNetwork.name]",
       "vnetResourceGroup": "[steps('accessSecurity').virtualNetwork.resourceGroup]",
       "vnetAddressPrefix": "[first(steps('accessSecurity').virtualNetwork.vnetPickerData.addressPrefixes)]",

@@ -83,6 +83,10 @@
     "diskType": {
       "type": "string",
       "defaultValue" : "Premium_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Standard_LRS"
+      ],
       "metadata": {
         "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
       }
@@ -139,6 +143,17 @@
       "defaultValue": "openvpn",
       "metadata": {
         "description": "OpenVPN user password (Please use a strong password to protect your cluster)"
+      }
+    },
+    "openVpnDiskType": {
+      "type": "string",
+      "defaultValue" : "Standard_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Standard_LRS"
+      ],
+      "metadata": {
+        "description": "Disk type to use for OpenVPN VM managed disks (Premium_LRS, Standard_LRS)"
       }
     },
     "vnetName": {
@@ -339,7 +354,7 @@
             "value": "[parameters('adminPublicKey')]"
           },
           "diskType": {
-            "value": "[parameters('diskType')]"
+            "value": "[parameters('openVpnDiskType')]"
           },
           "fourDotSubnetPublic": {
             "value": "[variables('fourDotSubnetPublic')]"
