@@ -271,7 +271,10 @@
     "imageSKU": "7.4",
     "imageVersion": "latest",
     "imageReference": {
-      "id": "/subscriptions/a1dc916f-709a-4cb7-ab67-6801936e4a98/resourceGroups/MapRImageCreateRG/providers/Microsoft.Compute/images/MapRImage_6.0.1_Final"
+      "publisher": "[variables('imagePublisher')]",
+      "offer": "[variables('imageOffer')]",
+      "sku": "[variables('imageSKU')]",
+      "version": "[variables('imageVersion')]"
     },
     "plan": {
       "name": "[variables('imageSKU')]",
