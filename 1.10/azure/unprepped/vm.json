@@ -101,53 +101,78 @@
     },
 
     "maprdataDiskCache": "ReadOnly",
+    "maprdataDiskCreateOption": "Empty",
     "diskArray": [{
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 0,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 1,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 2,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 3,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 4,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 5,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 6,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     },
     {
       "diskSizeGB": "[parameters('diskSize')]",
       "lun": 7,
-      "createOption": "Empty",
-      "caching": "[variables('maprdataDiskCache')]"
+      "createOption": "[variables('maprdataDiskCreateOption')]",
+      "caching": "[variables('maprdataDiskCache')]",
+      "managedDisk": {
+        "storageAccountType": "[parameters('diskType')]"
+      }
     }]
   },
   "resources": [
