@@ -269,7 +269,7 @@
 
     "imagePublisher": "OpenLogic",
     "imageOffer": "Centos",
-    "imageSKU": "7.4",
+    "imageSKU": "7.5",
     "imageVersion": "latest",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",
