@@ -261,7 +261,7 @@
     "maprVMTemplate": "MapR.VM.Template",
     "maprOpenVPNTemplate": "MapR.OpenVPN.Template",
 
-    "deploymentsVersion": "2016-09-01",
+    "deploymentsVersion": "2018-05-01",
 
     "imagePublisher": "mapr-technologies",
     "imageOffer": "mapr60-base",
@@ -280,6 +280,19 @@
     }
   },
   "resources": [
+    {
+      "apiVersion": "[variables('deploymentsVersion')]",
+      "name": "pid-a1b3c42f-fa04-44bc-ad65-065538a8b40b",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        }
+      }
+    },
     {
       "name": "[variables('maprNetworkTemplate')]",
       "type": "Microsoft.Resources/deployments",
