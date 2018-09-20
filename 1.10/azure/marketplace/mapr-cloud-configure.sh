@@ -13,7 +13,7 @@ CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 MAPR_CORE_UNPREPPED="6.1.0"
 
 msg_err() {
-    echo "ERROR: $1"
+    echo "ERROR: $1" >&2
     exit 1
 }
 
@@ -148,6 +148,25 @@ package_version_suse() {
     fi
 }
 
+check_dns() {
+    local dns=$(hostname -d)
+    local first_char="${dns:0:1}"
+    local is_number
+
+    case $first_char in
+        ''|*[!0-9]*) is_number=0 ;;
+        *) is_number=1 ;;
+    esac
+
+    local dns_message="DNS Suffix is: ${dns}; First character of DNS Suffix is: ${first_char}"
+
+    if [ $is_number -eq 0 ]; then
+        echo $dns_message
+    else
+        msg_err "The DNS Suffix $dns starts with a number which is incompatible with OpenJDK keytool application. This cluster is invalid. Recreate the cluster again; $dns_message"
+    fi
+}
+
 if [ -f /opt/mapr/conf/mapr-clusters.conf ]; then
     echo "MapR is already installed; Not running Stanza again."
     exit 0
@@ -165,6 +184,10 @@ ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
 LICENSE_TYPE=${12}
+
+# IN-2012: Azure: Immediately fail installation with bad domain suffix (Post-GA)
+# See also: https://bugs.openjdk.java.net/browse/JDK-8054380
+check_dns
 
 # Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
@@ -228,6 +251,7 @@ echo "MAPR_CORE: $MAPR_CORE"
 
 . $MAPR_HOME/build/installer/bin/activate
 
+# UBUNTU: update-rc.d mapr-installer defaults
 systemctl enable mapr-installer
 service mapr-installer start || echo "Could not start mapr-installer service"
 wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
