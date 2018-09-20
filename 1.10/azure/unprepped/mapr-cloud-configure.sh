@@ -187,7 +187,7 @@ LICENSE_TYPE=${12}
 
 # IN-2012: Azure: Immediately fail installation with bad domain suffix (Post-GA)
 # See also: https://bugs.openjdk.java.net/browse/JDK-8054380
-checkDNS
+check_dns
 
 # Auto detect the MAPR_USER and change the MAPR_PASSWORD
 . ./mapr-init.sh $MAPR_PASSWORD
