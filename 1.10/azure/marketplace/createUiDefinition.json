@@ -122,7 +122,7 @@
             "constraints": {
               "allowedValues": [
                 {
-                  "label": "MapR Converged Cluster: Batch, interactive and real-time analytics",
+                  "label": "MapR Data Platform: Batch, interactive and real-time analytics",
                   "value": "template-05-converged"
                 },
                 {
@@ -134,15 +134,15 @@
                   "value": "template-20-drill"
                 },
                 {
-                  "label": "Analytics with MapR-DB",
+                  "label": "MapR Database (MapR-DB) for Analytics",
                   "value": "template-30-maprdb"
                 },
                 {
-                  "label": "Operational Applications with MapR-DB",
+                  "label": "MapR Database for Operational Applications",
                   "value": "template-30-maprdb2"
                 },
                 {
-                  "label": "Operational Applications with MapR-DB and Distributed Query Service",
+                  "label": "MapR Database and Distributed Query Service for Operational Applications",
                   "value": "template-30-maprdb3"
                 },
                 {
@@ -154,7 +154,7 @@
                   "value": "template-60-spark"
                 },
                 {
-                  "label": "Custom Configuration: Customize your MapR installation",
+                  "label": "Custom Services",
                   "value": "custom-configuration"
                 }
               ],

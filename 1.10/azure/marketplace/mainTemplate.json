@@ -65,6 +65,17 @@
     "serviceTemplate": {
       "type": "string",
       "defaultValue": "template-40-maprstreams",
+      "allowedValues": [
+        "template-05-converged",
+        "template-10-hadoop",
+        "template-20-drill",
+        "template-30-maprdb",
+        "template-30-maprdb2",
+        "template-30-maprdb3",
+        "template-40-maprstreams",
+        "template-60-spark",
+        "custom-configuration"
+      ],
       "metadata": {
         "description": "Services for specific use cases"
       }

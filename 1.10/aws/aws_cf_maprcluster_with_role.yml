@@ -20,8 +20,10 @@ Parameters:
   provisioningTemplate:
     Description: Auto-provisioning templates for specific use cases
     Type: String
-    AllowedValues: ["Converged-Platform", "Data-Lake", "Data-Exploration", "Operational-Analytics", "Operational-Analytics-using-MapR-DB", "Operational-Applications-using-MapR-DB-and-DQS", "Real-Time-Analytics-with-Spark", "Real-Time-Analytics-with-Streams", "Custom-Configuration" ]
-    Default: "Converged-Platform"
+    AllowedValues: ["MapR-Data-Platform", "Data-Lake", "Data-Exploration", "MapR-Database-Analytics",
+                    "MapR-Database-Operational-Analytics", "MapR-Database-DQS-Operational-Analytics",
+                    "Real-Time-Analytics-with-Spark", "Real-Time-Analytics-with-Streams", "Custom-Configuration" ]
+    Default: "MapR-Data-Platform"
   nodeCount:
     Description: Number of nodes in cluster
     Type: Number
@@ -169,7 +171,7 @@ Mappings:
     "Custom-Configuration":
       URL: ""
       serviceTemplate: ""
-    "Converged-Platform":
+    "MapR-Data-Platform":
       URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/aws/mapr-core.yml"
       serviceTemplate: "template-05-converged"
     "Data-Lake":
@@ -178,13 +180,13 @@ Mappings:
     "Data-Exploration":
       URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/aws/mapr-core.yml"
       serviceTemplate: "template-20-drill"
-    "Operational-Analytics":
+    "MapR-Database-Analytics":
       URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/aws/mapr-core.yml"
       serviceTemplate: "template-30-maprdb2"
-    "Operational-Analytics-using-MapR-DB":
+    "MapR-Database-Operational-Analytics":
       URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/aws/mapr-core.yml"
       serviceTemplate: "template-30-maprdb"
-    "Operational-Applications-using-MapR-DB-and-DQS":
+    "MapR-Database-DQS-Operational-Analytics":
       URL: "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/aws/mapr-core.yml"
       serviceTemplate: "template-30-maprdb3"
     "Real-Time-Analytics-with-Spark":
