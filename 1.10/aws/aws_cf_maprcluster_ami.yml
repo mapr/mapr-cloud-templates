@@ -63,9 +63,15 @@ Parameters:
     AllowedPattern: ".+"
     ConstraintDescription: must select an existing EC2 KeyPair
   instanceType:
+    # c5, m5, m5d, r5 and r5d not yet supported because of NVMe
     Description: AWS Instance types - https://aws.amazon.com/ec2/instance-types
     Type: String
-    AllowedValues: [ m4.xlarge, m4.2xlarge, m4.4xlarge, m4.10xlarge, m4.16xlarge, d2.xlarge, d2.2xlarge, d2.4xlarge, d2.8xlarge, h1.2xlarge, h1.4xlarge, h1.8xlarge, h1.16xlarge, i3.large, i3.xlarge, i3.2xlarge, i3.4xlarge, i3.8xlarge, m3.xlarge, m3.2xlarge, c4.2xlarge, c4.4xlarge, c4.8xlarge, c3.2xlarge, c3.4xlarge, c3.8xlarge, r4.large, r4.xlarge, r4.2xlarge, r4.4xlarge, r4.8xlarge, r3.large, r3.xlarge, r3.2xlarge, r3.4xlarge, r3.8xlarge  ]
+    AllowedValues: [ c4.2xlarge, c4.4xlarge, c4.8xlarge,
+                     d2.xlarge, d2.2xlarge, d2.4xlarge, d2.8xlarge,
+                     h1.2xlarge, h1.4xlarge, h1.8xlarge, h1.16xlarge,
+                     i3.large, i3.xlarge, i3.2xlarge, i3.4xlarge, i3.8xlarge,
+                     m4.xlarge, m4.2xlarge, m4.4xlarge, m4.10xlarge, m4.16xlarge,
+                     r4.large, r4.xlarge, r4.2xlarge, r4.4xlarge, r4.8xlarge ]
     Default: m4.xlarge
   amiId:
     Description: AMI to be used. Leave it empty to use default AMI
@@ -218,7 +224,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateVPC
     Properties:
-      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws/aws_cf_vpc_openvpn.yml
+      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws-6.1/aws_cf_vpc_openvpn.yml
       Parameters:
         name: !Ref clusterName
         publicAccessCIDR: !Ref publicAccessCIDR
@@ -229,7 +235,7 @@ Resources:
   ClusterNodes:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws/aws_cf_maprcluster_nodes.yml
+      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws-6.1/aws_cf_maprcluster_nodes.yml
       Parameters:
         clusterName: !Ref clusterName
         nodeCount: 0
