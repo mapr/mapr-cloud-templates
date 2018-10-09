@@ -275,8 +275,8 @@
 
     "imagePublisher": "mapr-technologies",
     "imageOffer": "mapr60-base",
-    "imageSKU": "60-byol",
-    "imageVersion": "1.9.0",
+    "imageSKU": "61-byol",
+    "imageVersion": "1.0.0",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",
       "offer": "[variables('imageOffer')]",
