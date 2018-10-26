@@ -118,7 +118,7 @@
             "name": "serviceTemplate",
             "label": "Provisioning template",
             "toolTip": "Auto-provisioning templates for specific use cases",
-            "defaultValue": "MapR Converged Cluster: Batch, interactive and real-time analytics",
+            "defaultValue": "MapR Data Platform: Batch, interactive and real-time analytics",
             "constraints": {
               "allowedValues": [
                 {
