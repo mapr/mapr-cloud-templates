@@ -433,6 +433,7 @@
             "type": "Microsoft.Common.TextBox",
             "constraints": {
               "regex": "^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\\$)$",
+              "validationMessage": "User must start with a letter or '_' and be 1 to 32 characters long. No special characters allowed.",
               "required": true
             },
             "defaultValue": "openvpn",
