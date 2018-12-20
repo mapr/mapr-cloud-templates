@@ -4,7 +4,7 @@
   "parameters": {
     "artifactsBaseUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.10/azure/marketplace",
+      "defaultValue": "https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.11/azure/marketplace",
       "metadata": {
         "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
       }

@@ -3,7 +3,8 @@
 RESULT=""
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
-PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
+MAPR_DATA_DIR="$MAPR_HOME/data"
+PROPERTIES_JSON="$MAPR_DATA_DIR/properties.json"
 MAPR_SUDOERS_FILE="/etc/sudoers.d/mapr_user"
 
 MAPR_PASSWORD="$1"
@@ -11,6 +12,11 @@ MAPR_PASSWORD="$1"
 msg_err() {
     echo "ERROR: $1"
     exit 1
+}
+
+mapr_is_image_finalized() {
+    local finalized="$MAPR_DATA_DIR/finalized"
+    [ ! -f $finalized ] && msg_err "The Azure image created during the development process was not finalized"
 }
 
 mapr_user_properties_json() {
@@ -105,6 +111,9 @@ passwordless_sudo() {
 [ -n "${HTTPS_PROXY}" ] && echo export https_proxy=${HTTPS_PROXY} >> $MAPR_HOME/conf/env
 [ -n "${NO_PROXY}" ] && echo export no_proxy=${NO_PROXY} >> $MAPR_HOME/conf/env
 [ -f $MAPR_HOME/conf/env ] && cat $MAPR_HOME/conf/env >> /etc/environment && . $MAPR_HOME/conf/env
+
+# Make sure the image has been finalized, otherwise fail the installation
+mapr_is_image_finalized
 
 mapr_user_properties_json $PROPERTIES_JSON
 echo "MapR user from properties file is: '$RESULT'"
