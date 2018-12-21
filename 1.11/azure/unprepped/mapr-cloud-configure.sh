@@ -7,7 +7,6 @@ INTERNAL="${INTERNAL_ONLY}-"
 MAPR="/opt/mapr"
 MAPR_HOME="$MAPR/installer"
 PROPERTIES_JSON="$MAPR_HOME/data/properties.json"
-STANZA_URL="https://raw.githubusercontent.com/mapr/mapr-cloud-templates/master/1.11/azure/unprepped/mapr-core.yml"
 STATUS="SUCCESS"
 CLI="cd $MAPR_HOME; bin/mapr-installer-cli"
 MAPR_CORE_UNPREPPED="6.1.0"
@@ -184,6 +183,7 @@ ADMIN_AUTH_TYPE=$9
 SUBSCRIPTION_ID=${10}
 TENANT_ID=${11}
 LICENSE_TYPE=${12}
+ARTIFACT_URL=${13}
 
 # IN-2012: Azure: Immediately fail installation with bad domain suffix (Post-GA)
 # See also: https://bugs.openjdk.java.net/browse/JDK-8054380
@@ -208,8 +208,12 @@ echo "MAPR_USER: $MAPR_USER"
 echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 echo "TENANT_ID: $TENANT_ID"
 echo "LICENSE_TYPE: $LICENSE_TYPE"
+echo "ARTIFACT_URL: $ARTIFACT_URL"
 echo "OS: $OS"
 echo "IS_PREPPED: $IS_PREPPED"
+
+STANZA_URL="${ARTIFACT_URL}/mapr-core.yml"
+echo "STANZA_URL: $STANZA_URL"
 
 create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
 NODE_LIST=$RESULT

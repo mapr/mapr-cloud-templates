@@ -319,7 +319,7 @@
             ]
           },
           "protectedSettings": {
-            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', variables('threeDotSubnetPrivate'), ' ', variables('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', subscription().subscriptionId, ' ', subscription().tenantId, ' ', parameters('licenseType'))]"
+            "commandToExecute": "[concat('bash mapr-cloud-configure.sh ', parameters('mepVersion'), ' ', parameters('clusterName'), ' ', parameters('clusterAdminPassword'), ' ', variables('threeDotSubnetPrivate'), ' ', variables('startOctet'), ' ', parameters('nodeCount'), ' ', parameters('serviceTemplate'), ' ', resourceGroup().name, ' ', parameters('adminAuthType'), ' ', subscription().subscriptionId, ' ', subscription().tenantId, ' ', parameters('licenseType'), ' ', parameters('artifactsBaseUrl'))]"
           }
         }
       }]
