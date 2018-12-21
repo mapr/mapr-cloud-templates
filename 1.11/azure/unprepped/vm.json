@@ -102,76 +102,18 @@
 
     "maprdataDiskCache": "ReadOnly",
     "maprdataDiskCreateOption": "Empty",
+
     "diskArray": [{
       "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 0,
+      "lun": "[copyIndex()]",
       "createOption": "[variables('maprdataDiskCreateOption')]",
       "caching": "[variables('maprdataDiskCache')]",
       "managedDisk": {
         "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 1,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 2,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 3,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 4,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 5,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 6,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
-      }
-    },
-    {
-      "diskSizeGB": "[parameters('diskSize')]",
-      "lun": 7,
-      "createOption": "[variables('maprdataDiskCreateOption')]",
-      "caching": "[variables('maprdataDiskCache')]",
-      "managedDisk": {
-        "storageAccountType": "[parameters('diskType')]"
+      },
+      "copy": {
+        "name": "diskcopy",
+        "count": "8"
       }
     }]
   },
