@@ -54,7 +54,9 @@
       "type": "string",
       "defaultValue" : "6.0.0",
       "allowedValues": [
-        "6.0.0"
+        "6.0.0",
+        "6.0.1",
+        "6.1.0"
       ],
       "metadata": {
         "description": "Type MEP version to install"
