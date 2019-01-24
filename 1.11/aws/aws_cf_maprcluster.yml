@@ -63,7 +63,6 @@ Parameters:
     AllowedPattern: ".+"
     ConstraintDescription: must select an existing EC2 KeyPair
   instanceType:
-    # c5, m5, m5d, r5 and r5d not yet supported because of NVMe
     Description: AWS Instance types - https://aws.amazon.com/ec2/instance-types
     Type: String
     AllowedValues: [ c5.2xlarge, c5.4xlarge, c5.9xlarge,
