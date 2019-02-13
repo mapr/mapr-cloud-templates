@@ -16,7 +16,7 @@ Parameters:
     Description: MapR Ecosystem Pack version
     Type: String
     AllowedValues: [ 6.0.0, 6.0.1, 6.1.0 ]
-    Default: 6.0.0
+    Default: 6.1.0
   provisioningTemplate:
     Description: Auto-provisioning templates for specific use cases
     Type: String
@@ -215,7 +215,7 @@ Mappings:
     #If you update these AMI, make sure to update the login user used in this template
     #Update with AMI before using the template
     us-east-1: # N Virginia
-      AMI: ami-035bdae2be5936e31
+      AMI: ami-056b5089480d1e8b0
     us-east-2: # Ohio
       AMI: ami-bdeec0d8
     us-west-1: # California

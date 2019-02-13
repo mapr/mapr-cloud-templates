@@ -16,7 +16,7 @@ Parameters:
     Description: MapR Ecosystem Pack version
     Type: String
     AllowedValues: [ 6.0.0, 6.0.1, 6.1.0 ]
-    Default: 6.0.0
+    Default: 6.1.0
   provisioningTemplate:
     Description: Auto-provisioning templates for specific use cases
     Type: String
