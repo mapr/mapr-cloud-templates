@@ -52,7 +52,7 @@
     },
     "mepVersion": {
       "type": "string",
-      "defaultValue" : "6.0.0",
+      "defaultValue" : "6.1.0",
       "allowedValues": [
         "6.0.0",
         "6.0.1",
@@ -278,7 +278,7 @@
     "imagePublisher": "mapr-technologies",
     "imageOffer": "mapr60-base",
     "imageSKU": "61-byol",
-    "imageVersion": "1.0.0",
+    "imageVersion": "1.1.0",
     "imageReference": {
       "publisher": "[variables('imagePublisher')]",
       "offer": "[variables('imageOffer')]",

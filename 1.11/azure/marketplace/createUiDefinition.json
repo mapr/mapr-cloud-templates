@@ -83,12 +83,20 @@
             "name": "mepVersion",
             "label": "MEP",
             "toolTip": "MapR Ecosystem Pack version",
-            "defaultValue": "6.0.0",
+            "defaultValue": "6.1.0",
             "constraints": {
               "allowedValues": [
                 {
                   "label": "6.0.0",
                   "value": "6.0.0"
+                },
+                {
+                  "label": "6.0.1",
+                  "value": "6.0.1"
+                },
+                {
+                  "label": "6.1.0",
+                  "value": "6.1.0"
                 }
               ],
               "required": true
@@ -202,8 +210,9 @@
                 "Standard_D16s_v3",
                 "Standard_D32s_v3",
                 "Standard_D64s_v3",
-                "Standard_F8s",
-                "Standard_F16s",
+                "Standard_F8s_v2",
+                "Standard_F16s_v2",
+                "Standard_F32s_v2",
                 "Standard_DS3_v2",
                 "Standard_DS4_v2",
                 "Standard_DS5_v2",
@@ -214,15 +223,17 @@
                 "Standard_E4s_v3",
                 "Standard_E8s_v3",
                 "Standard_E16s_v3",
+                "Standard_E20s_v3",
                 "Standard_E32s_v3",
+                "Standard_M32ls",
                 "Standard_GS2",
                 "Standard_GS3",
                 "Standard_GS4",
                 "Standard_GS5",
                 "Standard_L4s",
-                "Standard_L8s",
-                "Standard_L16s",
-                "Standard_L32s"
+                "Standard_L8s_v2",
+                "Standard_L16s_v2",
+                "Standard_L32s_v2"
               ]
             },
             "imageReference": {
