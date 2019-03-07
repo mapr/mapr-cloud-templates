@@ -220,9 +220,6 @@ NODE_LIST=$RESULT
 echo "NODE_LIST: $NODE_LIST"
 
 if [ "$IS_PREPPED" == "true" ]; then
-    echo "Upgrading MapR installer if necessary..."
-    /opt/mapr/installer/bin/mapr-setup.sh -y upgrade
-
     build_version
     BUILD_FILE_VERSION=$RESULT
     package_version_$OS
