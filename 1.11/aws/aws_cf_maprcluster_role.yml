@@ -36,6 +36,7 @@ Resources:
                 - "autoscaling:DeleteLaunchConfiguration"
                 - "autoscaling:UpdateAutoScalingGroup"
                 - "autoscaling:SuspendProcesses"
+                - "autoscaling:DisableMetricsCollection"
                 - "cloudformation:DescribeStack*"
                 - "cloudformation:GetTemplate"
                 - "cloudformation:UpdateStack"
