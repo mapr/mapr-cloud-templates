@@ -295,8 +295,8 @@ Resources:
             fi
 
             cd /tmp
-            wget -c http://swupdate.openvpn.org/as/openvpn-as-2.5-Ubuntu16.amd_64.deb
-            dpkg -i openvpn-as-2.5-Ubuntu16.amd_64.deb
+            wget -c http://swupdate.openvpn.org/as/openvpn-as-2.6.1-Ubuntu16.amd_64.deb
+            dpkg -i openvpn-as-2.6.1-Ubuntu16.amd_64.deb
             echo "openvpn:$admin_pw" | chpasswd
             sleep 5
 
