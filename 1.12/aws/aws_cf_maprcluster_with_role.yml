@@ -42,6 +42,7 @@ Parameters:
     Description: GB
     Type: Number
     Default: 100
+    MinValue: 31
   diskCount:
     Description: Number of EBS volumes per node
     Type: Number

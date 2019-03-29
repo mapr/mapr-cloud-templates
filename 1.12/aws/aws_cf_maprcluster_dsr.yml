@@ -18,6 +18,7 @@ Parameters:
     Description: GB (Total disk allocated will be 3x of the value specified)
     Type: Number
     Default: 100
+    MinValue: 31
   instanceType:
     Description: AWS Instance types - https://aws.amazon.com/ec2/instance-types
     Type: String
