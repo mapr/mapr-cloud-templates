@@ -31,7 +31,7 @@ config:
   #DOC license type (M3 = community edition, M5 = enterprise edition)
   license_type: M5
   #DOC MEP version (required only for Mapr 5.2.0 and above)
-  mep_version: 6.0
+  mep_version: 6.2.0
   #DOC list of disks to install packages on (required)
   #If you do not specifiy any disks, all available and usable disks will be used
   disks: []

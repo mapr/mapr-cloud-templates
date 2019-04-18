@@ -52,11 +52,12 @@
     },
     "mepVersion": {
       "type": "string",
-      "defaultValue" : "6.1.0",
+      "defaultValue" : "6.2.0",
       "allowedValues": [
         "6.0.0",
         "6.0.1",
-        "6.1.0"
+        "6.1.0",
+        "6.2.0"
       ],
       "metadata": {
         "description": "Type MEP version to install"
