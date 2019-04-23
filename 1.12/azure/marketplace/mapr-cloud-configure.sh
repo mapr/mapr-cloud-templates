@@ -205,6 +205,7 @@ echo "SERVICE_TEMPLATE: $SERVICE_TEMPLATE"
 echo "RESOURCE_GROUP: $RESOURCE_GROUP"
 echo "ADMIN_AUTH_TYPE: $ADMIN_AUTH_TYPE"
 echo "MAPR_USER: $MAPR_USER"
+echo "MAPR_GROUP: $MAPR_GROUP"
 echo "SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
 echo "TENANT_ID: $TENANT_ID"
 echo "LICENSE_TYPE: $LICENSE_TYPE"
@@ -260,7 +261,7 @@ wait_for_connection https://localhost:9443 || msg_err "Could not run curl"
 INPUT=$MAPR_HOME/conf/stanza_input.yml
 rm -f $INPUT
 touch $INPUT
-chown $MAPR_USER:$MAPR_USER $INPUT || msg_err "Could not change owner to $MAPR_USER"
+chown $MAPR_USER:$MAPR_GROUP $INPUT || msg_err "Could not change owner to $MAPR_USER"
 
 if [ "$SERVICE_TEMPLATE" == "custom-configuration" ]; then
     create_node_list $START_OCTET $NODE_COUNT $THREE_DOT_SUBNET_PRIVATE
@@ -297,6 +298,7 @@ else
     echo "config.mep_version=$MEP " >> $INPUT
     echo "config.cluster_name=$CLUSTER_NAME " >> $INPUT
     echo "config.cluster_admin_id=$MAPR_USER " >> $INPUT
+    echo "config.cluster_admin_group=$MAPR_GROUP " >> $INPUT
     echo "config.hosts=$NODE_LIST " >> $INPUT
     echo "config.license_type=$LICENSE_TYPE " >> $INPUT
     echo "config.provider.config.resource_group=$RESOURCE_GROUP " >> $INPUT
