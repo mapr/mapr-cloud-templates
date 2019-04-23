@@ -15,8 +15,10 @@ msg_err() {
 }
 
 mapr_is_image_finalized() {
+    echo "Checking Azure image finalization"
     local finalized="$MAPR_DATA_DIR/finalized"
     [ ! -f $finalized ] && msg_err "The Azure image created during the development process was not finalized"
+    echo "The Azure image has been properly finalized"
 }
 
 mapr_user_properties_json() {
@@ -72,10 +74,33 @@ compare_users() {
     msg_err "Could not find User '$1' or '$2' is in the list of OS users"
 }
 
+compare_groups() {
+    if [ "$1" = "$2" ] ; then
+        echo "Groups  match: '$1' = '$2'"
+    else
+        echo "WARNING: group '$1' does not match group '$2'"
+    fi
+
+    id -g $1 > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Group '$1' exists"
+        RESULT="$1"
+        return
+    fi
+    id -g $2 > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Group '$2' exists"
+        RESULT="$2"
+        return
+    fi
+
+    msg_err "Could not find Group '$1' or '$2' is in the list of OS groups"
+}
+
 create_user_and_group() {
-    groupadd -g 5000 $MAPR_USER
-    [ $? -ne 0 ] && msg_err "Could not add group $MAPR_USER"
-    echo "Group $MAPR_USER created"
+    groupadd -g 5000 $MAPR_GROUP
+    [ $? -ne 0 ] && msg_err "Could not add group $MAPR_GROUP"
+    echo "Group $MAPR_GROUP created"
     useradd -g 5000 -m -u 5000 $MAPR_USER
     [ $? -ne 0 ] && msg_err "Could not add user $MAPR_USER"
     echo "User $MAPR_USER created"
@@ -123,10 +148,20 @@ mapr_owner_properties_json $PROPERTIES_JSON
 echo "MapR user from file owner is: '$RESULT'"
 MAPR_PROPERTIES_OWNER=$RESULT
 
-if [ -z "${MAPR_USER_PROPERTIES}" -a -z "${MAPR_PROPERTIES_OWNER}" ]; then
+mapr_group_properties_json $PROPERTIES_JSON
+echo "MapR group from properties file is: '$RESULT'"
+MAPR_GROUP_PROPERTIES=$RESULT
+
+mapr_owner_group_properties_json $PROPERTIES_JSON
+echo "MapR group from file owner is: '$RESULT'"
+MAPR_PROPERTIES_GROUP=$RESULT
+
+if [ -z "${MAPR_USER_PROPERTIES}" ] && [ -z "${MAPR_GROUP_PROPERTIES}" ] &&
+   [ -z "${MAPR_PROPERTIES_OWNER}" ] && [ -z "{$MAPR_PROPERITIES_GROUP}" ]; then
     echo "A MapR user was not found so this installation will proceed as an unprepped image install."
     IS_PREPPED="false"
     MAPR_USER="mapr"
+    MAPR_GROUP="mapr"
     create_user_and_group
     sudoers_add
 else
@@ -134,8 +169,11 @@ else
     IS_PREPPED="true"
     compare_users $MAPR_USER_PROPERTIES $MAPR_PROPERTIES_OWNER
     MAPR_USER=$RESULT
+    compare_groups $MAPR_GROUP_PROPERTIES $MAPR_PROPERTIES_GROUP
+    MAPR_GROUP=$RESULT
 fi
 
 echo "MapR user is: $MAPR_USER"
+echo "MapR group is: $MAPR_GROUP"
 change_password $MAPR_USER $MAPR_PASSWORD
 passwordless_sudo
