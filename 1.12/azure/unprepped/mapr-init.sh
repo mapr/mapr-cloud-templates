@@ -58,13 +58,13 @@ compare_users() {
         echo "WARNING: user '$1' does not match user '$2'"
     fi
 
-    id -u $1 > /dev/null
+    id -u $1
     if [ $? -eq 0 ]; then
         echo "User '$1' exists"
         RESULT="$1"
         return
     fi
-    id -u $2 > /dev/null
+    id -u $2
     if [ $? -eq 0 ]; then
         echo "User '$2' exists"
         RESULT="$2"
@@ -81,13 +81,13 @@ compare_groups() {
         echo "WARNING: group '$1' does not match group '$2'"
     fi
 
-    id -g $1 > /dev/null
+    getent group $1
     if [ $? -eq 0 ]; then
         echo "Group '$1' exists"
         RESULT="$1"
         return
     fi
-    id -g $2 > /dev/null
+    getent group $2
     if [ $? -eq 0 ]; then
         echo "Group '$2' exists"
         RESULT="$2"
