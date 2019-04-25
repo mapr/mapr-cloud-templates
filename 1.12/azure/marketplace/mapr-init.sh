@@ -21,8 +21,8 @@ mapr_is_image_finalized() {
     echo "The Azure image has been properly finalized"
 }
 
-mapr_user_properties_json() {
-    local KEY=cluster_admin_id
+mapr_get_properties_json() {
+    local KEY=$2
 
     if [ ! -f "$1" ]; then
         echo "WARNING: $1 file not found"
@@ -30,14 +30,14 @@ mapr_user_properties_json() {
         return
     fi
 
-    grep -Po '"cluster_admin_id":.*?[^\\]",' $1 > /dev/null
+    grep -Po '"'$KEY'":.*?[^\\]",' $1 > /dev/null
     if [ $? -ne 0 ]; then
-        echo "WARNING: Could not find cluster_admin_id in $1"
+        echo "WARNING: Could not find $KEY in $1"
         RESULT=""
         return
     fi
 
-    RESULT="$(sed -n 's/.*"cluster_admin_id": "\(.*\)",/\1/p' $1)"
+    RESULT="$(sed -n 's/.*"'$KEY'": "\(.*\)",/\1/p' $1)"
 }
 
 mapr_owner_properties_json() {
@@ -49,6 +49,17 @@ mapr_owner_properties_json() {
     fi
 
     RESULT="$(echo $output | awk 'NR==1 {print $3}')"
+}
+
+mapr_owner_group_properties_json() {
+    local output=$(ls -l $1)
+    if [ -z "${output}" ]; then
+        echo "WARNING: Could not ls $1"
+        RESULT=""
+        return
+    fi
+
+    RESULT="$(echo $output | awk 'NR==1 {print $4}')"
 }
 
 compare_users() {
@@ -140,7 +151,8 @@ passwordless_sudo() {
 # Make sure the image has been finalized, otherwise fail the installation
 mapr_is_image_finalized
 
-mapr_user_properties_json $PROPERTIES_JSON
+mapr_get_properties_json $PROPERTIES_JSON cluster_admin_id
+
 echo "MapR user from properties file is: '$RESULT'"
 MAPR_USER_PROPERTIES=$RESULT
 
@@ -148,7 +160,7 @@ mapr_owner_properties_json $PROPERTIES_JSON
 echo "MapR user from file owner is: '$RESULT'"
 MAPR_PROPERTIES_OWNER=$RESULT
 
-mapr_group_properties_json $PROPERTIES_JSON
+mapr_get_properties_json $PROPERTIES_JSON cluster_admin_group
 echo "MapR group from properties file is: '$RESULT'"
 MAPR_GROUP_PROPERTIES=$RESULT
 
