@@ -9,3 +9,5 @@ Installer v1.6 Released with MapR core v5.2.2 and MEP v3.0.x
 ### 02/2019: v1.11 Public Released and latest version. Use this.
 
 ### 03/2019: v1.12 In development. Do not use.
+
+### 04/2019: v1.13 In development. Do not use.
