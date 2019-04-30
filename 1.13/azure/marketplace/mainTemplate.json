@@ -114,6 +114,13 @@
         "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
       }
     },
+    "bootDiagnostics": {
+      "type": "string",
+      "defaultValue": "no",
+      "metadata": {
+        "description": "Enable boot diagnostics for virtual machines"
+      }
+    },
     "diskSize":  {
       "type": "int",
       "minValue": 63,
@@ -484,6 +491,9 @@
           },
           "serviceTemplate": {
             "value": "[parameters('serviceTemplate')]"
+          },
+          "bootDiagnostics": {
+            "value": "[parameters('bootDiagnostics')]"
           },
           "subnetRefPrivate": {
             "value": "[variables('subnetRefPrivate')]"

@@ -53,6 +53,9 @@
     "serviceTemplate": {
       "type": "string"
     },
+    "bootDiagnostics": {
+      "type": "string"
+    },
     "subnetRefPrivate": {
       "type": "string"
     },
@@ -78,6 +81,7 @@
   "variables": {
     "computeApiVersion": "2018-06-01",
     "networkApiVersion": "2018-07-01",
+    "storageApiVersion": "2019-04-01",
     "nodeCountSansInstaller": "[sub(parameters('nodeCount'), 1)]",
     "nonDotClusterName": "[replace(parameters('clusterName'), '.', '-')]",
 
@@ -89,6 +93,7 @@
 
     "uniqueString": "[concat(subscription().subscriptionId, deployment().name, subscription().tenantId)]",
     "unusedPassword": "[concat('A@l5', uniqueString(resourceGroup().id, variables('uniqueString')))]",
+    "storageAccountName": "[concat('store', uniquestring(resourceGroup().id))]",
 
     "linuxConfiguration": {
       "disablePasswordAuthentication": "false",
@@ -247,13 +252,26 @@
     },
 
     {
+      "condition": "[equals(parameters('bootDiagnostics'), 'yes')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2"
+    },
+
+    {
       "apiVersion": "[variables('computeApiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('maprvmName'), '0')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('maprnicName'), '0'))]",
-        "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+        "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
       ],
       "plan": "[parameters('plan')]",
       "tags": {
@@ -263,6 +281,12 @@
         "cluster": "[parameters('clusterName')]"
       },
       "properties": {
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "[equals(parameters('bootDiagnostics'), 'yes')]",
+            "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), variables('storageApiVersion')).primaryEndpoints.blob)]"
+          }
+        },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
         },
