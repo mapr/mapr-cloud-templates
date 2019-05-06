@@ -332,6 +332,26 @@
               "validationMessage": "Disk sizes must be a number between 63 and 4095"
             },
             "defaultValue": "127"
+          },
+          {
+            "name": "bootDiagnostics",
+            "label": "Boot diagnostics",
+            "toolTip": "Enable boot diagnostics for VM",
+            "type": "Microsoft.Common.DropDown",
+            "defaultValue": "no",
+            "constraints": {
+              "allowedValues": [
+                {
+                  "label": "yes",
+                  "value": "yes"
+                },
+                {
+                  "label": "no",
+                  "value": "no"
+                }
+              ],
+              "required": true
+            }
           }
         ]
       },
@@ -520,6 +540,7 @@
       "diskType": "[steps('nodeConfig').diskType]",
       "diskSize": "[int(steps('nodeConfig').diskSize)]",
       "diskCount": "[int(steps('nodeConfig').diskCount)]",
+      "bootDiagnostics": "[int(steps('nodeConfig').bootDiagnostics)]",
       "publicAccessCIDR": "[steps('accessSecurity').publicAccessCIDR]",
       "installOpenVPN": "[steps('accessSecurity').installOpenVPN]",
       "openVpnUser": "[steps('accessSecurity').openVpnUser]",
