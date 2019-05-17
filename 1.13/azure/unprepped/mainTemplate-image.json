@@ -94,7 +94,7 @@
       "type": "string",
       "defaultValue": "Standard_E2s_v3",
       "metadata": {
-        "description": "User name for the virtual machine"
+        "description": "Azure instance type for the virtual machine"
       }
     },
     "diskType": {
@@ -112,7 +112,7 @@
       "type": "string",
       "defaultValue" : "M5",
       "metadata": {
-        "description": "Disk type to use for managed disks (Premium_LRS, Standard_LRS)"
+        "description": "License type"
       }
     },
     "bootDiagnostics": {
