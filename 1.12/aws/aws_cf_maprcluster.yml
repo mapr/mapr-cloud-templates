@@ -403,6 +403,7 @@ Resources:
               echo "$services " >> $input
               cd $M_HOME
               cmd="bin/mapr-installer-cli install -f -n -t $url -u $M_USER:$M_USER_PWD@localhost:9443 -o @$input -o config.cluster_admin_password=$M_USER_PWD -o config.db_admin_password=$M_USER_PWD -o config.metrics_ui_admin_password=$M_USER_PWD"
+              sleep 60 # should do some kind of waitfor ssh connectivity
               sudo -u $M_USER $cmd > /tmp/out 2> /tmp/error || status="FAILURE"
               if [ "$status" == "SUCCESS" ]; then
                 t=$(curl -s -k  "https://$M_USER:$M_USER_PWD@localhost:9443/api/config/services?name=mapr-webserver")
