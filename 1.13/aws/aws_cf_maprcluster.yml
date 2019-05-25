@@ -338,7 +338,7 @@ Resources:
             M_USER=$(grep installer_admin_id "$M_HOME/data/properties.json" | cut -d\" -f4)
             M_GROUP=$(grep installer_admin_group "$M_HOME/data/properties.json" | cut -d\" -f4)
             echo "$M_USER:$M_USER_PWD" | chpasswd
-            if ( $? != 0); then
+            if [ $? != 0 ]; then
               echo "{ \"Status\" : \"FAILURE\", \"UniqueId\" : \"${clusterName}\", \"Data\" : \"Unable to reset password for $M_USER\", \"Reason\" : \"Unable to reset password for $M_USER\" }" > $statusFile
               curl -T $statusFile '${InstallWaitHandle}'
               exit 1
@@ -415,7 +415,7 @@ Resources:
               else
                 reason=$(tail -1 $M_HOME/logs/installer-cli.log)
                 hostname=$(hostname -f)
-                [ -z $reason ] && reason="Unable to determine failure reason. Probably failed early provisiong AWS resources. Check installer logs at https://$hostname:9443."
+                [ -z "$reason" ] && reason="Unable to determine failure reason. Probably failed early provisiong AWS resources. Check installer logs at https://$hostname:9443."
               fi
             else
               input=$M_HOME/conf/config.yml
@@ -448,7 +448,7 @@ Resources:
               if [ "$status" == "FAILURE" ]; then
                 reason=$(tail -1 $M_HOME/logs/installer-cli.log)
                 hostname=$(hostname -f)
-                [ -z $reason ] && reason="Unable to determine failure reason. Check installer logs at https://$hostname:9443."
+                [ -z "$reason" ] && reason="Unable to determine failure reason. Check installer logs at https://$hostname:9443."
               fi
             fi
             echo "{ \"Status\" : \"$status\", \"UniqueId\" : \"${clusterName}\", \"Data\" : \"$data\", \"Reason\" : \"$reason\" }" > $statusFile
