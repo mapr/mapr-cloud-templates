@@ -284,7 +284,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "[equals(parameters('bootDiagnostics'), 'yes')]",
-            "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), variables('storageApiVersion')).primaryEndpoints.blob)]"
+            "storageUri": "[if(equals(parameters('bootDiagnostics'), 'yes'), concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), variables('storageApiVersion')).primaryEndpoints.blob), json('null'))]"
           }
         },
         "availabilitySet": {
