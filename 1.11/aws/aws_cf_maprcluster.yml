@@ -214,36 +214,36 @@ Mappings:
   RegionMap:
     #If you update these AMI, make sure to update the login user used in this template
     #Update with AMI before using the template
-    us-east-1: # N Virginia
-      AMI: ami-056b5089480d1e8b0
+    us-east-1: # N Viriginia
+      AMI: ami-0f36bedd4bcf440b5
     us-east-2: # Ohio
-      AMI: ami-bdeec0d8
+      AMI: ami-03f323abc59150689
     us-west-1: # California
-      AMI: ami-55310935
+      AMI: ami-0a565bc473c9dbdd4
     us-west-2: # Oregon
-      AMI: ami-b6ed3fce
+      AMI: ami-08d28d7eededd4e12
     us-gov-west-1: # AWS GovCloud
-      AMI: ami-df54ddbe
-    ca-central-1: # Québec
-      AMI: ami-ac9a21c8
+      AMI: ami-24285845
+    ca-central-1: # Qu?bec
+      AMI: ami-08e6813ff511cc2a9
     eu-central-1: # Frankfurt
-      AMI: ami-627bf80d
+      AMI: ami-079dd1dc0b29b5d5a
     eu-west-1: # Ireland
-      AMI: ami-9802b7e1
+      AMI: ami-0e89a7124a1fe84be
     eu-west-2: # London
-      AMI: ami-27223d43
+      AMI: ami-052eb969155f4a4d3
     ap-southeast-1: # Singapore
-      AMI: ami-82d387e1
+      AMI: ami-06b0ae65ee50c500b
     ap-southeast-2: # Sydney
-      AMI: ami-53698231
+      AMI: ami-030ef05195ecacdc8
     ap-south-1 : # Mumbai
-      AMI: ami-8fb6f9e0
-    ap-northeast-1: # Tokyo
-      AMI: ami-40398a26
+      AMI: ami-012621e29966bbd09
+    ap-northeast-1: # Tokoyo
+      AMI: ami-0db0117f20e2e8da1
     ap-northeast-2: # Seoul
-      AMI: ami-9e8225f0
-    sa-east-1: # São Paulo
-      AMI: ami-665e1b0al
+      AMI: ami-0ced98f7985ac1323
+    sa-east-1: # S?o Paulo
+      AMI: ami-04b0baa1c234d0b02
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
