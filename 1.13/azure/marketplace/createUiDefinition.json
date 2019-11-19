@@ -83,7 +83,7 @@
             "name": "mepVersion",
             "label": "MEP",
             "toolTip": "MapR Ecosystem Pack version",
-            "defaultValue": "7.0.0",
+            "defaultValue": "6.3.0",
             "constraints": {
               "allowedValues": [
                 {
@@ -99,6 +99,10 @@
                   "value": "6.0.2"
                 },
                 {
+                  "label": "6.0.3",
+                  "value": "6.0.3"
+                },
+                {
                   "label": "6.1.0",
                   "value": "6.1.0"
                 },
@@ -107,12 +111,20 @@
                   "value": "6.1.1"
                 },
                 {
+                  "label": "6.1.2",
+                  "value": "6.1.2"
+                },
+                {
                   "label": "6.2.0",
                   "value": "6.2.0"
                 },
                 {
-                  "label": "7.0.0",
-                  "value": "7.0.0"
+                  "label": "6.2.1",
+                  "value": "6.2.1"
+                },
+                {
+                  "label": "6.3.0",
+                  "value": "6.3.0"
                 }
               ],
               "required": true
