@@ -69,8 +69,8 @@ Mappings:
   Variables:
     Keys:
       SSHUSER: "centos"
-      MAPRCORE: "6.2.0"
-      MEP: "7.0.0"
+      MAPRCORE: "6.1.0"
+      MEP: "6.3.0"
       # Values for this template
       provisioningTemplate: "Real-Time-Analytics-with-Spark"
       diskType: "gp2"

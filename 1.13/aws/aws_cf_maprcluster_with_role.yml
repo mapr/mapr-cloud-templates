@@ -173,7 +173,7 @@ Mappings:
   Variables:
     Keys:
       SSHUSER: "centos"
-      MAPRCORE: "6.2.0"
+      MAPRCORE: "6.1.0"
       # Update the proxy settings if your environment requires proxy. NOPROXY must include 169.254.169.254,localhost
       HTTPPROXY: ""
       HTTPSPROXY: ""
@@ -244,7 +244,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: CreateVPC
     Properties:
-      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws-installer-1.13/aws_cf_vpc_openvpn.yml
+      TemplateURL: https://hpe-mapr-installer.s3.us-east-2.amazonaws.com/templates/aws-installer-1.13/aws_cf_vpc_openvpn.yml
       Parameters:
         name: !Ref clusterName
         publicAccessCIDR: !Ref publicAccessCIDR
@@ -255,7 +255,7 @@ Resources:
   ClusterNodes:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws-installer-1.13/aws_cf_maprcluster_nodes.yml
+      TemplateURL: https://hpe-mapr-installer.s3.us-east-2.amazonaws.com/templates/aws-installer-1.13/aws_cf_maprcluster_nodes.yml
       Parameters:
         clusterName: !Ref clusterName
         nodeCount: 0
@@ -282,7 +282,7 @@ Resources:
   ClusterRole:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.us-east-2.amazonaws.com/mapr-installer/templates/aws-6.1/aws_cf_maprcluster_role.yml
+      TemplateURL: https://hpe-mapr-installer.s3.us-east-2.amazonaws.com/templates/aws-installer-1.13/aws_cf_maprcluster_role.yml
       Parameters:
         name: !Ref "AWS::StackName"
   InstallWaitHandle:
